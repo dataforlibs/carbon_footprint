@@ -1,0 +1,97 @@
+<!OADOCTYPE html>
+<meta charset="utf-8">
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v4.js"></script>
+
+<!-- Create a div where the graph will take place -->
+<div id="my_dataviz"></div>
+
+
+<script>
+
+// set the dimensions and margins of the graph
+var margin = {top: 20, right: 30, bottom: 30, left: 60},
+    width = 1250 - margin.left - margin.right,
+    height = 700 - margin.top - margin.bottom;
+
+// append the svg object to the body of the page
+var svg = d3.select("#my_dataviz")
+  .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
+// Parse the Data
+d3.csv("topics_over_time3_selenay.csv", function(data) {
+
+  // List of groups = header of the csv files
+    var keys = data.columns.slice(1);
+//    console.log(keys);
+   // console.log(d3.extent(data, function(d) { return new Date(d.Timestamp); }));
+  // Add X axis
+  var x = d3.scaleTime()
+      .domain(d3.extent(data, function(d) { return new Date(d.date1); }))
+    .range([ 0, width ]);
+  svg.append("g")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x).ticks(12));
+
+  // Add Y axis
+  var y = d3.scaleLog()
+    .domain([0.01, 1000])
+    .range([ height, 0 ]);
+  svg.append("g")
+    .call(d3.axisLeft(y));
+
+  // color palette
+    var color = d3.scaleOrdinal(d3.schemeCategory20);
+
+
+var tip = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
+//stack the data?
+  var stackedData = d3.stack()
+    //.offset(d3.stackOffsetSilhouette)
+    .keys(keys)
+    (data)
+    console.log(stackedData);
+  // Show the areas
+  svg
+    .selectAll("mylayers")
+    .data(stackedData)
+    .enter()
+.append("path")
+	.attr("class",function(d){return "class_"+d.key.toString().replaceAll(",","").replaceAll(" ","")})
+.style("fill", function(d) { return color(d.key); })
+.style("stroke","black")
+.style("stroke-width","0.01px")
+    .attr("d", d3.area()
+          .x(function(d, i) { return x(new Date(d.data.date1)); })
+            .y0(function(d) { return y(d[0]+0.01); })
+        .y1(function(d) { return y(d[1]+0.01); })
+).on("mouseover", function(d) {
+  tip.style("opacity", 1)
+     .html( d.key )
+     .style("left", (d3.event.pageX-25) + "px")
+.style("top", (d3.event.pageY-75) + "px")
+d3.selectAll("path").style("opacity",0.2);
+d3.select(this).style("opacity",1);
+    d3.selectAll(".class_"+d.key.toString().replaceAll(",","").replaceAll(" ","")).style("opacity",1);
+  })
+  .on("mouseout", function(d) {
+tip.style("opacity", 0)
+d3.selectAll("path").style("opacity",0.8);
+//d3.select(this).style("opacity",1);
+  });
+
+
+})
+</script>
+</body>
+</html>
+

@@ -1,0 +1,1908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  <title>Carbon Footprint Research Analysis</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    
+     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/dc/4.2.3/style/dc.css">
+     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+
+     <link rel="stylesheet" type="text/css" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.dataTables.min.css">
+     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.4.0/css/select.dataTables.min.css">
+    
+     <link rel="stylesheet" href="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.min.css">
+     <link href='https://cdnjs.cloudflare.com/ajax/libs/foundicons/3.0.0/foundation-icons.css' rel='stylesheet' type='text/css'>
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.4.3/css/foundation-prototype.min.css">
+     <!----<link rel="stylesheet" type="text/css" href="final_style.css">--->
+
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.js"></script>
+
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+      <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+      <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+      <script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/select/1.4.0/js/dataTables.select.min.js"></script>
+    
+    <style>
+ .title-bar{
+
+ background-image: linear-gradient(to right,#3174f4,#3cb1fb);
+
+        }
+
+      
+        #chart{
+
+          
+        }
+        button {
+  /*background-color: #4CAF50; /* Green */
+  /*border: 1 px;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;*/
+        }
+        #search2{
+
+          box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+  border: 1px solid #f37361;
+  border-radius: 12px;
+
+  line-height: 1;
+  margin-bottom: 10px;
+  padding-left: 10px;
+  font-size: 1rem !important;
+        }
+#b_one,#b_two{
+  border: 2px solid #f37361 !important;
+  background-color: white; /* Green */
+            border: 1px solid #f37361;
+            color: #f37361;
+            border-radius: 12px;
+            border-color: #f37361;
+            /*padding: 15px 32px;*/
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+            width: 30% !important; height: 2rem !important; margin-bottom: 10px; position: relative;top:-2px;padding-left: 10px;
+            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+  border: 1px solid #f37361;
+  border-radius: 12px;
+}
+#b_one:hover,#b_two:hover {
+background:#f37361;
+  color: white;
+}
+        
+
+#search,#clear{
+
+background-color: white; /* Green */
+          border: 1px solid #f37361;
+          color: #f37361;
+          border-radius: 12px;
+          border-color: #f37361;
+          /*padding: 15px 32px;*/
+          text-align: center;
+          text-decoration: none;
+          display: inline-block;
+          font-size: 16px;
+          box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+          width: 50% !important; 
+          height: 2rem !important; margin-bottom: 10px; position: relative;top:-2px;padding-left: 10px;
+          box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+border: 1px solid #f37361;
+border-radius: 12px;
+}
+#search:hover,#clear:hover {
+background:#f37361;
+color: white;
+}
+        
+        #chart {
+            
+            margin: 30px;
+            height: 33rem;
+        }
+
+    .dc-table-group {
+         visibility: collapse;
+ }
+        
+tr.dc-table-row.sel-rows {
+     background-color: lightblue;
+}
+        #example1_wrapper, #example1, #chart{
+            
+            margin: 30px;
+        }
+        #example1_length {
+            margin-left: 30px;
+            
+        }
+    /* EOS */
+
+    .my_primary{
+            margin:5% auto; 
+          width: 90%;
+          color: white !important;
+          
+font-family: 'Times New Roman';
+font-size: 150%;
+font-weight: 900 !important;
+/*font-style: oblique;*/
+
+          background-color:black !important;
+        }
+        .text,p{
+
+            margin:0 10% 0 10%; 
+          width: 80%;
+
+
+          margin-top: .2rem;
+margin-bottom: .5rem;
+font-weight: 400;
+line-height: 1.4;
+
+/*color: #8a8a8a;*/
+
+        }
+        p{
+            text-indent: 50px;
+font-weight: 400;
+line-height: 1.4;
+/*color: #8a8a8a;*/
+margin-bottom: 30px; /* between paragraphs */
+}
+
+
+h1{
+    
+    /*font-size:1.5em;*/
+    color:#f37361;
+margin:0 auto; 
+width: 50%;
+font-style: oblique;
+}
+
+#canvas_root1 path.domain{
+stroke-width:2px;
+
+}
+#canvas_root1 g.tick text{
+font-size: 16px;
+
+}
+#ts{
+  text-align: center;
+}
+
+#logo {
+    width: 10%;
+    height:10%;
+ }
+ #example1_wrapper{
+width:80%;
+ }
+  </style>
+
+
+  
+</head>
+<body>
+
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <ul class="dropdown menu" data-dropdown-menu="" role="menubar" data-e="uqku92-e">
+        <li class="menu-text" role="menuitem">Carbon Footprint Research Analysis</li>
+        <li role="menuitem"><a href="https://dataforlibs.github.io/carbon_footprint/lifepaths/countries_lifepaths.html">Countries' Lifepaths</a></li>
+        <li role="menuitem"><a href="https://dataforlibs.github.io/carbon_footprint/lifepaths/author_lifepaths.html">Authors' Lifepaths</a></li>
+        <li role="menuitem"><a href="https://dataforlibs.github.io/carbon_footprint/topics/index.html">Topics</a></li>
+      </ul>
+    </div>
+    <div class="top-bar-right">
+      
+    </div>
+</div>
+
+
+
+<h1>Countries' Lifepaths</h1>
+
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-BF1QXCXCMZ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-BF1QXCXCMZ');
+</script>
+    <!-- Google tag (gtag.js) -->
+<!----
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-K34DKXYLYX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-K34DKXYLYX');
+</script>
+--->
+  
+<!----
+ <div class="title-bar"
+         data-responsive-toggle="example-menu"
+         data-hide-for="medium">
+
+      <div id="example-menu">
+      <ul class="menu icons icon-left">
+
+        <li><a href="../index.html"><img src="../logo_small.png" id="logo" alt="Long COVID Observatory"> Long COVID Observatory</a></li>
+        <li><a href="../tree.html">Long COVID Trees</a></li>  
+       <li><a href="lifepaths.html"  class="focus">Long COVID Terms' Lifepaths</a></li>
+      </ul>
+
+      </div>
+      </div>
+--->
+    <div class="text-center">
+    <h1></h1>
+    </div>
+     <div class="grid-x grid-margin-x" id="content" data-mutate="xow22x-sticky" data-events="mutate">
+          <div class="small-9 medium-9 large-9 cell">
+  
+
+            
+                    
+                  <div id="dc-table-graph" style="visibility:hidden"></div>  
+<button id="b_one" type="button" style="border: 2px solid black;margin-left:30px;" onclick="changeColor('classification')">Classification</button>
+<button id="b_two" type="button" onclick="changeColor('number')">Number of documents</button> 
+
+<div id="chart"></div>  
+
+</div>
+
+
+
+<div class="small-3 medium-3 large-3 cell">
+
+    <div data-anchor="content" data-resize="xow22x-sticky" data-mutate="xow22x-sticky" data-e="2uixt7-e" style="max-width: 250px; margin-top: 5em; bottom: auto; top: 0px;" data-events="mutate"> 
+        <div id="ts"></div>  
+         <div id="ts_table" style="overflow: auto; line-height: 1;"></div> 
+    </div>
+  </div>
+</div>
+<div class="grid-x grid-margin-x" data-mutate="xow22x-sticky" data-events="mutate">
+
+  <div class="small-12 medium-12 large-12 cell">
+<table id="example1" class="display" style="width:100%">
+        <thead>
+            <tr>
+     
+                <th>Term</th>
+                <th>#of articles</th>
+                <th>Start Year</th>
+                <th>End Year</th>
+                <th>#of Days</th>
+                <th>Status</th>
+                 <th>Active</th>
+               
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+      
+                <th>Term</th>
+                <th>#of articles</th>
+                <th>Start Year</th>
+                <th>End Year</th>
+                <th>#of Days</th>
+                  <th>Status</th>
+                 <th>Active</th>
+            </tr>
+        </tfoot>
+    </table>   
+              </div>
+        </div>
+         
+
+        
+
+
+<script>//<![CDATA[
+var cc={"red":"#f37361","black":"black","green":"#6ca443","blue":"#3174f4"};     
+        var filteredrows;
+        var res=[];
+        var data = {"data":[]};    
+        var current=[1];
+    var colorScale;
+    var colorScale2;
+    var dd1=[];
+    colorScale2 = d3.scaleLinear()
+    .domain([-10,1,56])//10,50,300,
+    .range(["#446383","#f37361","yellow"]);//"blue","black"]);//"white","yellow","red",
+        
+    function changeColor(val) {
+
+        current=[];
+//var cc={"red":"#f37361","black":"black","green":"#6ca443","blue":"#3174f4"};
+        d3.select(".legend").remove();
+        d3.selectAll("button").style("border","0px solid black");
+    if (val=="classification") {
+        d3.selectAll("#canvas_root1 circle").attr('fill', function (d) {  return cc[d.color]; });
+        d3.select("#b_one").style("border","2px solid black");
+        current.push(1);
+         add_legend1();
+        } else if (val=="number") {
+       d3.selectAll("#canvas_root1 circle").attr('fill', function (d) { return colorScale(d.o2); 
+                                                                      });
+             d3.select("#b_two").style("border","2px solid black");
+            current.push(2);
+            add_legend2();
+        } else  {
+            
+   /* d3.json("terms_entropy_last.json", function(dd){   
+        dd1=dd;
+
+      d3.selectAll("#canvas_root1 circle").attr('fill', function (d) { return colorScale2(dd[d.c]); 
+        });
+         d3.select("#b_three").style("border","2px solid black");
+        current.push(3);
+        add_legend3();
+        });*/
+        }
+    }
+        
+        
+         function add_legend2() {
+    
+
+    
+    var dataL = [];
+    for (var i=0; i<colorScale.domain().length; i++) {
+        
+        dataL.push({"color":colorScale(Math.round(colorScale.domain()[i])),"value":Math.round(colorScale.domain()[i])});
+    }
+    //console.log(dataL);
+    var extent = d3.extent(dataL, d => d.value);
+    
+    var paddingL = 80;
+    var widthL = 320;
+    var innerWidth = widthL - (paddingL * 2);
+    var barHeight = 8;
+    var heightL = 28;
+
+    var xScale = d3.scaleLinear()
+        .range([0, innerWidth])
+        .domain(extent);
+
+    var xTicks = [10,50,100,150,200]
+
+xTicks.push(300);
+xTicks.push(400);
+xTicks.push(500);
+xTicks.push(600);
+    var xAxis = d3.axisBottom(xScale)
+        .tickSize(barHeight * 2);
+       // .tickValues(xTicks);
+
+    var svgL = d3.select("#canvas_root1").append("g").attr("class","legend").attr("width", widthL).attr("height", heightL);
+    var g = svgL.append("g").attr("transform", "translate(" + paddingL + ", 50)");
+
+    var defs = svgL.append("defs");
+    var linearGradient = defs.append("linearGradient").attr("id", "myGradient");
+    linearGradient.selectAll("stop")
+        .data(dataL)
+      .enter().append("stop")
+        .attr("offset", d => ((d.value - extent[0]) / (extent[1] - extent[0]) * 100) + "%")
+        .attr("stop-color", d => d.color);
+
+    g.append("rect")
+        .attr("width", innerWidth)
+        .attr("height", barHeight)
+        .style("fill", "url(#myGradient)");
+
+    g.append("g")
+        .call(xAxis)
+      .selectAll("text")  
+    .style("font-size", "9px")
+    .attr("dx", "-2em")
+    .attr("dy", ".25em")
+    .attr("transform", "translate(-10,0)rotate(-65)");
+}  
+    
+    function add_legend3() {
+    var dataL = [];
+    for (var i=0; i<colorScale2.domain().length; i++) {
+        
+        dataL.push({"color":colorScale2.range()[i],"value":Math.round(colorScale2.domain()[i])});
+    }
+    
+    var extent = d3.extent(dataL, d => d.value);
+    
+    var paddingL = 50;
+    var widthL = 320;
+    var innerWidth = widthL - (paddingL * 2);
+    var barHeight = 8;
+    var heightL = 28;
+
+    var xScale = d3.scaleLinear()
+        .range([0, innerWidth])
+        .domain(extent);
+
+    var xTicks = dataL.filter(f => f.value % 1 === 0).map(d => d.value);//filter(f => f.value % 50 === 0).
+
+    var xAxis = d3.axisBottom(xScale)
+        .tickSize(barHeight * 2)
+        .tickValues(xTicks);
+
+    var svgL = d3.select("#canvas_root1").append("g").attr("class","legend").attr("width", widthL).attr("height", heightL);
+    var g = svgL.append("g").attr("transform", "translate(" + paddingL + ", 50)");
+
+    var defs = svgL.append("defs");
+    var linearGradient = defs.append("linearGradient").attr("id", "myGradient");
+    linearGradient.selectAll("stop")
+        .data(dataL)
+      .enter().append("stop")
+        .attr("offset", d => ((d.value - extent[0]) / (extent[1] - extent[0]) * 100) + "%")
+        .attr("stop-color", d => d.color);
+
+    g.append("rect")
+        .attr("width", innerWidth)
+        .attr("height", barHeight)
+        .style("fill", "url(#myGradient)");
+
+    g.append("g")
+        .call(xAxis);
+}  
+
+    
+ function add_legend1(){
+      var paddingL = 150;
+    var widthL = 520;
+    var innerWidth = widthL - (paddingL * 2);
+    var barHeight = 8;
+    var heightL = 28;
+    var svgL = d3.select("#canvas_root1").append("g").attr("class","legend").attr("width", widthL).attr("height", heightL);
+   
+     var cols=['#6ca443','#3174f4','#f37361','black'];
+      var labels=['Acceleration','Inflection time','Deceleration','Deactivation'];
+      var labels2=['Local','Local','Global'];
+     for (var t=0; t<cols.length; t++) {
+         if (t==0) {
+ var g = svgL.append("g").attr("transform", "translate(" + (paddingL-90) + ", 50)");    
+     } else {
+         var g = svgL.append("g").attr("transform", "translate(" + (paddingL*(t+1)-90) + ", 50)");    
+         
+     }
+         
+    g.append('circle')
+  .attr('cx', 10)
+  .attr('cy', 10)
+  .attr('r', 5)
+  .attr('stroke', 'black')
+  .attr('fill', cols[t]);
+    g.append("text")
+        .text(function(d){return labels[t]});
+     }
+ }
+ 
+
+    
+   
+    
+    
+$(document).ready(function () {
+    var table;
+    var x12;
+    var x1;
+    var selectedPoints;
+    var interactionSvg;
+    var context;
+    var kk=[];
+    var timeGroup;
+    var timeDimension;
+	var radScale;
+	var dataTable;
+	var all_data = [];
+	var all = [];
+	var all_points = [];
+	var ofs = 0,
+		pag = 11;
+
+	var starting_data = [];
+	var div = d3.select("body").append("div")
+		.attr("class", "tooltip")
+		.style("opacity", 0);
+	var points = [];
+	var lines = [];
+
+	var width = window.innerWidth * 0.7;
+	var height = window.innerHeight * 0.6;
+	var padding = {
+		top: 10,
+		right: 40,
+		bottom: 10,
+		left: 80
+	};
+    d3.select("#chart").attr("height",height+window.innerHeight * 0.03);
+	var plotAreaWidth = width - padding.left - padding.right;
+	var plotAreaHeight = height - padding.top - padding.bottom;
+	var cust_names = [];
+var line = d3.line()
+    .x(function(d, i) { return xScale(i); }) // set the x values for the line generator
+    .y(function(d) { return yScale(d.y); }) // set the y values for the line generator 
+    .curve(d3.curveMonotoneX) // apply smoothing to the line
+
+d3.json("customers_more1_Gore1_states.json", function(treeData) {
+    //console.log(treeData);
+    
+    cust_names = treeData;
+    
+d3.json("all_years_shipped_to_final_saturation_final_circles3_Gore1_states.json", function(allOptions) {    
+    
+    all_points = allOptions;
+   // console.log(all_points);
+var kk0 = {'0': 'Accounts', '1': 'Acts', '2': 'Administration', '3': 'Agencies', '4': 'Associations', '5': 'Bipoc', '6': 'Boards', '7': 'Center', '8': 'Codes', '9': 'Colleges', '10': 'Commissions', '11': 'Committees', '12': 'Companies', '13': 'Corps', '14': 'Dental', '15': 'Departments', '16': 'Diseases', '17': 'District', '18': 'Division', '19': 'Divisions', '20': 'Fire', '21': 'Funds', '22': 'Geolocations', '23': 'Habitats', '24': 'Hospitals', '25': 'Indian', '26': 'Insurances', '27': 'Laboratories', '28': 'Laws', '29': 'Materials', '30': 'Offices', '31': 'Organisms', '32': 'Other', '33': 'Permits', '34': 'Plans', '35': 'Plants', '36': 'Plastic', '37': 'Pollutants', '38': 'Pollution', '39': 'Products', '40': 'Programs', '41': 'Recycling', '42': 'Senate', '43': 'Service', '44': 'Societies', '45': 'Specification', '46': 'Standards', '47': 'Systems', '48': 'Tests', '49': 'Training', '50': 'Union', '51': 'Universities', '52': 'Verbs', '53': 'Waste', '54': 'Water'};
+
+    
+    
+	function updateSelectedPoints(selectedPoints) {
+		if (!selectedPoints.length) {
+			points.forEach(function(d) {
+                  if (current[0]==1) {
+            d.color = cc[d.color];
+                               } else if (current[0]==2) {
+        d.color = colorScale(d.o2);
+                    } else if (current[0]==3){
+           /* d3.json("terms_entropy_last.json", function(dd){  
+d.color = colorScale2(dd[d.c]); 
+            });*/
+        
+        }
+                                d.st = "rgba(0,0,0,1)";
+				d.w = 0.15;
+				d.sel = 1;
+			});
+			drawPoints1();
+		} else {
+
+			var val = [];
+			selectedPoints.forEach(function(d) {
+				val.push(d.c.replace(" ", ""));
+                
+                 if (current[0]==1) {
+            d.color = cc[d.color];
+                               } else if (current[0]==2) {
+        d.color = colorScale(d.o2);
+                    } else if (current[0]==3){
+          /*  d3.json("terms_entropy_last.json", function(dd){  
+d.color = colorScale2(dd[d.c]); 
+            });*/
+        
+        }
+				d.st = "rgba(0,0,0,1)";
+				d.w = 0.65;
+				d.sel = 1;
+			});
+			points.forEach(function(d) {
+
+				if (val.indexOf(d.c.replace(" ", "")) !== -1) {
+					 if (current[0]==1) {
+            d.color = cc[d.color];
+                               } else if (current[0]==2) {
+        d.color = colorScale(d.o2);
+                    } else if (current[0]==3){
+           /* d3.json("terms_entropy_last.json", function(dd){  
+d.color = colorScale2(dd[d.c]); 
+            });*/
+        
+        }
+					d.st = "rgba(0,0,0,1)";
+					d.w = 0.15;
+					d.sel = 1;
+				} else {
+
+					d.st = 'rgba(0, 0, 0, 0)';
+					d.w = 0;
+					d.sel = 0;
+
+				}
+			});
+
+			drawPoints(selectedPoints);
+
+
+		}
+
+	}    
+	function drawPoints(selectedPoints) {
+
+       // console.log(selectedPoints);
+		var context = canvas.node().getContext('2d');
+		context.save();
+		context.clearRect(0, 0, width, height);
+		context.translate(padding.left, padding.top);
+
+		if (selectedPoints.length !== 0) {
+			d3.values(lines).forEach((d, i) => {
+				drawLine(context, d, i, x1, y, selectedPoints);
+			});
+		} else {
+			d3.values(lines).forEach((d, i) => {
+
+				drawLine1(context, d, i, x1, y);
+			});
+		}
+
+		for (var i = 0; i < points.length; ++i) {
+			var point = points[i];
+            if (current[0]==1) {
+            context.fillStyle = point.color;
+                               } else if (current[0]==2) {
+        context.fillStyle = colorScale(point.o);
+                    } else if (current[0]==3){
+         /*   d3.json("terms_entropy_last.json", function(dd){  
+context.fillStyle = colorScale2(dd[point.c]); 
+            });*/
+        
+        }
+			context.beginPath();
+			context.arc(point.x, point.y, point.r2, 0, 2 * Math.PI);
+			context.fill();
+			context.strokeStyle = point.st;
+			context.lineWidth = point.w;
+			context.stroke();
+		}
+		context.restore();
+	}
+    
+    
+
+    function  draw_ts(e) {
+         d3.select("#ts").html("");
+         d3.select("#ts_table").html("");
+        d3.json("ts_states/"+e+"_2024-01-31.json", function(m){ ///.replaceAll(" ","_").replaceAll("\/","_").replaceAll("/","_")
+            var ht="";
+            for (var u=0; u<d3.keys(m).length; u++) {
+                ht+="<b>"+d3.keys(m)[u]+"</b>: "+m[d3.keys(m)[u]]+"<br>";
+            }
+        d3.json("ts_states/"+e+"_2024-01-31.json",function(data){
+             d3.select("#ts").html("<b>"+e+"</b> <br>"+data["date"]);
+var margin0 = {top: 10, right: 30, bottom: 70, left: 60},
+    width0 = 260 - margin0.left - margin0.right,
+    height0 = 200 - margin0.top - margin0.bottom;
+var svg = d3.select("#ts")
+  .append("svg")
+    .attr("width", width0 + margin0.left + margin0.right)
+    .attr("height", height0 + margin0.top + margin0.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin0.left + "," + margin0.top + ")");
+   
+
+  var sc2=d3
+  .scaleTime()
+  .range([new Date("2007-01-01"), new Date("2024-01-31")]) //2025-05-16T00:00:00 1.32
+  .domain([d3.extent(data["rel_time"], function(d) { return d; })[0],1]); ///d3.extent(data["rel_time"], function(d) { return d; })[0],maxX  d3.extent(data["rel_time"], function(d) { return d; })[0]    
+    
+var minM=d3.extent(data["modeled"], function(d) { return +d; })[0];
+var maxM=d3.extent(data["modeled"], function(d) { return +d; })[1];     
+var minR=d3.extent(data["real_series"], function(d) { return +d; })[0];
+var maxR=d3.extent(data["real_series"], function(d) { return +d; })[1];    
+data["time"]=['2007-01-01', '2007-07-01', '2008-01-01', '2008-07-01', '2009-01-01', '2009-07-01', '2010-01-01', '2010-07-01', '2011-01-01', '2011-07-01', '2012-01-01', '2012-07-01', '2013-01-01', '2013-07-01', '2014-01-01', '2014-07-01', '2015-01-01', '2015-07-01', '2016-01-01', '2016-07-01', '2017-01-01', '2017-07-01', '2018-01-01', '2018-07-01', '2019-01-01', '2019-07-01', '2020-01-01', '2020-07-01', '2021-01-01', '2021-07-01', '2022-01-01', '2022-07-01', '2023-01-01', '2023-07-01','2024-01-01'];
+/*['2007-01-01', '2007-07-01',  '2008-01-01',  '2008-07-01',  '2009-01-01',  '2009-07-01',  '2010-01-01', '2010-07-01', '2011-01-01', '2011-07-01', '2012-01-01',  '2012-07-01', '2013-01-01', '2013-07-01',  '2014-01-01',  '2014-07-01',  '2015-01-01',  '2015-07-01',  '2016-01-01',  '2016-07-01',  '2017-01-01',  '2017-07-01',  '2018-01-01', '2018-07-01',  '2019-07-01',  '2020-01-01',  '2020-07-01', '2021-01-01', '2021-07-01', '2022-01-01', '2022-07-01', '2023-01-01', '2023-07-01', '2024-01-01', '2024-02-01',  '2024-07-01']; */
+var times=data["time"].map(function(f){var yy=new Date(f); return new Date(yy.getFullYear().toString(), (yy.getMonth()+1),(yy.getDate()));});
+data["time"]=times;           
+
+var minA=d3.max([minM,minR]);
+var maxA=d3.max([maxM,maxR]);      
+var maxX=d3.max([1,data["ml_x"][0]]);              
+    var x0 = d3.scaleTime()
+      .domain([d3.extent(times)[0],sc2(maxX)])//d3.extent(data["rel_time"], function(d) { return d; })[0]
+      .range([ 0, width0 ]);
+
+      var sc=d3
+  .scaleLinear()
+  .domain([d3.extent(data["rel_time"], function(d) { return d; })[0], maxX]) //2025-05-16T00:00:00 1.32
+  .range([0, width0]);
+
+    svg.append("g")
+      .attr("transform", "translate(0," + height0 + ")")
+      .call(d3.axisBottom(x0))
+      .selectAll("text")  
+    .style("text-anchor", "end")
+    .attr("dx", "-.8em")
+    .attr("dy", ".15em")
+    .attr("transform", "rotate(-65)");
+
+
+    var y0 = d3.scaleLinear()
+      .domain([0,maxA])//minA
+      .range([ height0, 0 ]);
+         
+    svg.append("g")
+      .call(d3.axisLeft(y0));
+            var data0=[];
+            var data1=[];
+for (var k=0; k<data["modeled"].length; k++) {
+    data0.push({"modeled":data["modeled"][k],"time":data["time"][k]});
+    data1.push({"real_series":data["real_series"][k],"time":data["time"][k]});
+}
+    // Add the line
+    svg.append("path")
+      .datum(data0)
+      .attr("fill", "none")
+      .attr("stroke", "steelblue")
+      .attr("stroke-width", 1.5)
+      .attr("d", d3.line()
+        .x(function(d) { return x0(d.time) })
+        .y(function(d) { return y0(d.modeled) })
+        );
+            
+       /* svg.append("path")
+      .datum(data1)
+      .attr("fill", "none")
+      .attr("stroke", "#f37361")
+      .attr("stroke-width", 1.5)
+      .attr("d", d3.line()
+        .x(function(d) { return x0(d.time) })
+        .y(function(d) { return y0(d.real_series) })
+        );  */
+            
+            
+             svg.append('g')
+    .selectAll("dot")
+    .data(data1)
+    .enter()
+    .append("circle")
+      .attr("cx", function (d) { return x0(d.time); } )
+      .attr("cy", function (d) { return y0(d.real_series); } )
+      .attr("r", 1.5)
+      .style("fill", "#f37361")
+            
+    var gt=data["rel_time"].map(function(f){return Math.round(f*100)/100});        
+    var data2=[{"time":data["ml_x"][0],"ml_y":data["ml_y"][0]},
+               {"time":data["ml_x"][1],"ml_y":data["ml_y"][1]}];        
+    // Add the line
+    svg.append("path")
+      .datum(data2)
+      .attr("fill", "none")
+      .attr("stroke", "grey")
+      .attr("stroke-width", 1.5)
+      .attr("d", d3.line()
+        .x(function(d) { return sc(d.time) })
+        .y(function(d) { return y0(d.ml_y) })
+        );
+            
+        });
+        
+        });
+        
+        
+        
+        
+    }
+	function drawPoints1() {
+        context = canvas.node().getContext('2d');
+		context.save();
+		context.clearRect(0, 0, width, height);
+		context.translate(padding.left, padding.top);
+
+
+		d3.values(lines).forEach((d, i) => {
+
+			drawLine1(context, d, i, x1, y);
+		});
+
+		context.restore();
+d3.select("#canvas_root1").selectAll(".line2").remove();
+
+//console.log(points);
+    if (points.length>27) {    
+        
+        highlightGroup
+    .selectAll("dot")
+    .data(points)
+    .enter()
+    .append("circle")
+        .attr("class","cir")
+		.attr('r', function (d) { return radScale(d.o2); }) //radScale()
+    .attr("cx", function (d) { return d.x+80; } )
+      .attr("cy", function (d) { return d.y+10; } )
+      .attr('stroke-width', 0)
+    .attr('fill', function (d) { /*colorScale(d.o)*/if (current[0]==1) {return cc[d.color];} else if (current[0]==2) {return colorScale(d.o2);} else if (current[0]==3){
+   return colorScale2(dd1[d.c]); 
+        }})
+		.attr('stroke', d3.rgb(0, 0, 0))
+        .style('z-index', 101)
+         .style("fill-opacity",0.3)
+        .on("click", function(e){
+            draw_ts(e.c);
+        
+        });
+        
+    } else if (points.length<27) {
+    highlightGroup
+    .selectAll(".cir").remove();
+  
+
+for (var u=0; u<points.length; u++) {    
+var dataset=[];
+   var uu=points[u]["yr"].split("-");
+    var uu1=points[u]["x1"].split("-");
+    dataset.push({"x":x12(new Date(+uu1[0],+uu1[1],+uu1[2])),"y":y(points[u]["y1"])});
+    dataset.push({"x":x12(new Date(+uu[0],+uu[1],+uu[2]))-35,"y":y(10)-5});
+d3.select("#canvas_root1").append("path")
+    .datum(dataset) // 10. Binds data to the line 
+    .attr("class", "line2") // Assign a class for styling 
+    .style("stroke-dasharray", ("3, 3"))
+    .attr("d", line) // 11. Calls the line generator 
+    .style('z-index', -1); 
+}
+              
+   highlightGroup
+  .selectAll("dot")
+    .data(points)
+    .enter()
+    .append("circle")
+          .attr("class","cir")
+		.attr('r', function (d) { return radScale(d.o2)*5; })
+    .attr("cx", function (d) { return d.x+80; } )
+      .attr("cy", function (d) { return d.y+10; } )
+      .attr('stroke-width', 0.5)
+    .attr('fill', function (d) { if (current[0]==1) {return cc[d.color];} else if (current[0]==2) {return colorScale(d.o2);} else  if (current[0]==3){
+       var kkk="";
+  
+                
+                kkk=dd1[d.c];
+
+       return colorScale2(kkk); 
+        
+        } })
+		.attr('stroke', d3.rgb(0, 0, 0))
+        .style('z-index', 1001)
+         .style("fill-opacity",0.3)
+       .on("click", function(e){
+      draw_ts(e.c);
+        });
+         draw_ts(points[0]["c"]);
+        
+    } else {
+        
+         highlightGroup
+    .selectAll(".cir").remove();
+        
+   highlightGroup
+  .selectAll("dot")
+    .data(points)
+    .enter()
+    .append("circle")
+          .attr("class","cir")
+		.attr('r', function (d) { return radScale(d.o2); })
+    .attr("cx", function (d) { return d.x+80; } )
+      .attr("cy", function (d) { return d.y+10; } )
+      .attr('stroke-width', 0.1)
+    .attr('fill', function (d) { if (current[0]==1) {return cc[d.color];} else if (current[0]==2) {return colorScale(d.o2);} else  if (current[0]==3){
+            
+   return colorScale2(dd1[d.c]); 
+        } })
+         .style("fill-opacity",0.3)
+		.attr('stroke', d3.rgb(0, 0, 0))
+        .style('z-index', 101)
+        .on("click", function(e){
+       draw_ts(e.c);
+        
+        });
+        
+        
+    }
+	}
+
+        
+
+	function drawLine(context1, d, i, x, y, selectedPoints) {
+
+		var val = selectedPoints.map(function(d) {
+			return d.c;
+		});
+
+		if (d.length > 1) {
+			if (val.indexOf(d[0]["name"]) > -1) {
+				context1.beginPath();
+				context1.moveTo(d[0].date, d[0].value);
+				for (var t = 1; t < d.length; t++) {
+					context1.lineTo(d[t].date, d[t].value);
+				}
+				context1.strokeStyle = 'rgba(0,0,0,0.7)';
+				context1.lineWidth = 0.65;
+				context1.stroke();
+			} else {
+
+				context1.beginPath();
+				context1.moveTo(d[0].date, d[0].value);
+				for (var t = 1; t < d.length; t++) {
+					context1.lineTo(d[t].date, d[t].value);
+				}
+				context1.strokeStyle = 'rgba(0,0,0,0)';
+				context1.lineWidth = 0.15;
+				context1.stroke();
+
+
+			}
+			//  context1.restore();
+		}
+
+	}
+
+	function drawLine1(context1, d, i, x, y) {
+
+		if (d.length > 1) {
+			context1.beginPath();
+			context1.moveTo(d[0].date, d[0].value);
+			for (var t = 1; t < d.length; t++) {
+				context1.lineTo(d[t].date, d[t].value);
+			}
+			context1.strokeStyle = 'rgba(0,0,0,0.7)';
+			context1.lineWidth = 0.15;
+			context1.stroke();
+
+		}
+
+
+	}
+	var visRoot = d3
+		.select("#chart")
+		.append('div')
+		.attr('class', 'vis-root')
+		.style('position', 'absolute');
+
+	var screenScale = window.devicePixelRatio || 1;
+
+	var canvas = visRoot
+		.append('canvas')
+    .attr('id',"canvas_root")
+    .attr("style", "border: thin solid #f37361;  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);border-radius: 12px;")
+		.attr('width', width * screenScale)
+		.attr('height', height * screenScale)
+		.style('width', (width + "px"))
+		.style('height', (height + "px"))
+    .style('z-index', 100);
+ canvas
+		.node()
+		.getContext('2d')
+		.scale(screenScale, screenScale);
+
+
+	interactionSvg = visRoot
+		.append('svg')
+    .attr('id',"canvas_root1")
+		.attr('width', width)
+		.attr('height', height)
+		.style('position', 'absolute')
+		.style('top', 0)
+		.style('left', 0);
+    interactionSvg
+    .append("text")
+    .attr("x", 100)
+    .attr("y", 20)
+    .attr("dy", ".35em")
+    .text("Legend");
+        var highlightGroup = interactionSvg.append("g").attr("class","highlight");
+        
+    
+    var margin = {
+		top: 5,
+		left: 50,
+		bottom: 50,
+		right: 50
+	};
+	x1 = d3.scaleTime().range([0, width - 100]).domain([new Date(2006, 12, 1), new Date(2040, 7, 1)]);
+	var y = d3.scaleLinear()
+		.domain([0, 10])
+		.range([0, height - margin.bottom]);
+
+
+        
+        var xAxisG = interactionSvg.append('g')
+		.attr('class', 'x')
+		.attr('transform', 'translate(' + margin.left + ', ' + (margin.top + height - margin.bottom) + ')');
+
+
+	var yAxisG = interactionSvg.append('g')
+		.attr('class', 'y')
+		.attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
+	var xAxis = d3.axisBottom().scale(x1);
+	var yAxis = d3.axisLeft().scale(y);
+	xAxisG.call(xAxis);
+	yAxisG.call(yAxis);
+    
+    function make_graph(pointed) {
+		//console.log("ddd");
+		///all_points = d3.values(pointed);
+		//cust_names = details1;
+        
+        
+    
+		//console.log(pointed);
+		//console.log(details1);
+		/*var kk0 = {'0': 'Accounts', '1': 'Acts', '2': 'Administration', '3': 'Agencies', '4': 'Associations', '5': 'Bipoc', '6': 'Boards', '7': 'Center', '8': 'Codes', '9': 'Colleges', '10': 'Commissions', '11': 'Committees', '12': 'Companies', '13': 'Corps', '14': 'Dental', '15': 'Departments', '16': 'Diseases', '17': 'District', '18': 'Division', '19': 'Divisions', '20': 'Fire', '21': 'Funds', '22': 'Geolocations', '23': 'Habitats', '24': 'Hospitals', '25': 'Indian', '26': 'Insurances', '27': 'Laboratories', '28': 'Laws', '29': 'Materials', '30': 'Offices', '31': 'Organisms', '32': 'Other', '33': 'Permits', '34': 'Plans', '35': 'Plants', '36': 'Plastic', '37': 'Pollutants', '38': 'Pollution', '39': 'Products', '40': 'Programs', '41': 'Recycling', '42': 'Senate', '43': 'Service', '44': 'Societies', '45': 'Specification', '46': 'Standards', '47': 'Systems', '48': 'Tests', '49': 'Training', '50': 'Union', '51': 'Universities', '52': 'Verbs', '53': 'Waste', '54': 'Water'};
+
+		kk = d3.keys(details1);
+		var data_ = d3.values(details1).map(function(d, i) {
+			var temp = {};
+            //console.log(kk0[d[0]]);
+            if (typeof kk0[d[0]]!="undefined") {
+                var tt=kk0[d[0]];
+                }
+            else {
+                var tt="Other";
+                }    
+			temp.category = tt[0].toUpperCase() + tt.substring(1);
+			temp.start = d[2];
+			temp.end = d[3];
+			temp.life = Number(d[4]);
+			temp.name = kk[i];
+			return temp;
+		});
+
+		var data = data_;
+		all_data = crossfilter(data);
+		all = all_data.groupAll();
+
+
+		var select1 = dc.selectMenu('#select1');
+		var letterDimension = all_data.dimension(function(d) {
+			return d["category"][0].toUpperCase() + d["category"].substring(1);
+		});
+
+		select1
+			.dimension(letterDimension)
+			.group(letterDimension.group())
+			.controlsUseVisibility(true);
+		var year2_ = all_data.dimension(function(d) {
+			return d.end
+		});
+		var years2 = year2_.group().reduceCount();
+		var chart1 = dc.barChart("#chart-line-hitsperyear");
+		chart1
+			.width(330)
+			.height(100)
+			.margins({
+				top: 10,
+				left: 70,
+				right: 10,
+				bottom: 20
+			})
+			.x(d3.scaleLinear().domain([d3.min(data, function(d) {
+				return d.end;
+			}) - 1, d3.max(data, function(d) {
+				return d.end;
+			}) + 1]))
+			.brushOn(true)
+			// .yAxisLabel("Number of orders")
+			.elasticY(true)
+			.turnOnControls(true)
+			.transitionDuration(200)
+			.dimension(year2_)
+			.group(years2)
+			.centerBar(true)
+			.renderHorizontalGridLines(true)
+			.turnOnControls(true)
+			.gap(5) // 65 = norm
+			.xAxis().ticks(8).tickFormat(function(v) {
+				return v;
+			});
+		chart1.yAxis().ticks(5);
+		chart1.xAxisPadding(10);
+
+		var year3_ = all_data.dimension(function(d) {
+			return d['life'];
+		});
+
+		//console.log(year3);
+		var years3 = year3_.group(function(d) { return Math.floor(d / 50) * 50 });//.reduceCount(); //.reduceSum(function(fact) {  return Number(fact.life); }); 
+		//.reduceCount();//
+		//  console.log(years3);
+
+		var chart2 = dc.barChart("#chart-line2-lifespan");
+		chart2
+			.width(330)
+			.height(100)
+			.margins({
+				top: 10,
+				left: 70,
+				right: 10,
+				bottom: 20
+			})
+			.x(d3.scaleLinear().domain(d3.extent(data, function(d) {
+				return Number(d.life);
+			})))
+			.y(d3.scaleLinear().domain([0,500]))
+			.brushOn(true)
+			.elasticY(true)
+
+			// .yAxisLabel("Lifespan")
+			.turnOnControls(true)
+			.gap(2)
+			.dimension(year3_)
+			.group(years3)
+			.centerBar(true)
+			.renderHorizontalGridLines(true)
+			.transitionDuration(200)
+			.xAxis().ticks(6).tickFormat(function(v) {
+				return v;
+			});
+		// .gap(7);
+		chart2.yAxis().ticks(3);
+		chart2.xAxisPadding(5);
+		var runDimension = all_data.dimension(function(d) {
+			return d.start;
+		});
+		var speedSumGroup = runDimension.group().reduceCount();
+		var chart = dc.barChart("#chart-line2-hitsperyear");
+
+		//  console.log(data);
+		chart
+			.width(330)
+			.height(100)
+			.margins({
+				top: 10,
+				left: 70,
+				right: 10,
+				bottom: 20
+			})
+			.x(d3.scaleLinear().domain([d3.min(data, function(d) {
+				return d.start;
+			}) - 1, d3.max(data, function(d) {
+				return d.start;
+			}) + 1]))
+			.brushOn(true)
+			// .yAxisLabel("This is the Y Axis!")
+			.elasticY(true)
+			.turnOnControls(true)
+			.gap(5)
+			.transitionDuration(200)
+			.dimension(runDimension)
+			.group(speedSumGroup)
+			.centerBar(true)
+			.renderHorizontalGridLines(true)
+			.xAxis().ticks(8).tickFormat(function(v) {
+				return v;
+			});
+		chart.yAxis().ticks(5);
+		chart.xAxisPadding(!10);
+
+		function display() {
+			//alert("1");
+			d3.select('#begin')
+				.text(ofs);
+			d3.select('#end')
+				.text(ofs + pag - 1);
+			d3.select('#last')
+				.attr('disabled', ofs - pag < 0 ? 'true' : null);
+			d3.select('#next')
+				.attr('disabled', ofs + pag >= all_data.size() ? 'true' : null);
+			d3.select('#size').text(all_data.size());
+		}
+
+		function update() {
+			dataTable.beginSlice(ofs);
+			dataTable.endSlice(ofs + pag);
+			display();
+		}
+		timeDimension = all_data.dimension(function(d, i) {
+			return d.name;
+		});
+		timeGroup = timeDimension.group().reduceCount();
+
+		selectField.dimension(timeDimension)
+			.group(timeGroup)
+			.multiple(true)
+          //  .attributeName("add")
+			.title(function(d) {
+				return d.key
+			})
+			.promptText("All NEs");
+        
+        
+       
+        //.controlsUseVisibility(false)
+       // .visibility(true);
+        
+        //.elasticY(true);
+
+		dc.renderAll();
+        
+        
+
+		dataTable = dc.dataTable("#dc-table-graph");
+		dataTable.width(960).height(800)
+			.dimension(timeDimension)
+			.section(function(d) {
+				return "";
+			})
+			.size(Infinity)
+			.columns([
+				function(d, i) {
+					return d.name;
+				}
+			])
+			.order(d3.ascending)
+			.on('renderlet', function(dataTable) {
+				d3.select("g.lasso-group > path").remove();
+				// console.log(timeDimension.top(Infinity));
+				var nested_data = d3.nest()
+					.key(function(d) {
+						return d.name;
+					})
+					.rollup(function(leaves) {
+						return leaves;
+					})
+					.entries(timeDimension.top(Infinity));
+				var vari = {};
+				for (var i = 0; i < nested_data.length; i++) {
+					vari[nested_data[i].key] = nested_data[i].value;
+				}
+				make_plot(nested_data.map(function(d) {
+					return d.key;
+				}));
+			});
+
+		$("#paging").remove();
+		$('<div id="paging">Showing <span id="begin"></span>-<span id="end"></span> of <span id="size"></span>.<input id="last" type="Button" value="Previous" onclick="last()" /><input id="next" type="button" value="Next" onclick="next()"/></div>').insertAfter("#dc-table-graph");
+		$("#paging").css("visibility", "hidden");
+		update();
+		dc.dataCount(".dc-data-count")
+			.crossfilter(all_data)
+			.groupAll(all)
+			.html(function() {
+				return {
+					some: "<strong>%filter-count</strong> selected out of <strong>%total-count</strong> rows | <a href='javascript:dc.filterAll(); dc.renderAll();''>Reset All</a>",
+					all: "All records selected. Please click on the graph to apply filters."
+				}
+			});
+		dc.renderAll();
+         document.querySelector("#menuselect select[multiple=true]").setAttribute('id', 'selAdd');
+         
+         */
+	}
+    
+    function make_plot(translated10) {
+d3.select("#ts").html("");
+         d3.select("#ts_table").html("");
+		/*points = [];
+		var translated10 = {};
+		//console.log(d3.keys(all_points).length);
+
+		var dirty_dozen = d3.keys(all_points).map(function(d) {
+			return d
+		});
+		//console.log(dirty_dozen);    
+		for (var i = 0; i < keys.length; i++) {
+			// if (dirty_dozen.indexOf(keys[i])>-1){ //.replace(" ","")
+			// console.log(d3.keys(all_points).indexOf(keys[i].replace(" ","")));
+			translated10[keys[i]] = all_points[d3.keys(all_points)[dirty_dozen.indexOf(keys[i])]]; //.replace(" ","")
+			// }
+		}
+		// console.log(translated10);
+*/
+		var kkk30 = d3.values(translated10);
+		// console.log(d3.values(translated10));
+		var translated9 = [];
+                var translated90 = [];
+		for (var r = 0; r < kkk30.length; r++) {
+                      translated9.push(kkk30[r]);
+
+			 /* for (var z=0; z<kkk30[r].length; z++) {    
+			translated90.push(kkk30[r][z]["o2"]);
+                        //console.log(kkk30[r]);
+			}*/
+		}
+       //console.log(d3.extent(translated90));
+		var arr = [ -10,1,2,3,4,5,6,7,8, 10,15, 20, 25, 30, 35,40, 45, 50,56];
+       ///1.64705882, 2.29411765, 3.94117647, 4.58823529, 5.23529412, 7.88235294, 9.52941176,
+
+       colorScale = d3.scaleLinear()
+			.domain(arr)
+			.range(["#446383","#f37361","yellow"]);
+
+//["#000080", "#08306b", "#023858", "#045a8d", "#0570b0", "#2171b5", "#2b8cbe", "#00a6ca", "#00ccbc", "#90eb9d", "#ffff8c", "#f9d057", "#f29e2e", "#fd8d3c", "#e76818", "#d94801", "#a63603", "#7f2704"]);
+        
+		radScale = d3.scaleLinear()
+			.domain([1, 50])
+			.range([4, 20]);
+
+		var radScale2 = d3.scaleLinear()
+			.domain([1, 50])
+			.range([4, 22]);
+		var maxes = [];
+		points=[];
+		translated9.map(function(d) {
+			//if (typeof cust_names[d.c.replace(" ","")]!=="undefined") {
+
+			if (typeof d != "undefined" && d[0]["c"]!="Disease") {
+
+				for (var o = 0; o < d.length; o++) {
+					var temp = {}
+
+					
+					// for (var g=0; g<d[o].values.length; g++) {       
+					temp.c = d[o]["c"]; //.replace(" ","");    
+          //console.log(d[0]["c"]);
+try {
+					temp.end = cust_names[d[o]["c"]][2];
+temp.start = cust_names[d[o]["c"]][1];
+temp.life = cust_names[d[o]["c"]][3];
+} catch(e){
+temp.end = 2023;
+temp.start = 2020;
+temp.life = "?";
+}
+		//			temp.start = cust_names[d[o]["c"]][1];
+		//			temp.life = cust_names[d[o]["c"]][3];
+					temp.sel = 1;
+					temp.sels1 = true;
+                    temp["y1"]=d[o]["y"];
+                    temp["yr"]=d[o]["yr"];
+                    temp["x1"]=d[o]["x"];
+					if (d[o]["x"].toString().indexOf("-") > -1) {
+                        //console.log(+d[o]["x"].toString().split("-")[0], +d[o]["x"].toString().split("-")[1], +d[o]["x"].toString().replace(" 00:00:00","").split("-")[2]);
+						temp.x = x1(new Date(+d[o]["x"].toString().split("-")[0], +d[o]["x"].toString().split("-")[1], +d[o]["x"].toString().replace(" 00:00:00","").split("-")[2]))-30;
+						temp.y = y(d[o]["y"]);// + 35;
+					} else {
+                        console.log(d[o]);
+						temp.x = d[o]["x"];
+						temp.y = d[o]["y"];
+					}
+                    //console.log(temp.x,d[o]["x"]);
+					temp["o2"] = d[o]["o2"];
+                    
+                     if (current[0]==1) {
+            temp.color = d[o]["color"];
+                               } else if (current[0]==2) {
+        temp.color = colorScale(d[o]["o2"]);
+                    } else if (current[0]==3){
+                        var gg=d[o]["c"];
+           // d3.json("terms_entropy.json", function(dd){  
+           // console.log(gg,dd1[gg]);
+temp.color = colorScale2(dd1[gg]); 
+          //  });
+        
+        }
+					//temp.color = d[o]["color"];
+                        //colorScale(d[o]["o"]).replace("rgb", "rgba").replace(")", ",0.9)");
+					//console.log(temp.color,current[0]);
+					temp.st = "rgba(0,0,0,1)";
+					temp.w = 0.15;
+					temp.r = radScale(d[o]["o"]);
+					temp.r2 = radScale2(d[o]["o"]);
+					// d.tip="#text";
+					points.push(temp);
+					maxes.push(d[o]["o"]);
+                   //console.log(temp);
+				}
+				
+			}
+
+		});
+
+		//alert(d3.max(maxes));
+		var nested_data = d3.nest()
+			.key(function(d) {
+				return d.c;
+			})
+			//.key(function(d) { return +d.yr; })
+			.sortKeys(d3.ascending)
+			//.rollup(function(leaves) { return leaves.length; })
+			.entries(points);
+
+		//console.log(nested_data);
+
+		var rels = {};
+		for (var i = 0; i < nested_data.length; i++) {
+			rels[nested_data[i].key] = [];
+			// console.log(nested_data[i]);
+			for (var k = 0; k < nested_data[i].values.length; k++) {
+				rels[nested_data[i].key].push({
+					"date": nested_data[i].values[k]["x"],
+					"value": nested_data[i].values[k]["y"],
+					"orders": nested_data[i].values[k]["o"],
+					"name": nested_data[i].key
+				});
+			}
+		}
+		lines = rels;
+
+
+		drawPoints1();
+        
+         
+	}
+    
+    
+    var x11 = d3.scaleTime().range([new Date(2006, 12, 1), new Date(2040,7, 1)]).domain([0, width - 100]);
+    x12 = d3.scaleTime().range([50, width-50]).domain([new Date(2006, 12, 1), new Date(2040, 7, 1)]);
+	var y11 = d3.scaleLinear().domain([0, height - margin.bottom])
+		.range([0, 10]);
+    line = d3.line()
+    .x(function(d, i) { return d.x; }) // set the x values for the line generator
+    .y(function(d) { return d.y+10; }) // set the y values for the line generator 
+    .curve(d3.curveMonotoneX) // apply smoothing to the line
+    
+    
+    function filterByProperty(array, prop1, value1, prop2, value2){
+    var filtered = [];
+    for(var i = 0; i < array.length; i++){
+ //console.log(array[i]);
+        var obj = array[i];
+
+      //  for(var key in obj){
+          //  if(typeof(obj[key] == "object")){
+              //  var item = obj[key];
+        //console.log(obj["x"],value1);
+       
+       //console.log(new Date(Number(obj["x1"].split("-")[0]),Number(obj["x1"].split("-")[1]),Number(obj["x1"].split("-")[2])),x11(value1));
+                if((y11(obj[prop2]) >= value2-1 && y11(obj[prop2]) <= value2+1)){
+                  //  console.log(y11(obj[prop2]),value2-0.001,y11(obj[prop2]),obj[prop1],value1);
+                    filtered.push(obj);
+                }
+          //  }
+       // }
+
+    }    
+
+    return filtered;
+
+}
+    
+   ///////////////////////////////////////////// 
+    
+function filter_chart(sels) {
+    var filtered = Object.keys(allOptions).reduce(function (filtered, key) {
+    if (sels.indexOf(key)>-1) filtered[key] = allOptions[key];
+    return filtered;
+}, {});
+   context = canvas.node().getContext('2d');
+  context.save();
+       context.clearRect(0, 0, 0, 0);
+        context.restore();
+      highlightGroup.html("");
+    make_plot(filtered);
+    //console.log(filtered); ///make chart...
+}    
+    
+    
+    //"capital projects account": [0, "0", 2019, 2021, 737]
+ function get_filtered_datatable() {
+    filteredrows = $("#example1").dataTable()._('tr', {"filter": "applied"});
+     var arr=[];
+     var sels=[];
+    for ( var i = 0; i < filteredrows.length; i++ ) {
+        if (filteredrows[i]["active"]==1) {
+        arr.push(filteredrows[i]);
+        //console.log($(filteredrows[i]));
+        sels.push(filteredrows[i]["Term"]);
+        }
+    };
+     
+     //console.log(sels);
+     
+     filter_chart(sels);
+}
+    
+   /* editor = new $.fn.dataTable.Editor( {
+        "data": data["data"],
+        "table": "#example1",
+          "idSrc": "ID",
+        "fields": [ {
+                label:     "Active:",
+                name:      "active",
+                type:      "checkbox",
+                separator: "|",
+                options:   [
+                    { label: '', value: 1 }
+                ]
+            }, {
+                label: "Term (NE):",
+                name:  "Term"
+            }, {
+                label: "Category:",
+                name:  "Category"
+            }, {
+                label: "StartYear:",
+                name:  "StartYear"
+            }, {
+                label: "EndYear:",
+                name:  "EndYear"
+            }, {
+                label: "Days:",
+                name:  "days"
+            }
+            */
+            /*, {
+                label: "Active:",
+                name:  "active"
+            }*/
+     /*   ]
+    } );*/
+    
+var colors_revs={"black":"Deactivation", "red":"Deceleration","blue":"Inflection Time", "green":"Acceleration"};
+  var d=d3.keys(treeData);
+  //console.log(d);
+for (var i=0; i<d.length; i++) {
+   var temp={};
+
+    //temp["Month"]=1;
+    temp["ID"]=i;
+    temp["Term"]=d[i];
+    //console.log(treeData[d[i]]);
+    if (d[i]!="e") {
+       // console.log(d[i]);
+    if (d3.keys(all_points).indexOf(d[i])>-1) {
+   //console.log(d[i],d3.keys(all_points).indexOf(d[i]));
+     //console.log(all_points[d[i]][all_points[d[i]].length-1]["o"]);
+    temp["of articles"]=all_points[d[i]][all_points[d[i]].length-1]["o"];
+    //treeData[d[i]][0];
+    temp["StartYear"]=treeData[d[i]][1];
+    //console.log(temp["StartYear"]);
+    temp["EndYear"]=treeData[d[i]][2];
+    temp["Days"]=+treeData[d[i]][3];
+     temp["Status"]=colors_revs[all_points[d[i]][all_points[d[i]].length-1]["color"]];
+     //treeData[d[i]][5];
+    temp["active"]="1";
+    //console.log(temp);
+    data["data"].push(temp);
+    }
+}
+}
+//console.log(JSON.stringify(data));
+    /* var eventFired = function (type) {
+        /* $('#demo_info').html("");
+        var n = $('#demo_info')[0];
+         
+        n.innerHTML += '<div>' + type + ' event - ' + table.rows().data()[table.rows({search:"applied"} ).nodes().length-1] + '</div>';
+        n.scrollTop = n.scrollHeight;*/
+         
+        /*  get_filtered_datatable();
+    };*/
+    
+    
+    $.fn.dataTable.ext.errMode = 'throw';
+     table=$('#example1').DataTable({
+        data: data["data"],
+        initComplete : function() {
+        var input = $('.dataTables_filter input').attr("id","search2").unbind(),
+            self = this.api(),
+            $searchButton = $('<button>')
+                       .text('Search')
+                       .attr("id","search")
+                       .click(function() {
+                          self.search(input.val()).draw();
+                       }),
+            $clearButton = $('<button>')
+                       .text('Clear')
+                       .attr("id","clear")
+                       .click(function() {
+                          input.val('');
+                          $searchButton.click(); 
+                       }) 
+        $('.dataTables_filter').append($searchButton, $clearButton);
+    },
+          columns: [
+           // { data: "ID" },
+            { data: "Term" },
+            { data: "of articles" },
+            { data: "StartYear" },
+            { data: "EndYear" },
+            { data: "Days" },
+             { data: "Status" },  
+            {
+                data:   "active",
+                render: function ( data, type, row ) {
+                    //console.log(data,row);
+                    //var tem=data;
+                    if ( type === 'display' ) {
+                        data="1";
+                        return '<input type="checkbox" class="editor-active" data="1">';
+                        
+                    } else {
+                         data="0";
+                         return '<input type="checkbox" class="inactive" data="0">';
+                    }
+                    //console.log(data);
+                    return data;
+                },
+                className: "dt-body-center"
+            }
+        ],
+        select: {
+            style: 'os',
+            selector: 'td:not(:last-child)' // no row selection on last column
+        },
+        buttons: [
+            //{ extend: "create", editor: editor },
+          //  { extend: "edit",   editor: editor },
+          //  { extend: "remove", editor: editor }
+        ],
+        rowCallback: function ( row, data ) {
+            // Set the checked state of the checkbox in the table
+            if (data.active==1) {
+            $('input.editor-active', row).prop( 'checked', data.active == 1 );
+            } else {
+                 $('input.inactive', row).prop('checked',false);
+            }
+        },
+         dom: "Bfrtipl"
+    }).on('search.dt', function () {
+           // eventFired('Search');
+         get_filtered_datatable();
+        
+        });
+    
+     $('#example1').on( 'change', 'input.editor-active', function (g,i) {
+         var kk=$(this).closest('tr').find('td').each(function (index, td) {
+            if (index==0) {
+                for (var x=0; x<filteredrows.length; x++) {
+    if (filteredrows[x].Term==td.innerHTML) {
+        filteredrows[x].active="0";
+        
+    }
+                }
+            }
+  }); ///get title and change in filteredrows
+        //console.log(filteredrows);
+          //console.log(kk);
+         //.filter(function(d){d["Term"]==d3.keys(cust_names)[kk._DT_RowIndex]})
+         $(this).removeClass( "editor-active" ).addClass( "inactive").prop('checked',false);
+          get_filtered_datatable();
+        /*editor
+            .edit( $(this).closest('tr'), false )
+            .set( 'active', $(this).prop( 'checked' ) ? 1 : 0 )
+            .submit();*/
+    } );
+     $('#example1').on( 'change', 'input.inactive', function (g) {
+        // console.log($(this));
+         
+           var kk=$(this).closest('tr').find('td').each(function (index, td) {
+            if (index==0) {
+                for (var x=0; x<filteredrows.length; x++) {
+    if (filteredrows[x].Term==td.innerHTML) {
+        filteredrows[x].active="1";
+        
+    }
+                }
+            }
+  }); ///get title and change in filteredrows
+         $(this).removeClass( "inactive" ).addClass( "editor-active").prop('checked',true);
+          get_filtered_datatable();
+        /*editor
+            .edit( $(this).closest('tr'), false )
+            .set( 'active', $(this).prop( 'checked' ) ? 1 : 0 )
+            .submit();*/
+    } );
+ /*var marketDim, marketDim2;
+ data.forEach(function(d) {
+
+
+   d.Quantity = +d.Quantity;
+   d.TotalCost = +d.TotalCost;
+
+   var facts = crossfilter(data);
+   var all = facts.groupAll();
+   // count all the facts
+   dc.dataCount(".dc-data-count")
+     .dimension(facts)
+     .group(all);
+
+   //Dimensions
+   marketDim = facts.dimension(function(d) {
+     return d.Location;
+   });
+   marketDim2 = facts.dimension(function(d) {
+     return d.Location;
+   });
+
+   productDim = facts.dimension(function(d) {
+     return d.Product;
+   });
+
+   vendorDim = facts.dimension(function(d) {
+     return d.Vendor;
+   });
+
+   CategoryDim = facts.dimension(function(d) {
+     return d.Category;
+   });
+
+   //Groups
+   var MarketsGroup = marketDim.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+   var ClientsGroup = vendorDim.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+
+
+   function reduceAdd(p, v) {
+     p.total += +v.TotalCost;
+     p.count += +v.Quantity;
+     p.average = p.total / p.count;
+     p.average = Math.round(p.average)
+     return p
+   }
+
+   function reduceRemove(p, v) {
+     p.total -= v.TotalCost;
+     p.count -= v.Quantity;
+     p.average = p.count > 0 ? p.total / p.count : 0;
+     if (p.average < 0) {
+       p.average = 0;
+     }
+     p.average = Math.round(p.average, 2)
+     return p
+   }
+
+   function reduceInitial() {
+     return {
+       total: 0,
+       count: 0,
+       average: 0,
+     };
+   }
+
+
+   formatter = d3.format(".1s")
+   formatter2 = d3.format(".0%")
+
+   //Fake Dimension
+   rank = function(p) {
+     return ""
+   };
+
+   //Remove any table row that has 0 or a garbage value
+   function checkRows(d) {
+     if (d.value.total <= 0 || isNaN(d.value.total) || isNaN(d.value.average) || d.value.average <= 0 || isNaN(d.value.count) || d.value.count <= 0) {
+       return 0;
+     }
+     return d;
+   }
+
+   pieChart
+     .width(200)
+     .height(200)
+     .dimension(CategoryDim)
+     .group(CategoryDim.group().reduceSum(d => d.TotalCost));
+
+   //MarketTable
+   marketTable.width(500)
+     .height(480)
+     .dimension(MarketsGroup)
+     .group(rank)
+     .columns([function(d) {
+         d = checkRows(d);
+         while (d != 0) {
+           return d.key;
+         }
+       },
+       function(d) {
+         d = checkRows(d);
+         while (d != 0) {
+           return formatter(d.value.total);
+         }
+       },
+       function(d) {
+         d = checkRows(d);
+         while (d != 0) {
+           return formatter(d.value.count);
+         }
+       },
+       function(d) {
+         d = checkRows(d);
+         while (d != 0) {
+           return d.value.average;
+         }
+       }
+     ])
+     .sortBy(function(d) {
+       return d.value.total
+     })
+     .order(d3.descending)
+
+   MarketsGroup.filter = true;
+   let default_filter_handler = marketTable.filterHandler();
+   marketTable.filterHandler((_, filters) => {
+     return default_filter_handler(marketDim, filters);
+   });
+   marketTable.on('pretransition', function(table) {
+     table.selectAll('td.dc-table-column')
+       .on('click', function(d) {
+         let filters = table.filters().slice();
+         if (filters.indexOf(d.key) === -1)
+           filters.push(d.key);
+         else
+           filters = filters.filter(k => k != d.key);
+         table.replaceFilter([filters]);
+         dc.redrawAll();
+       });
+     let filters = table.filters();
+     table.selectAll('tr.dc-table-row')
+       .classed('sel-rows', d => filters.indexOf(d.key) !== -1);
+   });
+
+   search
+     .dimension(marketDim2);
+
+   /* marketTable.on("renderlet", function(chart){
+   
+                chart.selectAll('tr.dc-table-row').on('click',function(d){
+                    
+                    if(filterKeys.includes(d.key)){
+                      
+                     chart.select('tr.dc-table-row').datum(d.key).style('background-color','blue');
+                    }
+   
+                })
+   
+            });
+    */
+
+
+  /* dc.renderAll();
+
+ });
+
+  $('#resetAll').on('click', function() {
+    dc.filterAll();
+    dc.redrawAll();
+  });
+
+ $('#resetTable').on('click', function() {
+   marketTable.filter(null);
+   dc.redrawAll();
+ });*/
+
+    make_plot(all_points);
+    add_legend1();
+ });
+    
+    
+ });
+     });
+  //]]></script>
+
+<br>
+<footer class="callout large secondary">
+  <div class="grid-container">
+    <div class="grid-x">
+      <div class="large-12 cell" style="text-align: center;">
+   
+        <p></p>
+      
+    </div>
+ </div>
+    <script src=                                                                                                                                      
+"https://cdnjs.cloudflare.com/ajax/libs/foundation/6.0.1/js/foundation.js">                                                                           
+    </script> 
+    <script>
+      $(window).on("load",function() {
+                 $(document).foundation();
+     
+             });     
+
+         </script>
+    </div>
+</footer>
+
+</body>
+</html>
+
