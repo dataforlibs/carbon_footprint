@@ -1,4 +1,4 @@
-<!OADOCTYPE html>
+<html>
 <meta charset="utf-8">
 
 <!-- Load d3.js -->
@@ -12,7 +12,7 @@
 
 // set the dimensions and margins of the graph
 var margin = {top: 20, right: 30, bottom: 30, left: 60},
-    width = 1250 - margin.left - margin.right,
+    width = 1050 - margin.left - margin.right,
     height = 700 - margin.top - margin.bottom;
 
 // append the svg object to the body of the page
@@ -89,14 +89,6 @@ d3.selectAll("."+d.key.replaceAll(",","").replaceAll(" ","")).style("opacity",1)
 d3.selectAll("path").style("opacity",0.8);
 
 });
-
-
-
-
-
-
-
-
 
 })
 </script>
