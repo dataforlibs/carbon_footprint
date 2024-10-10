@@ -41,7 +41,7 @@ d3.csv("topics_over_time3_selenay.csv", function(data) {
 
   // Add Y axis
   var y = d3.scaleLinear()
-    .domain([-250, 250])
+    .domain([-350, 350])
     .range([ height, 0 ]);
   svg.append("g")
     .call(d3.axisLeft(y));
