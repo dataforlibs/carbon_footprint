@@ -1344,9 +1344,17 @@ d3.select("#ts").html("");
 					temp.c = d[o]["c"]; //.replace(" ","");    
           //console.log(d[0]["c"]);
 try {
-					temp.end = cust_names[d[o]["c"]][2];
+
+  if (cust_names[d[o]["c"]][2]>cust_names[d[o]["c"]][1]) {
+temp.end = cust_names[d[o]["c"]][2];
 temp.start = cust_names[d[o]["c"]][1];
 temp.life = cust_names[d[o]["c"]][3];
+  } else {
+    temp.end = cust_names[d[o]["c"]][1];
+temp.start = cust_names[d[o]["c"]][2];
+temp.life = cust_names[d[o]["c"]][3]*-1;
+
+  }
 } catch(e){
 temp.end = 2023;
 temp.start = 2020;
