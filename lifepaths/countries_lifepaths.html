@@ -296,7 +296,7 @@ width:80%;
                 <th>#of articles</th>
                 <th>Start Year</th>
                 <th>End Year</th>
-                <th>#of Days</th>
+               <!--- <th>#of Days</th>--->
                 <th>Status</th>
                  <th>Active</th>
                
@@ -309,7 +309,7 @@ width:80%;
                 <th>#of articles</th>
                 <th>Start Year</th>
                 <th>End Year</th>
-                <th>#of Days</th>
+                <!---<th>#of Days</th>--->
                   <th>Status</th>
                  <th>Active</th>
             </tr>
@@ -1054,7 +1054,7 @@ d3.select("#canvas_root1").append("path")
 			temp.category = tt[0].toUpperCase() + tt.substring(1);
 			temp.start = d[2];
 			temp.end = d[3];
-			temp.life = Number(d[4]);
+			//temp.life = Number(d[4]);
 			temp.name = kk[i];
 			return temp;
 		});
@@ -1114,7 +1114,7 @@ d3.select("#canvas_root1").append("path")
 		});
 
 		//console.log(year3);
-		var years3 = year3_.group(function(d) { return Math.floor(d / 50) * 50 });//.reduceCount(); //.reduceSum(function(fact) {  return Number(fact.life); }); 
+//		var years3 = year3_.group(function(d) { return Math.floor(d / 50) * 50 });//.reduceCount(); //.reduceSum(function(fact) {  return Number(fact.life); }); 
 		//.reduceCount();//
 		//  console.log(years3);
 
@@ -1348,17 +1348,17 @@ try {
   if (cust_names[d[o]["c"]][2]>cust_names[d[o]["c"]][1]) {
 temp.end = cust_names[d[o]["c"]][2];
 temp.start = cust_names[d[o]["c"]][1];
-temp.life = cust_names[d[o]["c"]][3];
+//temp.life = cust_names[d[o]["c"]][3];
   } else {
     temp.end = cust_names[d[o]["c"]][1];
 temp.start = cust_names[d[o]["c"]][2];
-temp.life = cust_names[d[o]["c"]][3]*-1;
+//temp.life = cust_names[d[o]["c"]][3]*-1;
 
   }
 } catch(e){
 temp.end = 2023;
 temp.start = 2020;
-temp.life = "?";
+//temp.life = "?";
 }
 		//			temp.start = cust_names[d[o]["c"]][1];
 		//			temp.life = cust_names[d[o]["c"]][3];
@@ -1616,7 +1616,7 @@ for (var i=0; i<d.length; i++) {
             { data: "of articles" },
             { data: "StartYear" },
             { data: "EndYear" },
-            { data: "Days" },
+            //{ data: "Days" },
              { data: "Status" },  
             {
                 data:   "active",
