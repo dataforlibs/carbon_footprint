@@ -717,7 +717,7 @@ var svg = d3.select("#ts")
 
   var sc2=d3
   .scaleTime()
-  .range([new Date("2007-01-01"), new Date("2024-07-31")]) //2025-05-16T00:00:00 1.32
+  .range([new Date("2007-01-01"), new Date("2023-07-31")]) //2025-05-16T00:00:00 1.32
   .domain([d3.extent(data["rel_time"], function(d) { return d; })[0],1]); ///d3.extent(data["rel_time"], function(d) { return d; })[0],maxX  d3.extent(data["rel_time"], function(d) { return d; })[0]    
     
 var minM=d3.extent(data["modeled"], function(d) { return +d; })[0];
@@ -1371,7 +1371,7 @@ d3.select("#ts").html("");
 
 
                                         //temp.start = cust_names[d[o]["c"]][1];
-					temp.end = "2024";
+					temp.end = "2023";
 					temp.start = cust_names[d[o]["c"]][1];
 					temp.life = cust_names[d[o]["c"]][3];
 					temp.sel = 1;
