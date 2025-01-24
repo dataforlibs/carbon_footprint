@@ -851,6 +851,7 @@ d3.select("#canvas_root1").selectAll(".line2").remove();
         .style('z-index', 101)
          .style("fill-opacity",0.3)
         .on("click", function(e){
+console.log(e);
             draw_ts(e.c);
         
         });
@@ -897,8 +898,10 @@ d3.select("#canvas_root1").append("path")
         .style('z-index', 1001)
          .style("fill-opacity",0.3)
        .on("click", function(e){
+console.log(e);
       draw_ts(e.c);
         });
+console.log(points[0]);
          draw_ts(points[0]["c"]);
         
     } else {
