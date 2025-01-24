@@ -696,12 +696,12 @@ context.fillStyle = colorScale2(dd[point.c]);
 	console.log(e);
          d3.select("#ts").html("");
          d3.select("#ts_table").html("");
-        d3.json("ts/"+e+"_2024-07-31.json", function(m){ ///.replaceAll(" ","_").replaceAll("\/","_").replaceAll("/","_")
+        d3.json("ts/"+e+"_2023-07-31.json", function(m){ ///.replaceAll(" ","_").replaceAll("\/","_").replaceAll("/","_")
             var ht="";
             for (var u=0; u<d3.keys(m).length; u++) {
                 ht+="<b>"+d3.keys(m)[u]+"</b>: "+m[d3.keys(m)[u]]+"<br>";
             }
-        d3.json("ts/"+e+"_2024-07-31.json",function(data){
+        d3.json("ts/"+e+"_2023-07-31.json",function(data){
              d3.select("#ts").html("<b>"+e+"</b> <br>"+data["date"]);
 var margin0 = {top: 10, right: 30, bottom: 70, left: 60},
     width0 = 260 - margin0.left - margin0.right,
