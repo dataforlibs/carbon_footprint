@@ -693,6 +693,7 @@ context.fillStyle = colorScale2(dd[point.c]);
     
 
     function  draw_ts(e) {
+	console.log(e);
          d3.select("#ts").html("");
          d3.select("#ts_table").html("");
         d3.json("ts/"+e+"_2024-07-31.json", function(m){ ///.replaceAll(" ","_").replaceAll("\/","_").replaceAll("/","_")
