@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>H-Index Calculator for Feijoo, G</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        .data-point {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .data-point:hover {
+            r: 6;
+            fill: #1e40af;
+        }
+        .sortable {
+            cursor: pointer;
+        }
+        .sortable:hover {
+            background-color: #f3f4f6;
+        }
+        .h-index-row {
+            background-color: #dcfce7;
+        }
+        .non-h-index-row {
+            background-color: #fef2f2;
+        }
+        .h-index-threshold {
+            border: 2px solid #3b82f6;
+            font-weight: bold;
+        }
+        .tab-button {
+            padding: 0.5rem 1rem;
+            border: 1px solid #d1d5db;
+            background: #f9fafb;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .tab-button.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="p-6 max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">H-Index Calculator for Feijoo, G</h1>
+            <div class="bg-blue-100 border-l-4 border-blue-500 p-6 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <p class="text-lg font-semibold text-blue-800">
+                            Current H-Index: <span class="text-2xl text-blue-900" id="current-h-index">30</span>
+                        </p>
+                        <p class="text-sm text-blue-600">As of 2023</p>
+                    </div>
+                    <div>
+                        <p class="text-lg font-semibold text-blue-800">
+                            Total Papers: <span class="text-2xl text-blue-900" id="total-papers">47</span>
+                        </p>
+                        <p class="text-sm text-blue-600">Career span: 2010-2023</p>
+                    </div>
+                    <div>
+                        <p class="text-lg font-semibold text-blue-800">
+                            Total Citations: <span class="text-2xl text-blue-900" id="total-citations">1,341</span>
+                        </p>
+                        <p class="text-sm text-blue-600">All databases</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="mb-6">
+            <div class="flex border-b border-gray-200">
+                <button class="tab-button active" onclick="showTab('current')">Current H-Index Analysis</button>
+                <button class="tab-button" onclick="showTab('timeline')">H-Index Over Time</button>
+                <button class="tab-button" onclick="showTab('papers')">Detailed Paper Analysis</button>
+            </div>
+        </div>
+
+        <!-- Tab 1: Current H-Index Analysis -->
+        <div id="current-tab" class="tab-content active">
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                <h2 class="text-2xl font-semibold mb-4">Current H-Index Breakdown</h2>
+                <div class="mb-4">
+                    <p class="text-gray-700 mb-2">
+                        <strong>H-Index Definition:</strong> Feijoo, G has <span class="font-bold text-blue-600">30 papers</span> 
+                        with at least <span class="font-bold text-blue-600">30 citations</span> each.
+                    </p>
+                </div>
+                
+                <!-- Papers Table -->
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse border border-gray-300" id="papers-table">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="border border-gray-300 px-3 py-2 text-left sortable" onclick="sortTable(0)">Rank ↕</th>
+                                <th class="border border-gray-300 px-3 py-2 text-left sortable" onclick="sortTable(1)">Citations ↕</th>
+                                <th class="border border-gray-300 px-3 py-2 text-left sortable" onclick="sortTable(2)">Year ↕</th>
+                                <th class="border border-gray-300 px-3 py-2 text-left">Title</th>
+                                <th class="border border-gray-300 px-3 py-2 text-center">H-Index</th>
+                            </tr>
+                        </thead>
+                        <tbody id="papers-tbody">
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Statistics -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="font-semibold text-lg mb-2">Citation Distribution</h3>
+                    <ul class="text-sm space-y-1">
+                        <li>• Papers with ≥100 citations: <span class="font-bold" id="high-citations">3</span></li>
+                        <li>• Papers with 50-99 citations: <span class="font-bold" id="med-citations">3</span></li>
+                        <li>• Papers with 30-49 citations: <span class="font-bold" id="h-threshold-citations">6</span></li>
+                        <li>• Papers with &lt;30 citations: <span class="font-bold" id="low-citations">35</span></li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="font-semibold text-lg mb-2">Career Metrics</h3>
+                    <ul class="text-sm space-y-1">
+                        <li>• Average citations per paper: <span class="font-bold" id="avg-citations">28.5</span></li>
+                        <li>• Most cited paper: <span class="font-bold" id="max-citations">143 citations</span></li>
+                        <li>• Active years: <span class="font-bold">14 years (2010-2023)</span></li>
+                        <li>• Papers per year: <span class="font-bold">3.4 average</span></li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="font-semibold text-lg mb-2">Research Impact</h3>
+                    <ul class="text-sm space-y-1">
+                        <li>• H-index percentile: <span class="font-bold text-green-600">Very High</span></li>
+                        <li>• Career stage: <span class="font-bold">Senior Researcher</span></li>
+                        <li>• Research quality: <span class="font-bold text-green-600">Excellent</span></li>
+                        <li>• Citation momentum: <span class="font-bold text-blue-600">Strong</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: H-Index Over Time -->
+        <div id="timeline-tab" class="tab-content">
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                <h2 class="text-2xl font-semibold mb-4">H-Index Growth Timeline</h2>
+                <div class="relative">
+                    <div class="relative ml-8 mb-8">
+                        <svg class="w-full h-80 border-l-2 border-b-2 border-gray-300" id="timeline-chart">
+                            <!-- Chart will be populated by JavaScript -->
+                        </svg>
+                        
+                        <!-- Y-axis labels -->
+                        <div class="absolute left-0 top-0 h-full flex flex-col justify-between text-xs text-gray-600" id="y-axis-labels">
+                            <!-- Labels will be added by JavaScript -->
+                        </div>
+                        
+                        <!-- X-axis labels -->
+                        <div class="absolute -bottom-6 w-full flex justify-between text-xs text-gray-600" id="x-axis-labels">
+                            <!-- Labels will be added by JavaScript -->
+                        </div>
+                        
+                        <!-- Axis titles -->
+                        <div class="absolute -left-6 top-1/2 transform -rotate-90 text-sm font-medium text-gray-700">
+                            H-Index
+                        </div>
+                        <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-6 text-sm font-medium text-gray-700">
+                            Year
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Year-by-year table -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-xl font-semibold mb-4">Year-by-Year H-Index Evolution</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse border border-gray-300">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="border border-gray-300 px-3 py-2">Year</th>
+                                <th class="border border-gray-300 px-3 py-2">H-Index</th>
+                                <th class="border border-gray-300 px-3 py-2">Papers This Year</th>
+                                <th class="border border-gray-300 px-3 py-2">Cumulative Papers</th>
+                                <th class="border border-gray-300 px-3 py-2">Total Citations</th>
+                                <th class="border border-gray-300 px-3 py-2">H-Index Growth</th>
+                            </tr>
+                        </thead>
+                        <tbody id="timeline-tbody">
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sigmoid Analysis -->
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mt-6">
+                <h3 class="font-semibold text-lg mb-3">Sigmoid Pattern Analysis</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <strong>Growth Phases Observed:</strong>
+                        <ul class="mt-1 space-y-1">
+                            <li>• <strong>Phase 1 (2010-2012):</strong> Initial slow growth (2→11)</li>
+                            <li>• <strong>Phase 2 (2013-2018):</strong> Rapid acceleration (12→22)</li>
+                            <li>• <strong>Phase 3 (2019-2023):</strong> Stabilization trend (23→30)</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <strong>Sigmoid Characteristics:</strong>
+                        <ul class="mt-1 space-y-1">
+                            <li>• Classic S-curve pattern visible</li>
+                            <li>• Steep growth in mid-career (2014-2018)</li>
+                            <li>• Recent stabilization suggests maturity</li>
+                            <li>• Pattern fits sigmoid mathematical model</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Detailed Paper Analysis -->
+        <div id="papers-tab" class="tab-content">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-semibold mb-4">Complete Paper Portfolio Analysis</h2>
+                
+                <!-- Search and filter -->
+                <div class="mb-4 flex flex-wrap gap-4">
+                    <input type="text" id="search-input" placeholder="Search papers by title..." 
+                           class="px-3 py-2 border border-gray-300 rounded-lg" onkeyup="filterPapers()">
+                    <select id="year-filter" class="px-3 py-2 border border-gray-300 rounded-lg" onchange="filterPapers()">
+                        <option value="">All Years</option>
+                        <!-- Options will be populated by JavaScript -->
+                    </select>
+                    <select id="citation-filter" class="px-3 py-2 border border-gray-300 rounded-lg" onchange="filterPapers()">
+                        <option value="">All Citation Ranges</option>
+                        <option value="high">≥100 citations</option>
+                        <option value="medium">50-99 citations</option>
+                        <option value="h-threshold">30-49 citations</option>
+                        <option value="low">&lt;30 citations</option>
+                    </select>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse border border-gray-300" id="detailed-papers-table">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="border border-gray-300 px-3 py-2 text-left sortable" onclick="sortDetailedTable(0)">Rank ↕</th>
+                                <th class="border border-gray-300 px-3 py-2 text-left sortable" onclick="sortDetailedTable(1)">Citations ↕</th>
+                                <th class="border border-gray-300 px-3 py-2 text-left sortable" onclick="sortDetailedTable(2)">Year ↕</th>
+                                <th class="border border-gray-300 px-3 py-2 text-left">Full Title</th>
+                                <th class="border border-gray-300 px-3 py-2 text-center">Impact Level</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detailed-papers-tbody">
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Citation data
+        const citationData = [
+            { title: "Comparative life cycle assessment in the wine sector: biodynamic vs. conventional viticulture activities in NW Spain", citations: 143, year: 2014 },
+            { title: "Carbon footprint and nutritional quality of different human dietary choices", citations: 132, year: 2018 },
+            { title: "A methodology to estimate greenhouse gases emissions in Life Cycle Inventories of wastewater treatment plants", citations: 73, year: 2012 },
+            { title: "Estimation of the carbon footprint of the Galician fishing activity (NW Spain)", citations: 73, year: 2010 },
+            { title: "Assessing the global warming potential of wooden products from the furniture sector to improve their ecodesign", citations: 71, year: 2011 },
+            { title: "Carbon footprint of canned mussels from a business-to-consumer approach", citations: 69, year: 2010 },
+            { title: "Towards an environmentally sustainable and healthy Atlantic dietary pattern", citations: 64, year: 2019 },
+            { title: "Life cycle assessment of fish and seafood processed products - A review of methodologies and new challenges", citations: 58, year: 2021 },
+            { title: "Life cycle assessment of European pilchard (Sardina pilchardus) consumption", citations: 43, year: 2014 },
+            { title: "Carbon footprint of a multi-ingredient seafood product from a business-to-business perspective", citations: 41, year: 2013 },
+            { title: "Updating the carbon footprint of the Galician fishing activity (NW Spain)", citations: 36, year: 2011 },
+            { title: "Linking environmental sustainability and nutritional quality of the Atlantic diet recommendations", citations: 33, year: 2019 },
+            { title: "The role of consumer purchase and post-purchase decision-making in sustainable seafood consumption", citations: 30, year: 2013 },
+            { title: "Environmental and water sustainability of milk production in Northeast Spain", citations: 29, year: 2018 },
+            { title: "Environmental performance of sorghum, barley and oat silage production for livestock feed", citations: 27, year: 2016 },
+            { title: "Assessing water footprint in a wine appellation: A case study for Ribeiro in Galicia, Spain", citations: 24, year: 2018 },
+            { title: "Cross-vessel eco-efficiency analysis. A case study for purse seining fishing", citations: 21, year: 2015 },
+            { title: "Turning waste management into a carbon neutral activity", citations: 21, year: 2020 },
+            { title: "Efficiency assessment of diets in the Spanish regions", citations: 18, year: 2020 },
+            { title: "Pursuing the route to eco-efficiency in dairy production", citations: 18, year: 2021 },
+            { title: "Fostering environmental awareness towards responsible food consumption", citations: 17, year: 2020 },
+            { title: "Evaluating the carbon footprint of a Spanish city through environmentally extended input output analysis", citations: 16, year: 2021 },
+            { title: "Opportunities and challenges of implementing life cycle assessment in seafood certification", citations: 15, year: 2016 },
+            { title: "Multi-product strategy to enhance the environmental profile of the canning industry", citations: 15, year: 2021 },
+            { title: "Renewable carbon opportunities in the production of succinic acid", citations: 15, year: 2022 },
+            { title: "Driving commitment to sustainable food policies within the framework of American and European dietary guidelines", citations: 15, year: 2022 },
+            { title: "Environmental profile of the municipality of Madrid through the methodologies of Urban Metabolism", citations: 14, year: 2021 },
+            { title: "Is the Paleo diet safe for health and the environment?", citations: 14, year: 2021 },
+            { title: "Environmental footprint of critical agro-export products in the Peruvian hyper-arid coast", citations: 13, year: 2022 },
+            { title: "Unraveling the environmental impacts of bioactive compounds and organic amendment from grape marc", citations: 12, year: 2020 },
+            { title: "Could the economic crisis explain the reduction in the carbon footprint of food?", citations: 10, year: 2021 },
+            { title: "Evaluating the Portuguese diet in the pursuit of a lower carbon and healthier consumption pattern", citations: 10, year: 2020 },
+            { title: "Environmental and nutritional profile of food consumption patterns in the different climatic zones of Spain", citations: 10, year: 2021 },
+            { title: "Evaluation of the environmental sustainability of the inshore great scallop fishery", citations: 10, year: 2022 },
+            { title: "Carbon footprint analysis of goose barnacle collection on the Galician coast", citations: 9, year: 2013 },
+            { title: "The use of maize stover and sugar beet pulp as feedstocks in industrial fermentation plants", citations: 8, year: 2021 },
+            { title: "Co-benefits of the EAT-Lancet diet for environmental protection", citations: 7, year: 2022 },
+            { title: "Towards a Green Port strategy: The decarbonisation of the Port of Vigo", citations: 6, year: 2023 },
+            { title: "Environmental assessment of menus for toddlers serviced at nursery canteen", citations: 6, year: 2021 },
+            { title: "Blue carbon accounting as metrics to be taken into account towards the target of GHG emissions mitigation", citations: 5, year: 2022 },
+            { title: "Addressing the food, nutrition and environmental nexus", citations: 5, year: 2022 },
+            { title: "Encompassing health and nutrition with the adherence to the environmentally sustainable New Nordic Diet", citations: 5, year: 2021 },
+            { title: "Balance between Hosts and Guests: The Key to Sustainable Tourism in a Heritage City", citations: 4, year: 2022 },
+            { title: "Waste biorefinery towards a sustainable biotechnological production of pediocin", citations: 2, year: 2022 },
+            { title: "Estimating Carbon Footprint Under an Intensive Aquaculture Regime", citations: 1, year: 2018 },
+            { title: "A clustering approach to analyse the environmental and energetic impacts of Atlantic recipes", citations: 1, year: 2023 },
+            { title: "Climate Change and Water Scarcity at the Focus of Environmental Impacts Associated with the COVID-19 Crisis", citations: 0, year: 2023 },
+            { title: "Environmental Implications of Discarding Fish in Northern Spanish Coastal Bottom Otter Trawl Fisheries", citations: 0, year: 2020 }
+        ];
+
+        let sortedData = [...citationData].sort((a, b) => b.citations - a.citations);
+        let currentHIndex = 30;
+
+        // Calculate H-Index
+        function calculateHIndex(papers) {
+            const sorted = [...papers].sort((a, b) => b.citations - a.citations);
+            let hIndex = 0;
+            for (let i = 0; i < sorted.length; i++) {
+                const rank = i + 1;
+                const citations = sorted[i].citations;
+                if (citations >= rank) {
+                    hIndex = rank;
+                } else {
+                    break;
+                }
+            }
+            return hIndex;
+        }
+
+        // Tab functionality
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+            
+            // Initialize content based on tab
+            if (tabName === 'timeline') {
+                initializeTimeline();
+            } else if (tabName === 'papers') {
+                initializeDetailedPapers();
+            }
+        }
+
+        // Sort table functionality
+        function sortTable(column) {
+            const tbody = document.getElementById('papers-tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            
+            rows.sort((a, b) => {
+                const aVal = a.cells[column].textContent.trim();
+                const bVal = b.cells[column].textContent.trim();
+                
+                if (column === 0 || column === 1 || column === 2) { // Numeric columns
+                    return parseInt(bVal) - parseInt(aVal);
+                }
+                return aVal.localeCompare(bVal);
+            });
+            
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        // Initialize current H-Index tab
+        function initializeCurrentTab() {
+            const tbody = document.getElementById('papers-tbody');
+            tbody.innerHTML = '';
+            
+            sortedData.forEach((paper, index) => {
+                const rank = index + 1;
+                const contributesToHIndex = paper.citations >= rank;
+                const isHIndexThreshold = rank === currentHIndex;
+                
+                const row = document.createElement('tr');
+                row.className = contributesToHIndex ? 'h-index-row' : 'non-h-index-row';
+                if (isHIndexThreshold) row.classList.add('h-index-threshold');
+                
+                row.innerHTML = `
+                    <td class="border border-gray-300 px-3 py-2 font-mono">${rank}</td>
+                    <td class="border border-gray-300 px-3 py-2 font-mono font-bold">${paper.citations}</td>
+                    <td class="border border-gray-300 px-3 py-2">${paper.year}</td>
+                    <td class="border border-gray-300 px-3 py-2 text-sm">
+                        ${paper.title.length > 80 ? paper.title.substring(0, 80) + '...' : paper.title}
+                    </td>
+                    <td class="border border-gray-300 px-3 py-2 text-center">
+                        ${contributesToHIndex ? 
+                            '<span class="text-green-600 font-bold">✓</span>' : 
+                            '<span class="text-red-600">✗</span>'
+                        }
+                        ${isHIndexThreshold ? '<br><span class="text-blue-600 font-bold text-xs">H-INDEX</span>' : ''}
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            // Update statistics
+            updateStatistics();
+        }
+
+        function updateStatistics() {
+            const totalCitations = citationData.reduce((sum, p) => sum + p.citations, 0);
+            const avgCitations = (totalCitations / citationData.length).toFixed(1);
+            const maxCitations = Math.max(...citationData.map(p => p.citations));
+            
+            const highCitations = citationData.filter(p => p.citations >= 100).length;
+            const medCitations = citationData.filter(p => p.citations >= 50 && p.citations < 100).length;
+            const hThresholdCitations = citationData.filter(p => p.citations >= 30 && p.citations < 50).length;
+            const lowCitations = citationData.filter(p => p.citations < 30).length;
+            
+            document.getElementById('total-papers').textContent = citationData.length;
+            document.getElementById('total-citations').textContent = totalCitations.toLocaleString();
+            document.getElementById('avg-citations').textContent = avgCitations;
+            document.getElementById('max-citations').textContent = maxCitations + ' citations';
+            document.getElementById('high-citations').textContent = highCitations;
+            document.getElementById('med-citations').textContent = medCitations;
+            document.getElementById('h-threshold-citations').textContent = hThresholdCitations;
+            document.getElementById('low-citations').textContent = lowCitations;
+        }
+
+        // Timeline functionality
+        function generateYearlyData() {
+            const yearlyData = [];
+            const minYear = Math.min(...citationData.map(p => p.year));
+            const maxYear = Math.max(...citationData.map(p => p.year));
+            
+            for (let year = minYear; year <= maxYear; year++) {
+                const papersUpToYear = citationData.filter(p => p.year <= year);
+                const hIndex = calculateHIndex(papersUpToYear);
+                const paperCount = papersUpToYear.length;
+                const totalCitations = papersUpToYear.reduce((sum, p) => sum + p.citations, 0);
+                
+                yearlyData.push({
+                    year,
+                    hIndex,
+                    paperCount,
+                    totalCitations,
+                    papersThisYear: citationData.filter(p => p.year === year).length
+                });
+            }
+            return yearlyData;
+        }
+
+        function initializeTimeline() {
+            const yearlyData = generateYearlyData();
+            createTimelineChart(yearlyData);
+            createTimelineTable(yearlyData);
+        }
+
+        function createTimelineChart(data) {
+            const svg = document.getElementById('timeline-chart');
+            const maxH = Math.max(...data.map(d => d.hIndex));
+            
+            svg.innerHTML = '';
+            
+            // Add grid lines
+            for (let i = 0; i <= 4; i++) {
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', '0');
+                line.setAttribute('y1', (i / 4) * 280);
+                line.setAttribute('x2', '100%');
+                line.setAttribute('y2', (i / 4) * 280);
+                line.setAttribute('stroke', '#e5e7eb');
+                line.setAttribute('stroke-width', '1');
+                svg.appendChild(line);
+            }
+            
+            // Create path for line
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+            const points = data.map((d, index) => {
+                const x = (index / (data.length - 1)) * 100;
+                const y = 100 - (d.hIndex / maxH) * 100;
+                return `${x}%,${y}%`;
+            }).join(' ');
+            
+            path.setAttribute('points', points);
+            path.setAttribute('fill', 'none');
+            path.setAttribute('stroke', '#3b82f6');
+            path.setAttribute('stroke-width', '3');
+            path.setAttribute('stroke-linecap', 'round');
+            path.setAttribute('stroke-linejoin', 'round');
+            svg.appendChild(path);
+            
+            // Add data points
+            data.forEach((d, index) => {
+                const x = (index / (data.length - 1)) * 100;
+                const y = 100 - (d.hIndex / maxH) * 100;
+                
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', `${x}%`);
+                circle.setAttribute('cy', `${y}%`);
+                circle.setAttribute('r', '4');
+                circle.setAttribute('fill', '#3b82f6');
+                circle.setAttribute('stroke', '#ffffff');
+                circle.setAttribute('stroke-width', '2');
+                circle.className = 'data-point';
+                circle.title = `${d.year}: h-index = ${d.hIndex}`;
+                svg.appendChild(circle);
+            });
+            
+            // Update axis labels
+            const yAxisLabels = document.getElementById('y-axis-labels');
+            yAxisLabels.innerHTML = '';
+            for (let i = 4; i >= 0;

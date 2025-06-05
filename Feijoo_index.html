@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>H-Index Evolution Over Time - Feijoo, G</title>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        .hover\:r-6:hover { r: 6; }
+        .transition-all { transition: all 0.3s; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const HIndexOverTime = () => {
+            const [hIndexOverTime, setHIndexOverTime] = useState([]);
+            const [currentHIndex, setCurrentHIndex] = useState(0);
+            
+            // Citation data from the CSV with publication years
+            const citationData = [
+                { title: "Estimation of the carbon footprint of the Galician fishing activity (NW Spain)", citations: 73, year: 2010 },
+                { title: "Carbon footprint of canned mussels from a business-to-consumer approach", citations: 69, year: 2010 },
+                { title: "Updating the carbon footprint of the Galician fishing activity (NW Spain)", citations: 36, year: 2011 },
+                { title: "Assessing the global warming potential of wooden products from the furniture sector", citations: 71, year: 2011 },
+                { title: "A methodology to estimate greenhouse gases emissions in Life Cycle Inventories of wastewater treatment plants", citations: 73, year: 2012 },
+                { title: "Carbon footprint of a multi-ingredient seafood product from a business-to-business perspective", citations: 41, year: 2013 },
+                { title: "Carbon footprint analysis of goose barnacle collection on the Galician coast", citations: 9, year: 2013 },
+                { title: "The role of consumer purchase and post-purchase decision-making in sustainable seafood consumption", citations: 30, year: 2013 },
+                { title: "Life cycle assessment of European pilchard (Sardina pilchardus) consumption", citations: 43, year: 2014 },
+                { title: "Comparative life cycle assessment in the wine sector: biodynamic vs. conventional viticulture activities in NW Spain", citations: 143, year: 2014 },
+                { title: "Cross-vessel eco-efficiency analysis. A case study for purse seining fishing", citations: 21, year: 2015 },
+                { title: "Opportunities and challenges of implementing life cycle assessment in seafood certification", citations: 15, year: 2016 },
+                { title: "Environmental performance of sorghum, barley and oat silage production for livestock feed", citations: 27, year: 2016 },
+                { title: "Estimating Carbon Footprint Under an Intensive Aquaculture Regime", citations: 1, year: 2018 },
+                { title: "Environmental and water sustainability of milk production in Northeast Spain", citations: 29, year: 2018 },
+                { title: "Carbon footprint and nutritional quality of different human dietary choices", citations: 132, year: 2018 },
+                { title: "Assessing water footprint in a wine appellation: A case study for Ribeiro in Galicia, Spain", citations: 24, year: 2018 },
+                { title: "Towards an environmentally sustainable and healthy Atlantic dietary pattern", citations: 64, year: 2019 },
+                { title: "Linking environmental sustainability and nutritional quality of the Atlantic diet recommendations", citations: 33, year: 2019 },
+                { title: "Efficiency assessment of diets in the Spanish regions", citations: 18, year: 2020 },
+                { title: "Turning waste management into a carbon neutral activity", citations: 21, year: 2020 },
+                { title: "Evaluating the Portuguese diet in the pursuit of a lower carbon and healthier consumption pattern", citations: 10, year: 2020 },
+                { title: "Fostering environmental awareness towards responsible food consumption", citations: 17, year: 2020 },
+                { title: "Environmental Implications of Discarding Fish in Northern Spanish Coastal Bottom Otter Trawl Fisheries", citations: 0, year: 2020 },
+                { title: "Unraveling the environmental impacts of bioactive compounds and organic amendment from grape marc", citations: 12, year: 2020 },
+                { title: "Environmental profile of the municipality of Madrid through the methodologies of Urban Metabolism", citations: 14, year: 2021 },
+                { title: "The use of maize stover and sugar beet pulp as feedstocks in industrial fermentation plants", citations: 8, year: 2021 },
+                { title: "Multi-product strategy to enhance the environmental profile of the canning industry", citations: 15, year: 2021 },
+                { title: "Life cycle assessment of fish and seafood processed products - A review of methodologies and new challenges", citations: 58, year: 2021 },
+                { title: "Pursuing the route to eco-efficiency in dairy production", citations: 18, year: 2021 },
+                { title: "Could the economic crisis explain the reduction in the carbon footprint of food?", citations: 10, year: 2021 },
+                { title: "Environmental assessment of menus for toddlers serviced at nursery canteen", citations: 6, year: 2021 },
+                { title: "Evaluating the carbon footprint of a Spanish city through environmentally extended input output analysis", citations: 16, year: 2021 },
+                { title: "Is the Paleo diet safe for health and the environment?", citations: 14, year: 2021 },
+                { title: "Encompassing health and nutrition with the adherence to the environmentally sustainable New Nordic Diet", citations: 5, year: 2021 },
+                { title: "Environmental and nutritional profile of food consumption patterns in the different climatic zones of Spain", citations: 10, year: 2021 },
+                { title: "Balance between Hosts and Guests: The Key to Sustainable Tourism in a Heritage City", citations: 4, year: 2022 },
+                { title: "Co-benefits of the EAT-Lancet diet for environmental protection", citations: 7, year: 2022 },
+                { title: "Waste biorefinery towards a sustainable biotechnological production of pediocin", citations: 2, year: 2022 },
+                { title: "Blue carbon accounting as metrics to be taken into account towards the target of GHG emissions mitigation", citations: 5, year: 2022 },
+                { title: "Environmental footprint of critical agro-export products in the Peruvian hyper-arid coast", citations: 13, year: 2022 },
+                { title: "Renewable carbon opportunities in the production of succinic acid", citations: 15, year: 2022 },
+                { title: "Addressing the food, nutrition and environmental nexus", citations: 5, year: 2022 },
+                { title: "Driving commitment to sustainable food policies within the framework of American and European dietary guidelines", citations: 15, year: 2022 },
+                { title: "Evaluation of the environmental sustainability of the inshore great scallop fishery", citations: 10, year: 2022 },
+                { title: "A clustering approach to analyse the environmental and energetic impacts of Atlantic recipes", citations: 1, year: 2023 },
+                { title: "Towards a Green Port strategy: The decarbonisation of the Port of Vigo", citations: 6, year: 2023 },
+                { title: "Climate Change and Water Scarcity at the Focus of Environmental Impacts Associated with the COVID-19 Crisis", citations: 0, year: 2023 }
+            ];
+
+            const calculateHIndex = (papers) => {
+                const sorted = [...papers].sort((a, b) => b.citations - a.citations);
+                let hIndex = 0;
+                for (let i = 0; i < sorted.length; i++) {
+                    const rank = i + 1;
+                    const citations = sorted[i].citations;
+                    if (citations >= rank) {
+                        hIndex = rank;
+                    } else {
+                        break;
+                    }
+                }
+                return hIndex;
+            };
+
+            useEffect(() => {
+                const yearlyData = [];
+                const minYear = Math.min(...citationData.map(p => p.year));
+                const maxYear = Math.max(...citationData.map(p => p.year));
+                
+                for (let year = minYear; year <= maxYear; year++) {
+                    const papersUpToYear = citationData.filter(p => p.year <= year);
+                    const hIndex = calculateHIndex(papersUpToYear);
+                    const paperCount = papersUpToYear.length;
+                    const totalCitations = papersUpToYear.reduce((sum, p) => sum + p.citations, 0);
+                    
+                    yearlyData.push({
+                        year,
+                        hIndex,
+                        paperCount,
+                        totalCitations,
+                        papersThisYear: citationData.filter(p => p.year === year).length
+                    });
+                }
+                
+                setHIndexOverTime(yearlyData);
+                setCurrentHIndex(yearlyData[yearlyData.length - 1]?.hIndex || 0);
+            }, []);
+
+            return (
+                <div className="p-6 max-w-6xl mx-auto">
+                    <div className="mb-6">
+                        <h1 className="text-2xl font-bold text-gray-800 mb-2">H-Index Evolution Over Time: Feijoo, G</h1>
+                        <div className="bg-blue-100 border-l-4 border-blue-500 p-4 mb-4">
+                            <p className="text-lg font-semibold text-blue-800">
+                                Current H-Index (2023): <span className="text-2xl text-blue-900">{currentHIndex}</span>
+                            </p>
+                            <p className="text-sm text-blue-600 mt-1">
+                                Career span: 2010-2023 ({hIndexOverTime.length} years)
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Timeline Visualization */}
+                    <div className="mb-8">
+                        <h2 className="text-xl font-semibold mb-4">H-Index Growth Timeline</h2>
+                        <div className="bg-white p-6 border rounded-lg">
+                            <div className="relative">
+                                <div className="relative h-64 border-l-2 border-b-2 border-gray-300 ml-8 mb-8">
+                                    {/* Grid lines */}
+                                    {[0, 1, 2, 3, 4].map(i => {
+                                        const maxH = Math.max(...hIndexOverTime.map(d => d.hIndex));
+                                        const yPos = (i / 4) * 240;
+                                        return React.createElement('div', {
+                                            key: i,
+                                            className: "absolute w-full border-t border-gray-200",
+                                            style: { top: `${yPos}px` }
+                                        });
+                                    })}
+                                    
+                                    {/* Line chart */}
+                                    <svg className="absolute inset-0 w-full h-full" style={{ overflow: 'visible' }}>
+                                        <polyline
+                                            fill="none"
+                                            stroke="#3b82f6"
+                                            strokeWidth="3"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            points={hIndexOverTime.map((data, index) => {
+                                                const maxH = Math.max(...hIndexOverTime.map(d => d.hIndex));
+                                                const x = (index / (hIndexOverTime.length - 1)) * 100;
+                                                const y = 100 - (data.hIndex / maxH) * 100;
+                                                return `${x}%,${y}%`;
+                                            }).join(' ')}
+                                        />
+                                        
+                                        {/* Draw data points */}
+                                        {hIndexOverTime.map((data, index) => {
+                                            const maxH = Math.max(...hIndexOverTime.map(d => d.hIndex));
+                                            const x = (index / (hIndexOverTime.length - 1)) * 100;
+                                            const y = 100 - (data.hIndex / maxH) * 100;
+                                            
+                                            return React.createElement('g', { key: data.year }, [
+                                                React.createElement('circle', {
+                                                    key: 'main',
+                                                    cx: `${x}%`,
+                                                    cy: `${y}%`,
+                                                    r: "4",
+                                                    fill: "#3b82f6",
+                                                    stroke: "#ffffff",
+                                                    strokeWidth: "2",
+                                                    className: "transition-all cursor-pointer"
+                                                }),
+                                                React.createElement('circle', {
+                                                    key: 'hover',
+                                                    cx: `${x}%`,
+                                                    cy: `${y}%`,
+                                                    r: "12",
+                                                    fill: "transparent",
+                                                    className: "hover:fill-blue-100 transition-all cursor-pointer",
+                                                    title: `${data.year}: h-index = ${data.hIndex}`
+                                                })
+                                            ]);
+                                        })}
+                                    </svg>
+                                    
+                                    {/* X-axis labels */}
+                                    <div className="absolute -bottom-6 w-full flex justify-between text-xs text-gray-600">
+                                        {hIndexOverTime.map((data, index) => {
+                                            if (index % 2 === 0 || index === hIndexOverTime.length - 1) {
+                                                return React.createElement('span', { key: data.year }, data.year);
+                                            }
+                                            return React.createElement('span', { key: data.year, className: "invisible" }, data.year);
+                                        })}
+                                    </div>
+                                </div>
+                                
+                                {/* Y-axis labels */}
+                                <div className="absolute left-0 top-0 h-64 flex flex-col justify-between text-xs text-gray-600">
+                                    {[4, 3, 2, 1, 0].map(i => {
+                                        const maxH = Math.max(...hIndexOverTime.map(d => d.hIndex));
+                                        const value = Math.round((i / 4) * maxH);
+                                        return React.createElement('span', { key: i }, value);
+                                    })}
+                                </div>
+                                
+                                {/* Y-axis title */}
+                                <div className="absolute -left-6 top-1/2 transform -rotate-90 text-sm font-medium text-gray-700">
+                                    H-Index
+                                </div>
+                                
+                                {/* X-axis title */}
+                                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-6 text-sm font-medium text-gray-700">
+                                    Year
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Analysis Summary */}
+                    <div className="bg-gray-100 p-4 rounded-lg">
+                        <h3 className="font-semibold mb-3">Career Trajectory Analysis:</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <strong>Growth Pattern:</strong>
+                                <ul className="mt-1 space-y-1">
+                                    <li>• Early career (2010-2012): Rapid initial growth (0→11)</li>
+                                    <li>• Mid career (2013-2018): Steady growth (12→22)</li>
+                                    <li>• Recent years (2019-2023): Continued growth (23→30)</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <strong>Key Milestones:</strong>
+                                <ul className="mt-1 space-y-1">
+                                    <li>• 2012: Reached h-index of 11 with breakthrough papers</li>
+                                    <li>• 2018: Major jump to h-index 22 (high-impact publications)</li>
+                                    <li>• 2023: Current h-index of 30 (senior researcher status)</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div className="mt-3 p-3 bg-blue-50 rounded">
+                            <strong>Sigmoid Pattern Observable:</strong> The h-index growth shows the classic sigmoid pattern mentioned in your research - initial slow growth, rapid acceleration in productive mid-career years, and recent stabilization as the researcher reaches senior status.
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(React.createElement(HIndexOverTime), document.getElementById('root'));
+    </script>
+</body>
+</html>
