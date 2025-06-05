@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>H-Index Step-by-Step Calculation for Feijoo, G</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        .h-index-row {
+            background-color: #dbeafe;
+            border: 2px solid #3b82f6;
+            font-weight: bold;
+        }
+        .break-point-row {
+            background-color: #fecaca;
+            border: 2px solid #ef4444;
+            font-weight: bold;
+        }
+        .qualifying-row {
+            background-color: #dcfce7;
+        }
+        .non-qualifying-row {
+            background-color: #fef2f2;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="p-6 max-w-7xl mx-auto">
+        <div class="mb-6">
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">H-Index Step-by-Step Calculation for Feijoo, G</h1>
+            
+            <div class="bg-blue-100 border-l-4 border-blue-500 p-6 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <p class="text-lg font-semibold text-blue-800">
+                            Calculated H-Index: <span class="text-3xl text-blue-900" id="h-index-result">--</span>
+                        </p>
+                        <p class="text-sm text-blue-600">Based on CSV data</p>
+                    </div>
+                    <div>
+                        <p class="text-lg font-semibold text-blue-800">
+                            Total Papers: <span class="text-2xl text-blue-900" id="total-papers">47</span>
+                        </p>
+                        <p class="text-sm text-blue-600">From 2010-2023</p>
+                    </div>
+                    <div>
+                        <p class="text-lg font-semibold text-blue-800">
+                            Break Point: <span class="text-2xl text-blue-900" id="break-point">--</span>
+                        </p>
+                        <p class="text-sm text-blue-600">First failing rank</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-100 p-4 rounded-lg mb-6">
+                <h3 class="font-semibold mb-3">H-Index Algorithm:</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <h4 class="font-medium mb-2">Steps:</h4>
+                        <ol className="text-sm space-y-1">
+                            <li>1. Sort all papers by citations (highest to lowest)</li>
+                            <li>2. For each rank 1, 2, 3, ...: check if citations ≥ rank</li>
+                            <li>3. H-index = highest rank where citations ≥ rank</li>
+                            <li>4. Stop when citations &lt; rank (break point)</li>
+                        </ol>
+                    </div>
+                    <div>
+                        <h4 class="font-medium mb-2">Definition:</h4>
+                        <p class="text-sm">The h-index is the <strong>largest number h</strong> such that the researcher has <strong>h papers</strong> with <strong>at least h citations each</strong>.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-sm text-gray-600 mb-3">
+                <span class="inline-block w-4 h-4 bg-green-50 border mr-2"></span>Qualifies (citations ≥ rank)
+                <span class="inline-block w-4 h-4 bg-red-50 border mr-2 ml-4"></span>Does not qualify (citations &lt; rank)
+                <span class="inline-block w-4 h-4 bg-blue-100 border-2 border-blue-500 mr-2 ml-4"></span>H-Index (last qualifying)
+                <span class="inline-block w-4 h-4 bg-red-100 border-2 border-red-500 mr-2 ml-4"></span>Break Point (first failing)
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-2xl font-semibold mb-4">Step-by-Step Calculation</h2>
+            <div class="overflow-x-auto max-h-96 overflow-y-auto">
+                <table class="w-full border-collapse border border-gray-300">
+                    <thead class="sticky top-0 bg-white">
+                        <tr class="bg-gray-100">
+                            <th class="border border-gray-300 px-3 py-2">Rank</th>
+                            <th class="border border-gray-300 px-3 py-2">Citations</th>
+                            <th class="border border-gray-300 px-3 py-2">Condition</th>
+                            <th class="border border-gray-300 px-3 py-2">Status</th>
+                            <th class="border border-gray-300 px-3 py-2">Year</th>
+                            <th class="border border-gray-300 px-3 py-2">Title</th>
+                        </tr>
+                    </thead>
+                    <tbody id="calculation-table">
+                        <!-- Will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-green-50 border border-green-200 p-4 rounded-lg">
+                <h3 class="font-semibold text-green-800 mb-3">Key Finding:</h3>
+                <ul class="text-sm text-green-700 space-y-1" id="key-findings">
+                    <!-- Will be populated by JavaScript -->
+                </ul>
+            </div>
+            
+            <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                <h3 class="font-semibold text-blue-800 mb-3">Summary Statistics:</h3>
+                <ul class="text-sm text-blue-700 space-y-1" id="summary-stats">
+                    <!-- Will be populated by JavaScript -->
+                </ul>
+            </div>
+        </div>
+
+        <div class="mt-6 bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+            <h3 class="font-semibold text-yellow-800 mb-3">Understanding the Result:</h3>
+            <div class="text-sm text-yellow-700 space-y-2" id="explanation">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Extract exact data from CSV using "Times Cited, All Databases" column
+        const rawData = [
+            { title: "Carbon footprint of a multi-ingredient seafood product from a business-to-business perspective", citations: 41, year: 2013 },
+            { title: "Carbon footprint analysis of goose barnacle (Pollicipes pollicipes) collection on the Galician coast (NW Spain)", citations: 9, year: 2013 },
+            { title: "The role of consumer purchase and post-purchase decision-making in sustainable seafood consumption. A Spanish case study using carbon footprinting", citations: 30, year: 2013 },
+            { title: "Life cycle assessment of European pilchard (Sardina pilchardus) consumption. A case study for Galicia (NW Spain)", citations: 43, year: 2014 },
+            { title: "Comparative life cycle assessment in the wine sector: biodynamic vs. conventional viticulture activities in NW Spain", citations: 143, year: 2014 },
+            { title: "Balance between Hosts and Guests: The Key to Sustainable Tourism in a Heritage City", citations: 4, year: 2022 },
+            { title: "Co-benefits of the EAT-Lancet diet for environmental protection in the framework of the Spanish dietary pattern", citations: 7, year: 2022 },
+            { title: "Waste biorefinery towards a sustainable biotechnological production of pediocin: Synergy between process simulation and environmental assessment", citations: 2, year: 2022 },
+            { title: "Blue carbon accounting as metrics to be taken into account towards the target of GHG emissions mitigation in fisheries", citations: 5, year: 2022 },
+            { title: "Environmental footprint of critical agro-export products in the Peruvian hyper-arid coast: A case study for green asparagus and avocado", citations: 13, year: 2022 },
+            { title: "A clustering approach to analyse the environmental and energetic impacts of Atlantic recipes-A Galician gastronomy case study", citations: 1, year: 2023 },
+            { title: "Towards a Green Port strategy: The decarbonisation of the Port of Vigo (NW Spain)", citations: 6, year: 2023 },
+            { title: "Addressing the food, nutrition and environmental nexus: The role of socio-economic status in the nutritional and environmental sustainability dimensions of dietary patterns in Chile", citations: 5, year: 2022 },
+            { title: "Climate Change and Water Scarcity at the Focus of Environmental Impacts Associated with the COVID-19 Crisis in Spain", citations: 0, year: 2023 },
+            { title: "Cross-vessel eco-efficiency analysis. A case study for purse seining fishing from North Portugal targeting European pilchard", citations: 21, year: 2015 },
+            { title: "A methodology to estimate greenhouse gases emissions in Life Cycle Inventories of wastewater treatment plants", citations: 73, year: 2012 },
+            { title: "Estimation of the carbon footprint of the Galician fishing activity (NW Spain)", citations: 73, year: 2010 },
+            { title: "Carbon footprint of canned mussels from a business-to-consumer approach. A starting point for mussel processors and policy makers", citations: 69, year: 2010 },
+            { title: "Towards an environmentally sustainable and healthy Atlantic dietary pattern: Life cycle carbon footprint and nutritional quality", citations: 64, year: 2019 },
+            { title: "Linking environmental sustainability and nutritional quality of the Atlantic diet recommendations and real consumption habits in Galicia (NW Spain)", citations: 33, year: 2019 },
+            { title: "Environmental profile of the municipality of Madrid through the methodologies of Urban Metabolism and Life Cycle Analysis", citations: 14, year: 2021 },
+            { title: "The use of maize stover and sugar beet pulp as feedstocks in industrial fermentation plants - An economic and environmental perspective", citations: 8, year: 2021 },
+            { title: "Evaluation of the environmental sustainability of the inshore great scallop (Pecten maximus) fishery in Galicia", citations: 10, year: 2022 },
+            { title: "Multi-product strategy to enhance the environmental profile of the canning industry towards circular economy", citations: 15, year: 2021 },
+            { title: "Renewable carbon opportunities in the production of succinic acid applying attributional and consequential modelling", citations: 15, year: 2022 },
+            { title: "Life cycle assessment of fish and seafood processed products - A review of methodologies and new challenges", citations: 58, year: 2021 },
+            { title: "Pursuing the route to eco-efficiency in dairy production: The case of Galician area", citations: 18, year: 2021 },
+            { title: "Could the economic crisis explain the reduction in the carbon footprint of food? Evidence from Spain in the last decade", citations: 10, year: 2021 },
+            { title: "Environmental assessment of menus for toddlers serviced at nursery canteen following the Atlantic diet recommendations", citations: 6, year: 2021 },
+            { title: "Evaluating the carbon footprint of a Spanish city through environmentally extended input output analysis and comparison with life cycle assessment", citations: 16, year: 2021 },
+            { title: "Is the Paleo diet safe for health and the environment?", citations: 14, year: 2021 },
+            { title: "Encompassing health and nutrition with the adherence to the environmentally sustainable New Nordic Diet in Southern Europe", citations: 5, year: 2021 },
+            { title: "Environmental and nutritional profile of food consumption patterns in the different climatic zones of Spain", citations: 10, year: 2021 },
+            { title: "Driving commitment to sustainable food policies within the framework of American and European dietary guidelines", citations: 15, year: 2022 },
+            { title: "Efficiency assessment of diets in the Spanish regions: A multi-criteria cross-cutting approach", citations: 18, year: 2020 },
+            { title: "Turning waste management into a carbon neutral activity: Practical demonstration in a medium-sized European city", citations: 21, year: 2020 },
+            { title: "Evaluating the Portuguese diet in the pursuit of a lower carbon and healthier consumption pattern", citations: 10, year: 2020 },
+            { title: "Fostering environmental awareness towards responsible food consumption and reduced food waste in chemical engineering students", citations: 17, year: 2020 },
+            { title: "Environmental Implications of Discarding Fish in Northern Spanish Coastal Bottom Otter Trawl Fisheries", citations: 0, year: 2020 },
+            { title: "Unraveling the environmental impacts of bioactive compounds and organic amendment from grape marc", citations: 12, year: 2020 },
+            { title: "Estimating Carbon Footprint Under an Intensive Aquaculture Regime", citations: 1, year: 2018 },
+            { title: "Environmental and water sustainability of milk production in Northeast Spain", citations: 29, year: 2018 },
+            { title: "Carbon footprint and nutritional quality of different human dietary choices", citations: 132, year: 2018 },
+            { title: "Assessing water footprint in a wine appellation: A case study for Ribeiro in Galicia, Spain", citations: 24, year: 2018 },
+            { title: "Updating the carbon footprint of the Galician fishing activity (NW Spain)", citations: 36, year: 2011 },
+            { title: "Assessing the global warming potential of wooden products from the furniture sector to improve their ecodesign", citations: 71, year: 2011 },
+            { title: "Opportunities and challenges of implementing life cycle assessment in seafood certification: a case study for Spain", citations: 15, year: 2016 },
+            { title: "Environmental performance of sorghum, barley and oat silage production for livestock feed using life cycle assessment", citations: 27, year: 2016 }
+        ];
+
+        // Sort by citations (descending)
+        const sortedPapers = rawData.sort((a, b) => b.citations - a.citations);
+
+        // Calculate h-index step by step
+        let hIndex = 0;
+        let breakPoint = 0;
+        
+        for (let i = 0; i < sortedPapers.length; i++) {
+            const rank = i + 1;
+            const citations = sortedPapers[i].citations;
+            
+            if (citations >= rank) {
+                hIndex = rank;
+            } else {
+                breakPoint = rank;
+                break;
+            }
+        }
+
+        // If all papers qualify, h-index = total papers
+        if (breakPoint === 0) {
+            breakPoint = sortedPapers.length + 1;
+        }
+
+        // Update header stats
+        document.getElementById('h-index-result').textContent = hIndex;
+        document.getElementById('total-papers').textContent = sortedPapers.length;
+        document.getElementById('break-point').textContent = breakPoint;
+
+        // Populate the calculation table
+        function populateTable() {
+            const tbody = document.getElementById('calculation-table');
+            tbody.innerHTML = '';
+            
+            sortedPapers.forEach((paper, index) => {
+                const rank = index + 1;
+                const citations = paper.citations;
+                const qualifies = citations >= rank;
+                const isHIndex = rank === hIndex;
+                const isBreakPoint = rank === breakPoint;
+                
+                const row = document.createElement('tr');
+                
+                // Determine row class
+                let rowClass = qualifies ? 'qualifying-row' : 'non-qualifying-row';
+                if (isHIndex) rowClass = 'h-index-row';
+                if (isBreakPoint) rowClass = 'break-point-row';
+                row.className = rowClass;
+                
+                row.innerHTML = `
+                    <td class="border border-gray-300 px-3 py-2 font-mono font-bold text-center">${rank}</td>
+                    <td class="border border-gray-300 px-3 py-2 font-mono font-bold text-center text-lg">${citations}</td>
+                    <td class="border border-gray-300 px-3 py-2 text-center font-mono">
+                        ${citations} ${qualifies ? '≥' : '<'} ${rank}
+                    </td>
+                    <td class="border border-gray-300 px-3 py-2 text-center">
+                        ${qualifies ? 
+                            '<span class="text-green-600 font-bold">✓ Qualifies</span>' : 
+                            '<span class="text-red-600 font-bold">✗ BREAKS</span>'
+                        }
+                        ${isHIndex ? '<br><span class="text-blue-600 font-bold text-xs">H-INDEX</span>' : ''}
+                        ${isBreakPoint ? '<br><span class="text-red-600 font-bold text-xs">BREAK POINT</span>' : ''}
+                    </td>
+                    <td class="border border-gray-300 px-3 py-2 text-center">${paper.year}</td>
+                    <td class="border border-gray-300 px-3 py-2 text-sm">
+                        ${paper.title.length > 70 ? paper.title.substring(0, 70) + '...' : paper.title}
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        // Populate key findings
+        function populateFindings() {
+            const keyFindings = document.getElementById('key-findings');
+            const breakPaper = sortedPapers[breakPoint - 1];
+            
+            keyFindings.innerHTML = `
+                <li>• Papers 1-${hIndex}: All qualify (citations ≥ rank)</li>
+                <li>• Paper ${breakPoint}: ${breakPaper ? breakPaper.citations : 'N/A'} citations < ${breakPoint} rank</li>
+                <li>• <strong>H-index = ${hIndex}</strong> (last qualifying rank)</li>
+                <li>• Algorithm stops at rank ${breakPoint} where condition breaks</li>
+            `;
+        }
+
+        // Populate summary stats
+        function populateSummary() {
+            const summaryStats = document.getElementById('summary-stats');
+            const totalCitations = sortedPapers.reduce((sum, p) => sum + p.citations, 0);
+            const avgCitations = (totalCitations / sortedPapers.length).toFixed(1);
+            const maxCitations = sortedPapers[0].citations;
+            
+            summaryStats.innerHTML = `
+                <li>• Total papers: ${sortedPapers.length}</li>
+                <li>• Papers contributing to h-index: ${hIndex}</li>
+                <li>• Highest cited: ${maxCitations} citations</li>
+                <li>• Total citations: ${totalCitations.toLocaleString()}</li>
+                <li>• Average citations per paper: ${avgCitations}</li>
+            `;
+        }
+
+        // Populate explanation
+        function populateExplanation() {
+            const explanation = document.getElementById('explanation');
+            const breakPaper = sortedPapers[breakPoint - 1];
+            
+            explanation.innerHTML = `
+                <p><strong>Why the h-index is ${hIndex}:</strong></p>
+                <p>• Feijoo has exactly <strong>${hIndex} papers</strong> with <strong>at least ${hIndex} citations each</strong></p>
+                <p>• The ${breakPoint}th paper has only <strong>${breakPaper ? breakPaper.citations : 'N/A'} citations</strong>, which is less than ${breakPoint}</p>
+                <p>• This breaks the h-index condition, so we stop at the previous rank: <strong>${hIndex}</strong></p>
+                <p>• An h-index of ${hIndex} indicates ${hIndex === 1 ? 'a researcher with limited impact' : 
+                      hIndex < 10 ? 'an early-career researcher' :
+                      hIndex < 20 ? 'a productive researcher with good impact' :
+                      hIndex < 30 ? 'an established researcher with strong impact' :
+                      'a highly accomplished senior researcher'}</p>
+            `;
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            populateTable();
+            populateFindings();
+            populateSummary();
+            populateExplanation();
+        });
+    </script>
+</body>
+</html>
