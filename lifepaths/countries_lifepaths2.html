@@ -1369,7 +1369,12 @@ temp.start = 2020;
                     temp["x1"]=d[o]["x"];
 					if (d[o]["x"].toString().indexOf("-") > -1) {
                         //console.log(+d[o]["x"].toString().split("-")[0], +d[o]["x"].toString().split("-")[1], +d[o]["x"].toString().replace(" 00:00:00","").split("-")[2]);
-						temp.x = x1(new Date(+d[o]["x"].toString().split("-")[0], +d[o]["x"].toString().split("-")[1], +d[o]["x"].toString().replace(" 00:00:00","").split("-")[2]))-30;
+						//temp.x = x1(new Date(+d[o]["x"].toString().split("-")[0], +d[o]["x"].toString().split("-")[1], +d[o]["x"].toString().replace(" 00:00:00","").split("-")[2]))-30;
+            temp.x = x1(new Date(
+    +d[o]["x"].split("-")[0],
+    +d[o]["x"].split("-")[1],
+    +d[o]["x"].replace(" 00:00:00","").split("-")[2]
+)) - 30;
 						temp.y = y(d[o]["y"]);// + 35;
 					} else {
                         console.log(d[o]);
