@@ -6,66 +6,67 @@
 <title>Countries' Lifepaths</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Segoe UI', sans-serif; background: #f8f8f8; color: #333; }
-#header { text-align:center; padding: 14px 0 2px; }
-#header h1 { font-size: 1.5rem; font-weight: bold; }
-#header p  { font-size: 0.82rem; color: #666; margin-top:3px; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f8f8; }
+
+#header { text-align: center; padding: 14px 0 4px; }
+#header h1 { font-size: 1.45rem; font-weight: bold; color: #222; }
+#header p  { font-size: 0.8rem; color: #777; margin-top: 3px; }
+
 #controls {
-  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
-  padding: 8px 20px; background: #fff; border-bottom: 1px solid #ddd;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  padding: 7px 18px; background: #fff; border-bottom: 1px solid #e0e0e0;
 }
-button {
-  padding: 5px 16px; border-radius: 20px; border: 2px solid #e74c3c;
-  background: white; color: #e74c3c; cursor: pointer; font-size: 0.82rem;
-  font-weight: 600; transition: all 0.15s;
+.btn {
+  padding: 4px 15px; border-radius: 18px; border: 2px solid #e74c3c;
+  background: white; color: #e74c3c; cursor: pointer; font-size: 0.8rem;
+  font-weight: 600; transition: all 0.13s;
 }
-button.active, button:hover { background: #e74c3c; color: white; }
-#search-box {
-  padding: 5px 12px; border-radius: 20px; border: 2px solid #e74c3c;
-  font-size: 0.82rem; outline: none; min-width: 180px;
+.btn.active, .btn:hover { background: #e74c3c; color: white; }
+#search {
+  padding: 4px 12px; border-radius: 18px; border: 2px solid #e74c3c;
+  font-size: 0.8rem; outline: none; width: 190px;
 }
-#count-label { font-size: 0.8rem; color: #999; margin-left: auto; }
+#count { font-size: 0.78rem; color: #aaa; margin-left: auto; }
+
 #legend {
-  display: flex; gap: 16px; align-items: center;
-  padding: 5px 20px 6px; flex-wrap: wrap;
+  display: flex; flex-wrap: wrap; gap: 14px; align-items: center;
+  padding: 5px 18px 6px; background: #fafafa; border-bottom: 1px solid #eee;
 }
-.leg-item {
-  display: flex; align-items: center; gap: 5px;
-  font-size: 0.8rem; cursor: pointer; user-select: none;
-}
-.leg-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
-.leg-reset { font-size: 0.75rem; color: #aaa; cursor: pointer; margin-left: 6px; }
-#chart-wrap { position: relative; }
+.leg { display: flex; align-items: center; gap: 5px; font-size: 0.79rem; cursor: pointer; user-select: none; }
+.leg-dot { width: 11px; height: 11px; border-radius: 50%; }
+.leg-off { opacity: 0.28; }
+.leg-reset { font-size: 0.74rem; color: #bbb; cursor: pointer; margin-left: 4px; }
+.leg-reset:hover { color: #888; }
+
+#wrap { position: relative; }
 svg { display: block; }
+
 .tip {
-  position: absolute; background: rgba(15,15,15,0.88); color: #fff;
-  padding: 8px 11px; border-radius: 8px; font-size: 0.76rem;
-  pointer-events: none; display: none; max-width: 210px;
-  line-height: 1.55; z-index: 99;
+  position: absolute; background: rgba(12,12,12,0.87); color: #fff;
+  padding: 8px 11px; border-radius: 8px; font-size: 0.75rem;
+  pointer-events: none; display: none; max-width: 215px;
+  line-height: 1.6; z-index: 99; box-shadow: 0 2px 12px rgba(0,0,0,0.3);
 }
-.tip b { font-size: 0.85rem; }
+.tip strong { font-size: 0.84rem; display: block; margin-bottom: 2px; }
+.tip .ph { font-weight: 600; }
 </style>
 </head>
 <body>
 
 <div id="header">
   <h1>Countries' Lifepaths</h1>
-  <p>x-axis: when peak growth is projected &nbsp;|&nbsp; y-axis: how fast growth occurs &nbsp;|&nbsp; size &prop; publications</p>
+  <p>x&#8209;axis: when peak growth is projected &nbsp;|&nbsp; y&#8209;axis: how fast growth occurs &nbsp;|&nbsp; size&thinsp;&prop;&thinsp;publications</p>
 </div>
 
 <div id="controls">
-  <button id="btn-traj"  class="active" onclick="setView('traj')">Trajectories</button>
-  <button id="btn-final" onclick="setView('final')">Final snapshot</button>
-  <input id="search-box" type="text" placeholder="Search country…" oninput="onSearch(this.value)">
-  <span id="count-label"></span>
+  <button class="btn active" id="btn-traj"  onclick="setView('traj')">Trajectories</button>
+  <button class="btn"        id="btn-final" onclick="setView('final')">Final snapshot</button>
+  <input id="search" type="text" placeholder="Search country…" oninput="onSearch(this.value)">
+  <span id="count"></span>
 </div>
 
 <div id="legend"></div>
-
-<div id="chart-wrap">
-  <svg id="chart"></svg>
-  <div class="tip" id="tip"></div>
-</div>
+<div id="wrap"><svg id="chart"></svg><div class="tip" id="tip"></div></div>
 
 <script>
 // ── Data ──────────────────────────────────────────────────────────────────
@@ -83,9 +84,10 @@ const PHASE = {
 let activePhases = new Set(['green','blue','red','black']);
 let searchTerm   = '';
 let viewMode     = 'traj';
+let highlighted  = null; // clicked country name
 
 // ── Layout ─────────────────────────────────────────────────────────────────
-const M = { top:20, right:70, bottom:58, left:68 };
+const M = { top:80, right:70, bottom:58, left:68 };
 let W, H, IW, IH;
 
 // ── Scales (simple linear) ─────────────────────────────────────────────────
@@ -153,7 +155,7 @@ function svgEl(tag, attrs, parent) {
 let svg, gGrid, gLines, gDots, gLabels;
 
 function initSVG() {
-  const wrap = document.getElementById('chart-wrap');
+  const wrap = document.getElementById('wrap');
   W  = window.innerWidth;
   H  = Math.max(520, window.innerHeight - 190);
   IW = W - M.left - M.right;
@@ -166,7 +168,7 @@ function initSVG() {
 
   const defs = svgEl('defs',{},svg);
   const cp   = svgEl('clipPath',{id:'cp'},defs);
-  svgEl('rect',{x:0,y:0,width:IW,height:IH},cp);
+  svgEl('rect',{x:-10,y:-80,width:IW+20,height:IH+80},cp);
 
   const g = svgEl('g',{transform:`translate(${M.left},${M.top})`},svg);
   gGrid   = svgEl('g',{},g);
@@ -225,50 +227,67 @@ function drawData() {
   gDots.innerHTML  = '';
   gLabels.innerHTML = '';
 
-  const T20  = top20Set();
-  const vis  = visible();
+  const T20    = top20Set();
+  const vis    = visible();
   const visSet = new Set(vis.map(c=>c.name));
+  const hasHL  = highlighted !== null;
 
-  // Background (non-visible) — faint grey trajectories
+  // Background (non-visible or dimmed) — faint grey
   if (viewMode === 'traj') {
     for (const c of countries) {
-      if (visSet.has(c.name)) continue;
-      drawTraj(c, false, 0.07);
+      const isDimmed = !visSet.has(c.name) || (hasHL && c.name !== highlighted);
+      if (isDimmed) drawTraj(c, false, 0.05);
     }
   }
 
-  // Visible countries
+  // Visible countries — dim all if something is highlighted, except the highlighted one
   for (const c of vis) {
+    if (hasHL && c.name !== highlighted) continue; // already drawn dimmed above
     const top = T20.has(c.name);
-    if (viewMode === 'traj') drawTraj(c, top, top ? 0.85 : 0.22);
-    else                     drawFinal(c, top);
+    if (viewMode === 'traj') drawTraj(c, true, 1.0, true);  // highlighted = full opacity
+    else                     drawFinal(c, top, true);
   }
 
-  // Labels for top20 visible
+  // If nothing highlighted, draw all visible normally
+  if (!hasHL) {
+    gLines.innerHTML = '';
+    gDots.innerHTML  = '';
+    for (const c of countries) {
+      if (!visSet.has(c.name)) { drawTraj(c, false, 0.05); continue; }
+      const top = T20.has(c.name);
+      if (viewMode === 'traj') drawTraj(c, top, top ? 0.85 : 0.22, false);
+      else                     drawFinal(c, top, false);
+    }
+  }
+
+  // Labels — show all top20 visible, or just highlighted
   for (const c of vis) {
-    if (!T20.has(c.name)) continue;
+    const isHL = hasHL && c.name === highlighted;
+    if (!T20.has(c.name) && !isHL) continue;
+    if (hasHL && !isHL) continue;
     const last = c.pts[c.pts.length-1];
     const px = xpx(last.x), py = ypx(last.y);
     const col = PHASE[last.col]?.hex || '#555';
     const t = svgEl('text',{
       x:px+7, y:py+3,
-      'font-size':'9','font-weight':'bold',
+      'font-size': isHL ? '11' : '9',
+      'font-weight':'bold',
       fill:col,'pointer-events':'none'
     },gLabels);
     t.textContent = c.name;
   }
 
-  document.getElementById('count-label').textContent =
+  document.getElementById('count').textContent =
     `Showing ${vis.length} of ${countries.length} countries`;
 }
 
-function drawTraj(c, isTop, alpha) {
+function drawTraj(c, isTop, alpha, hl=false) {
   const col = PHASE[c.fc]?.hex || '#888';
   if (c.pts.length >= 2) {
     const pts = c.pts.map(p => `${xpx(p.x).toFixed(1)},${ypx(p.y).toFixed(1)}`).join(' ');
     svgEl('polyline',{
-      points:pts, fill:'none', stroke:col,
-      'stroke-width': isTop ? 1.8 : 0.5,
+      points:pts, fill:'none', stroke: hl ? col : (alpha < 0.1 ? '#bbb' : col),
+      'stroke-width': hl ? 3 : (isTop ? 1.8 : 0.5),
       opacity: alpha,
       'stroke-linejoin':'round','stroke-linecap':'round'
     }, gLines);
@@ -277,11 +296,13 @@ function drawTraj(c, isTop, alpha) {
     const p = c.pts[i];
     const isFinal = i === c.pts.length-1;
     const dc = PHASE[p.col]?.hex || '#888';
-    const r  = rSize(p.o) * (isFinal ? 1.9 : 0.85) * (isTop ? 1.3 : 1.0);
+    const r  = rSize(p.o) * (isFinal ? (hl ? 2.4 : 1.9) : 0.85) * (isTop || hl ? 1.3 : 1.0);
     const dot = svgEl('circle',{
       cx: xpx(p.x), cy: ypx(p.y), r,
-      fill:dc, opacity: isFinal ? Math.min(alpha*1.15,0.95) : alpha*0.75,
-      stroke:'white','stroke-width': isFinal?0.8:0.25,
+      fill: hl ? dc : (alpha < 0.1 ? '#ccc' : dc),
+      opacity: hl ? 0.85 : 0.5,
+      stroke: hl ? 'black' : (alpha < 0.1 ? 'none' : 'black'),
+      'stroke-width': hl ? (isFinal ? 2 : 1) : (isFinal ? 1.2 : 0.5),
       cursor:'pointer'
     }, gDots);
     dot.addEventListener('mouseenter', ev => showTip(ev, c, p, i));
@@ -290,14 +311,14 @@ function drawTraj(c, isTop, alpha) {
   }
 }
 
-function drawFinal(c, isTop) {
+function drawFinal(c, isTop, hl=false) {
   const last = c.pts[c.pts.length-1];
   const col  = PHASE[last.col]?.hex || '#888';
-  const r    = rSize(last.o) * (isTop ? 2.4 : 1.5);
+  const r    = rSize(last.o) * (hl ? 2.8 : (isTop ? 2.4 : 1.5));
   const dot  = svgEl('circle',{
     cx:xpx(last.x), cy:ypx(last.y), r,
-    fill:col, opacity:0.85,
-    stroke:'white','stroke-width':0.8,
+    fill:col, opacity: hl ? 0.9 : 0.5,
+    stroke:'black','stroke-width': hl ? 2 : 1.2,
     cursor:'pointer'
   }, gDots);
   dot.addEventListener('mouseenter', ev => showTip(ev, c, last, c.pts.length-1));
@@ -306,12 +327,7 @@ function drawFinal(c, isTop) {
 }
 
 function clickCountry(name) {
-  const box = document.getElementById('search-box');
-  if (searchTerm === name) {
-    searchTerm = ''; box.value = '';
-  } else {
-    searchTerm = name; box.value = name;
-  }
+  highlighted = (highlighted === name) ? null : name;
   render();
 }
 
@@ -331,7 +347,7 @@ function showTip(ev, c, p, idx) {
 }
 function moveTip(ev) {
   const tip  = document.getElementById('tip');
-  const rect = document.getElementById('chart-wrap').getBoundingClientRect();
+  const rect = document.getElementById('wrap').getBoundingClientRect();
   let tx = ev.clientX - rect.left + 14;
   let ty = ev.clientY - rect.top  - 10;
   if (tx + 220 > rect.width) tx -= 235;
@@ -345,8 +361,8 @@ function buildLegend() {
   leg.innerHTML = '';
   for (const [col, {label,hex}] of Object.entries(PHASE)) {
     const item = document.createElement('div');
-    item.className = 'leg-item';
-    item.style.opacity = activePhases.has(col) ? '1' : '0.3';
+    item.className = 'leg';
+    item.className = 'leg' + (activePhases.has(col) ? '' : ' leg-off');
     item.innerHTML = `<div class="leg-dot" style="background:${hex}"></div><span>${label}</span>`;
     item.onclick = () => {
       if (activePhases.has(col)) { if (activePhases.size>1) activePhases.delete(col); }
@@ -360,7 +376,7 @@ function buildLegend() {
   rst.textContent = 'Reset filters';
   rst.onclick = () => {
     activePhases = new Set(['green','blue','red','black']);
-    searchTerm = ''; document.getElementById('search-box').value='';
+    searchTerm = ''; document.getElementById('search').value='';
     buildLegend(); render();
   };
   leg.appendChild(rst);
