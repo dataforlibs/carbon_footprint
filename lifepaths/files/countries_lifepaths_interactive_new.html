@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Countries' Lifepaths</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f8f8; }
+
+#header { text-align: center; padding: 14px 0 4px; }
+#header h1 { font-size: 1.45rem; font-weight: bold; color: #222; }
+#header p  { font-size: 0.8rem; color: #777; margin-top: 3px; }
+
+#controls {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  padding: 7px 18px; background: #fff; border-bottom: 1px solid #e0e0e0;
+}
+.btn {
+  padding: 4px 15px; border-radius: 18px; border: 2px solid #e74c3c;
+  background: white; color: #e74c3c; cursor: pointer; font-size: 0.8rem;
+  font-weight: 600; transition: all 0.13s;
+}
+.btn.active, .btn:hover { background: #e74c3c; color: white; }
+#search {
+  padding: 4px 12px; border-radius: 18px; border: 2px solid #e74c3c;
+  font-size: 0.8rem; outline: none; width: 190px;
+}
+#count { font-size: 0.78rem; color: #aaa; margin-left: auto; }
+
+#legend {
+  display: flex; flex-wrap: wrap; gap: 14px; align-items: center;
+  padding: 5px 18px 6px; background: #fafafa; border-bottom: 1px solid #eee;
+}
+.leg { display: flex; align-items: center; gap: 5px; font-size: 0.79rem; cursor: pointer; user-select: none; }
+.leg-dot { width: 11px; height: 11px; border-radius: 50%; }
+.leg-off { opacity: 0.28; }
+.leg-reset { font-size: 0.74rem; color: #bbb; cursor: pointer; margin-left: 4px; }
+.leg-reset:hover { color: #888; }
+
+#wrap { position: relative; }
+svg { display: block; }
+
+.tip {
+  position: absolute; background: rgba(12,12,12,0.87); color: #fff;
+  padding: 8px 11px; border-radius: 8px; font-size: 0.75rem;
+  pointer-events: none; display: none; max-width: 215px;
+  line-height: 1.6; z-index: 99; box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+.tip strong { font-size: 0.84rem; display: block; margin-bottom: 2px; }
+.tip .ph { font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <h1>Countries' Lifepaths</h1>
+  <p>x&#8209;axis: when peak growth is projected &nbsp;|&nbsp; y&#8209;axis: how fast growth occurs &nbsp;|&nbsp; size&thinsp;&prop;&thinsp;publications</p>
+</div>
+
+<div id="controls">
+  <button class="btn active" id="btn-traj"  onclick="setView('traj')">Trajectories</button>
+  <button class="btn"        id="btn-final" onclick="setView('final')">Final snapshot</button>
+  <input id="search" type="text" placeholder="Search country…" oninput="onSearch(this.value)">
+  <span id="count"></span>
+</div>
+
+<div id="legend"></div>
+<div id="wrap"><svg id="chart"></svg><div class="tip" id="tip"></div></div>
+
+<script>
+let DATA = {};
+const TOP20 = new Set(["USA", "China", "UK", "India", "Italy", "Spain", "Germany", "Australia", "Canada", "France", "Brazil", "Malaysia", "Netherlands", "Sweden", "Poland", "Portugal", "Turkey", "Finland", "Taiwan", "South Korea"]);
+
+const PHASE_COLOR = {
+  'Acceleration': '#27ae60',
+  'Inflection':   '#2980b9',
+  'Deceleration': '#e74c3c',
+  'Deactivated':  '#2c3e50',
+};
+// Also handle raw color strings as fallback
+const COLOR_MAP = { green:'Acceleration', blue:'Inflection', red:'Deceleration', black:'Deactivated' };
+
+function resolvePhase(p) {
+  if (PHASE_COLOR[p]) return p;
+  return COLOR_MAP[p] || 'Deactivated';
+}
+function phaseHex(p) { return PHASE_COLOR[resolvePhase(p)] || '#888'; }
+
+// ── State ──────────────────────────────────────────────────────────────────
+let activePhases = new Set(Object.keys(PHASE_COLOR));
+let searchTerm   = '';
+let viewMode     = 'traj';
+let highlighted  = null;
+
+// ── Layout ─────────────────────────────────────────────────────────────────
+const M = { top:18, right:72, bottom:60, left:64 };
+let W, H, IW, IH;
+
+// ── Y domain (inverted: small ln(k) → top) ─────────────────────────────────
+const Y_MIN = 0;
+const Y_MAX = 9;
+const Y0 = 0;
+const Y1 = 10;
+// Fixed domain [0,9]: 0 at top, 9 at bottom.
+function ypx(y) {
+  return (y - Y0) / (Y1 - Y0) * IH;
+}
+
+// ── X domain ───────────────────────────────────────────────────────────────
+const X0ms = new Date('2006-01-01').getTime();
+const X1ms = new Date('2030-01-01').getTime();
+function xpx(dateStr) {
+  const t = new Date(dateStr).getTime();
+  return (t - X0ms) / (X1ms - X0ms) * IW;
+}
+
+function rSize(o) {
+  return Math.max(2.5, Math.min(26, Math.pow(o, 0.45) * 2.2));
+}
+
+// ── SVG helpers ────────────────────────────────────────────────────────────
+const NS = 'http://www.w3.org/2000/svg';
+function mk(tag, a, p) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k,v] of Object.entries(a||{})) e.setAttribute(k,v);
+  if (p) p.appendChild(e);
+  return e;
+}
+function txt(parent, content, attrs) {
+  const t = mk('text', attrs, parent);
+  t.textContent = content;
+  return t;
+}
+
+let svg, gBg, gLines, gDots, gLabels;
+
+function initSVG() {
+  W  = window.innerWidth;
+  H  = Math.max(500, window.innerHeight - 185);
+  IW = W - M.left - M.right;
+  IH = H - M.top  - M.bottom;
+
+  svg = document.getElementById('chart');
+  svg.setAttribute('width',  W);
+  svg.setAttribute('height', H);
+  svg.innerHTML = '';
+
+  const defs = mk('defs',{},svg);
+  const cp   = mk('clipPath',{id:'cp'},defs);
+  mk('rect',{x:0,y:0,width:IW,height:IH},cp);
+
+  const g  = mk('g',{transform:`translate(${M.left},${M.top})`},svg);
+  gBg     = mk('g',{},g);
+  gLines  = mk('g',{'clip-path':'url(#cp)'},g);
+  gDots   = mk('g',{'clip-path':'url(#cp)'},g);
+  gLabels = mk('g',{},g);
+}
+
+function drawGrid() {
+  gBg.innerHTML = '';
+  mk('rect',{x:0,y:0,width:IW,height:IH,fill:'#f8f8f8',stroke:'#ccc'},gBg);
+
+  // Y ticks — every integer, respecting inversion
+  for (let v = 0; v <= 10; v++) {
+    const py = ypx(v);
+    if (py < -1 || py > IH+1) continue;
+    const g = mk('g',{transform:`translate(0,${py})`},gBg);
+    mk('line',{x1:0,y1:0,x2:IW,y2:0,stroke:'#ddd','stroke-dasharray':'3,3'},g);
+    txt(g, v, {x:-7, y:4, 'text-anchor':'end', 'font-size':'11', fill:'#777'});
+  }
+
+  // X ticks — every 2 years
+  for (let yr = 2006; yr <= 2030; yr += 2) {
+    const px = xpx(`${yr}-01-01`);
+    if (px < -1 || px > IW+1) continue;
+    mk('line',{x1:px,y1:0,x2:px,y2:IH,stroke:'#ddd','stroke-dasharray':'3,3'},gBg);
+    const g = mk('g',{transform:`translate(${px},${IH})`},gBg);
+    mk('line',{x1:0,y1:0,x2:0,y2:5,stroke:'#aaa'},g);
+    txt(g, yr, {x:0, y:18, 'text-anchor':'middle', 'font-size':'11', fill:'#666'});
+  }
+
+  mk('rect',{x:0,y:0,width:IW,height:IH,fill:'none',stroke:'#bbb'},gBg);
+
+  // Axis labels
+  txt(gBg,'Projected inflection date  t_inf',{
+    x:IW/2, y:IH+48,
+    'text-anchor':'middle','font-size':'13','font-weight':'600',fill:'#444'
+  });
+  txt(gBg,'ln(k)  ↑ higher growth intensity',{
+    transform:`translate(-48,${IH/2}) rotate(-90)`,
+    'text-anchor':'middle','font-size':'13','font-weight':'600',fill:'#444'
+  });
+}
+
+// ── Drawing ────────────────────────────────────────────────────────────────
+function visibleSet() {
+  return new Set(
+    Object.keys(DATA).filter(c => {
+      const last = DATA[c][DATA[c].length-1];
+      const ph = resolvePhase(last.phase);
+      return activePhases.has(ph) &&
+             (!searchTerm || c.toLowerCase().includes(searchTerm.toLowerCase()));
+    })
+  );
+}
+
+function drawData() {
+  gLines.innerHTML  = '';
+  gDots.innerHTML   = '';
+  gLabels.innerHTML = '';
+
+  const vis = visibleSet();
+  const isSingleHighlight = (vis.size === 1 && searchTerm !== '');
+
+  // 1. Background ghost lines (non-visible, very faint)
+  if (viewMode === 'traj') {
+    const ghostAlpha = isSingleHighlight ? 0.03 : 0.06;
+    for (const [name, entries] of Object.entries(DATA)) {
+      if (vis.has(name)) continue;
+      drawTraj(name, entries, false, ghostAlpha);
+    }
+  }
+
+  // 2. Visible countries
+  for (const [name, entries] of Object.entries(DATA)) {
+    if (!vis.has(name)) continue;
+    const isTop = TOP20.has(name);
+    const isHL  = isSingleHighlight;
+    if (viewMode === 'traj') drawTraj(name, entries, isTop, isHL ? 1.0 : (isTop ? 0.85 : 0.22), isHL);
+    else                     drawFinal(name, entries, isTop, isHL);
+  }
+
+  // 3. Labels for top20 that are visible
+  for (const name of TOP20) {
+    if (!vis.has(name)) continue;
+    const last = DATA[name][DATA[name].length-1];
+    const col  = phaseHex(last.phase);
+    txt(gLabels, name, {
+      x: xpx(last.x)+7, y: ypx(last.y)+3,
+      'font-size':'9', 'font-weight':'bold',
+      fill:col, 'pointer-events':'none'
+    });
+  }
+
+  document.getElementById('count').textContent =
+    `Showing ${vis.size} of ${Object.keys(DATA).length} countries`;
+}
+
+function drawTraj(name, entries, isTop, alpha, isHL=false) {
+  const last    = entries[entries.length-1];
+  const linecol = phaseHex(last.phase);
+
+  // Line
+  if (entries.length >= 2) {
+    const pts = entries.map(e=>`${xpx(e.x).toFixed(1)},${ypx(e.y).toFixed(1)}`).join(' ');
+    mk('polyline',{
+      points:pts, fill:'none', stroke:linecol,
+      'stroke-width': isHL ? 3.5 : (isTop ? 1.8 : 0.5),
+      opacity: alpha,
+      'stroke-linejoin':'round','stroke-linecap':'round'
+    }, gLines);
+  }
+
+  // Dots
+  entries.forEach((e,i) => {
+    const isFinal = i === entries.length - 1;
+    const dc = phaseHex(e.phase);
+    const r  = rSize(e.o) * (isFinal ? (isHL ? 3.0 : 1.9) : (isHL ? 2.2 : 0.8)) * (isTop ? 1.3 : 1.0);
+    const dot = mk('circle',{
+      cx:xpx(e.x).toFixed(1), cy:ypx(e.y).toFixed(1), r:r.toFixed(1),
+      fill:dc, stroke: isHL ? '#222' : 'white',
+      'stroke-width': isHL ? 1.2 : (isFinal ? 0.8 : 0.2),
+      'fill-opacity': isHL ? '0.5' : '1.0',
+      opacity: isHL ? '1.0' : (isFinal ? Math.min(alpha*1.1,0.95) : alpha*0.7).toFixed(2),
+      cursor:'pointer'
+    }, isHL ? gLabels : gDots);  // draw highlighted on topmost layer
+    dot.addEventListener('mouseenter', ev => showTip(ev, name, e, i, entries.length));
+    dot.addEventListener('mouseleave', hideTip);
+    dot.addEventListener('click', () => onClickCountry(name));
+  });
+}
+
+function drawFinal(name, entries, isTop, isHL=false) {
+  const e   = entries[entries.length-1];
+  const col = phaseHex(e.phase);
+  const r   = rSize(e.o) * (isHL ? 3.5 : (isTop ? 2.5 : 1.6));
+  const dot = mk('circle',{
+    cx:xpx(e.x).toFixed(1), cy:ypx(e.y).toFixed(1), r:r.toFixed(1),
+    fill:col, stroke:'white', 'stroke-width':'0.8', opacity:'0.85',
+    cursor:'pointer'
+  }, gDots);
+  dot.addEventListener('mouseenter', ev => showTip(ev, name, e, entries.length-1, entries.length));
+  dot.addEventListener('mouseleave', hideTip);
+  dot.addEventListener('click', () => onClickCountry(name));
+}
+
+// ── Tooltip ────────────────────────────────────────────────────────────────
+function showTip(ev, name, e, idx, total) {
+  const tip = document.getElementById('tip');
+  const ph  = resolvePhase(e.phase);
+  const col = PHASE_COLOR[ph];
+  tip.innerHTML = `
+    <strong>${name}</strong>
+    Window: ${e.yr || e.x}<br>
+    Proj. inflection: ${e.x}<br>
+    ln(k): ${e.y.toFixed(3)}<br>
+    Publications: ${Math.round(e.o).toLocaleString()}<br>
+    Phase: <span class="ph" style="color:${col}">${ph}</span><br>
+    Snapshot ${idx+1} / ${total}`;
+  tip.style.display = 'block';
+  posTip(ev);
+}
+function posTip(ev) {
+  const tip  = document.getElementById('tip');
+  const rect = document.getElementById('wrap').getBoundingClientRect();
+  let tx = ev.clientX - rect.left + 14;
+  let ty = ev.clientY - rect.top  - 12;
+  if (tx + 225 > rect.width)  tx -= 240;
+  if (ty + 160 > rect.height) ty -= 150;
+  tip.style.left = tx+'px';
+  tip.style.top  = ty+'px';
+}
+function hideTip() { document.getElementById('tip').style.display = 'none'; }
+
+// ── Legend ─────────────────────────────────────────────────────────────────
+function buildLegend() {
+  const leg = document.getElementById('legend');
+  leg.innerHTML = '';
+  for (const [ph, hex] of Object.entries(PHASE_COLOR)) {
+    const d = document.createElement('div');
+    d.className = 'leg' + (activePhases.has(ph) ? '' : ' leg-off');
+    d.innerHTML = `<div class="leg-dot" style="background:${hex}"></div><span>${ph}</span>`;
+    d.onclick = () => {
+      if (activePhases.has(ph)) { if (activePhases.size > 1) activePhases.delete(ph); }
+      else activePhases.add(ph);
+      buildLegend(); drawData();
+    };
+    leg.appendChild(d);
+  }
+  const rst = document.createElement('span');
+  rst.className = 'leg-reset';
+  rst.textContent = 'Reset filters';
+  rst.onclick = () => {
+    activePhases = new Set(Object.keys(PHASE_COLOR));
+    searchTerm = ''; document.getElementById('search').value = '';
+    buildLegend(); drawData();
+  };
+  leg.appendChild(rst);
+}
+
+// ── Controls ───────────────────────────────────────────────────────────────
+function setView(v) {
+  viewMode = v;
+  document.getElementById('btn-traj').classList.toggle('active',  v==='traj');
+  document.getElementById('btn-final').classList.toggle('active', v==='final');
+  drawData();
+}
+function onSearch(val) {
+  searchTerm   = val;
+  highlighted  = null;
+  drawData();
+}
+function onClickCountry(name) {
+  const box = document.getElementById('search');
+  if (searchTerm === name) { searchTerm = ''; box.value = ''; }
+  else                     { searchTerm = name; box.value = name; }
+  drawData();
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────
+function init() {
+  initSVG();
+  drawGrid();
+  buildLegend();
+  drawData();
+}
+window.addEventListener('resize', () => { if(window._dataLoaded){ initSVG(); drawGrid(); drawData(); } });
+
+fetch('lifepaths_visualization.json')
+  .then(r => {
+    if (!r.ok) throw new Error('Failed to load data: ' + r.status);
+    return r.json();
+  })
+  .then(json => {
+    DATA = json;
+    window._dataLoaded = true;
+    init();
+  })
+  .catch(err => {
+    document.getElementById('wrap').innerHTML =
+      '<p style="color:red;padding:20px">Error loading data: ' + err.message + '</p>';
+  });
+</script>
+</body>
+</html>
