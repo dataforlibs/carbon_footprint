@@ -137,13 +137,10 @@ function top20Set() {
 }
 
 function visible() {
-  if (searchTerm) {
-    // Search overrides phase filter — always find the country by name
-    return countries.filter(c =>
-      c.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }
-  return countries.filter(c => activePhases.has(c.fc));
+  return countries.filter(c =>
+    activePhases.has(c.fc) &&
+    (!searchTerm || c.name.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
 }
 
 // ── SVG helpers ────────────────────────────────────────────────────────────
@@ -251,19 +248,12 @@ function drawData() {
     else                     drawFinal(c, top, true);
   }
 
-  // If nothing highlighted, draw ghosts first then visible on top
+  // If nothing highlighted, draw all visible normally
   if (!hasHL) {
     gLines.innerHTML = '';
     gDots.innerHTML  = '';
-    // Pass 1: ghost lines for all non-visible countries
     for (const c of countries) {
-      if (!visSet.has(c.name)) {
-        if (viewMode === 'traj') drawTraj(c, false, 0.05);
-        else drawFinal(c, false, false);
-      }
-    }
-    // Pass 2: visible countries drawn last → always rendered on top
-    for (const c of vis) {
+      if (!visSet.has(c.name)) { drawTraj(c, false, 0.05); continue; }
       const top = T20.has(c.name);
       if (viewMode === 'traj') drawTraj(c, top, top ? 0.85 : 0.22, false);
       else                     drawFinal(c, top, false);
