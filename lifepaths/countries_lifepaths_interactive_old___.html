@@ -124,7 +124,7 @@ function parse() {
     const pts = entries
       .filter(e => e.y != null && e.o > 0)
       .map(e => ({ x:e.x, y:e.y, o:e.o, col:e.color, yr:e.yr||e.x }))
-      .sort((a,b) => new Date(a.yr)-new Date(b.yr));
+      .sort((a,b) => new Date(a.x)-new Date(b.x));
     const last = pts[pts.length-1] || {};
     return { name, pts, fc: last.col||'black', fo: last.o||1 };
   }).filter(c => c.pts.length > 0);
