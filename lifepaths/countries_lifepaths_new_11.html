@@ -271,7 +271,7 @@ function drawTraj(name, entries, isTop, alpha, isHL=false) {
       cx:xpx(e.x).toFixed(1), cy:ypx(e.y).toFixed(1), r:r.toFixed(1),
       fill:dc, stroke: isHL ? '#222' : 'white',
       'stroke-width': isHL ? 1.2 : (isFinal ? 0.8 : 0.2),
-      'fill-opacity': isHL ? '0.5' : '1.0',
+      'fill-opacity': isHL ? '0.8' : '1.0',
       opacity: isHL ? '1.0' : (isFinal ? Math.min(alpha*1.1,0.95) : alpha*0.7).toFixed(2),
       cursor:'pointer'
     }, isHL ? gLabels : gDots);  // draw highlighted on topmost layer
