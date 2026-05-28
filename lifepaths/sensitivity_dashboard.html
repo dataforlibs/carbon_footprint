@@ -1,0 +1,1046 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sensitivity Analysis Dashboard</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f4;
+      --panel: #ffffff;
+      --ink: #202428;
+      --muted: #5f6872;
+      --line: #d9ded8;
+      --blue: #2459a7;
+      --green: #1f7a57;
+      --gold: #a96a00;
+      --red: #b33b3b;
+      --violet: #6a4aa4;
+      --cyan: #247b8f;
+      --shadow: 0 8px 24px rgba(28, 38, 49, 0.08);
+      --radius: 8px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid var(--line);
+      background: rgba(246, 247, 244, 0.94);
+      backdrop-filter: blur(12px);
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) auto;
+      gap: 16px;
+      align-items: center;
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 14px 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 760;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    button, select, input {
+      height: 34px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--ink);
+      border-radius: 6px;
+      padding: 0 10px;
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      min-width: 34px;
+      display: inline-grid;
+      place-items: center;
+      font-weight: 650;
+    }
+
+    button:hover, select:hover, input:hover { border-color: #aeb8b0; }
+    button.primary { background: var(--ink); color: white; border-color: var(--ink); }
+    button[aria-pressed="true"] { background: #e5efe9; border-color: #9fc5b4; color: var(--green); }
+
+    main {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 18px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(150px, 1fr));
+      gap: 10px;
+    }
+
+    .metric {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 12px;
+      box-shadow: var(--shadow);
+      min-height: 82px;
+    }
+
+    .metric .label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+      text-transform: uppercase;
+    }
+
+    .metric .value {
+      margin-top: 5px;
+      font-size: 24px;
+      font-weight: 780;
+    }
+
+    .metric .note {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(360px, 0.95fr) minmax(520px, 1.55fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .panel-title {
+      font-weight: 760;
+      font-size: 14px;
+    }
+
+    .panel-body { padding: 14px; }
+
+    .condition-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .condition {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+      min-height: 116px;
+    }
+
+    .condition.ok { border-color: #a9cfbd; background: #f7fbf8; }
+    .condition.missing { background: #fbf8f2; }
+    .condition .name { font-weight: 760; }
+    .condition .meta { color: var(--muted); font-size: 12px; }
+    .bar {
+      height: 7px;
+      background: #e9ece8;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .bar span { display: block; height: 100%; background: var(--green); width: 0%; }
+
+    .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 12px;
+      color: var(--muted);
+      background: #fafafa;
+      white-space: nowrap;
+    }
+
+    .country-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .country-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      min-height: 142px;
+    }
+
+    .country-card .condition-name {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-weight: 760;
+      margin-bottom: 8px;
+    }
+
+    .phase {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 12px;
+      font-weight: 720;
+      background: #eef1f3;
+    }
+    .phase.Acceleration { color: var(--blue); background: #eef4ff; }
+    .phase.Inflection { color: var(--violet); background: #f2eefb; }
+    .phase.Deceleration { color: var(--gold); background: #fff5df; }
+    .phase.Deactivated { color: var(--red); background: #fff0ef; }
+
+    .kv {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 5px 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .kv strong { color: var(--ink); font-weight: 720; }
+
+    .chart-wrap {
+      display: grid;
+      gap: 12px;
+    }
+
+    .plot-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .plot-buttons, .phase-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pill-btn {
+      height: 30px;
+      border-radius: 18px;
+      border: 2px solid #e74c3c;
+      color: #e74c3c;
+      background: #fff;
+      padding: 0 14px;
+      font-size: 12px;
+    }
+
+    .pill-btn.active, .pill-btn:hover { background: #e74c3c; color: #fff; }
+
+    .legend-item {
+      display: inline-flex;
+      gap: 5px;
+      align-items: center;
+      font-size: 12px;
+      cursor: pointer;
+      user-select: none;
+      color: #444;
+    }
+
+    .legend-item.off { opacity: 0.28; }
+    .legend-dot { width: 11px; height: 11px; border-radius: 50%; }
+
+    #lifepathWrap {
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f8f8f8;
+      overflow: hidden;
+    }
+
+    #lifepathChart {
+      display: block;
+      width: 100%;
+      height: min(62vh, 640px);
+      min-height: 460px;
+    }
+
+    .tip {
+      position: absolute;
+      display: none;
+      max-width: 240px;
+      pointer-events: none;
+      z-index: 20;
+      background: rgba(12, 12, 12, 0.88);
+      color: white;
+      padding: 8px 11px;
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.55;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    }
+
+    .tip b { font-size: 13px; }
+
+    .table-tools {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 8px;
+      align-items: center;
+      width: 100%;
+    }
+
+    .table-shell {
+      max-height: 520px;
+      overflow: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 820px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--line);
+      white-space: nowrap;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #f0f2ef;
+      z-index: 1;
+      font-size: 12px;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    tr:hover td { background: #fafbf8; }
+    tr.selected td { background: #eaf3ff; }
+
+    .empty {
+      padding: 24px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .warn {
+      color: #7a4b00;
+      background: #fff8e8;
+      border: 1px solid #f0d499;
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: none;
+    }
+    .warn.show { display: block; }
+
+    @media (max-width: 1100px) {
+      .topbar, .layout { grid-template-columns: 1fr; }
+      .controls { justify-content: flex-start; }
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .country-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 720px) {
+      main { padding: 12px; }
+      .topbar { padding: 12px; }
+      .stats, .condition-grid, .country-grid, .table-tools { grid-template-columns: 1fr; }
+      button, select, input { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <div>
+        <h1>Sensitivity Analysis Dashboard</h1>
+        <div class="subtitle" id="subtitle">Reading partial country result files from lifepaths_output.</div>
+      </div>
+      <div class="controls">
+        <button id="refreshBtn" class="primary" title="Refresh data now" aria-label="Refresh">↻</button>
+        <button id="autoBtn" title="Toggle auto-refresh" aria-pressed="true">Auto</button>
+        <select id="countrySelect" title="Selected country"></select>
+        <select id="conditionSelect" title="Chart condition"></select>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="warn" id="warning"></div>
+
+    <section class="stats" aria-label="Overview metrics">
+      <div class="metric"><div class="label">Loaded Conditions</div><div class="value" id="metricLoaded">0/12</div><div class="note">final or partial files</div></div>
+      <div class="metric"><div class="label">Countries Seen</div><div class="value" id="metricCountries">0</div><div class="note">union across analyses</div></div>
+      <div class="metric"><div class="label">Rows In Table</div><div class="value" id="metricRows">0</div><div class="note">condition-country pairs</div></div>
+      <div class="metric"><div class="label">Active Progress</div><div class="value" id="metricProgress">0%</div><div class="note" id="metricProgressNote">no status file yet</div></div>
+      <div class="metric"><div class="label">Last Refresh</div><div class="value" id="metricRefresh">--</div><div class="note">auto refresh every 10s</div></div>
+    </section>
+
+    <section class="layout">
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">Analysis Files</div>
+          <div class="chip" id="fileMode">partial-first</div>
+        </div>
+        <div class="panel-body">
+          <div class="condition-grid" id="conditionGrid"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title" id="countryTitle">Country Detail</div>
+          <div class="chips" id="countryChips"></div>
+        </div>
+        <div class="panel-body">
+          <div class="country-grid" id="countryCards"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <div class="panel-title">Lifepath Plot</div>
+          <div class="subtitle">x-axis: projected inflection date | y-axis: ln(k) growth intensity | size proportional to publications</div>
+        </div>
+        <div class="chips"><span class="chip">selected analysis</span><span class="chip">live partial JSON</span></div>
+      </div>
+      <div class="panel-body chart-wrap">
+        <div class="plot-toolbar">
+          <div class="plot-buttons">
+            <button class="pill-btn active" id="plotTrajBtn">Trajectories</button>
+            <button class="pill-btn" id="plotFinalBtn">Final snapshot</button>
+          </div>
+          <div class="phase-legend" id="phaseLegend"></div>
+        </div>
+        <div id="lifepathWrap"><svg id="lifepathChart"></svg><div class="tip" id="plotTip"></div></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div class="table-tools">
+          <input id="searchInput" placeholder="Search countries" aria-label="Search countries" />
+          <select id="phaseFilter" aria-label="Filter by phase">
+            <option value="">All phases</option>
+            <option>Acceleration</option>
+            <option>Inflection</option>
+            <option>Deceleration</option>
+            <option>Deactivated</option>
+          </select>
+          <select id="analysisFilter" aria-label="Filter by analysis">
+            <option value="">All analyses</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-shell">
+        <table id="resultsTable">
+          <thead>
+            <tr>
+              <th data-sort="country">Country</th>
+              <th data-sort="condition">Condition</th>
+              <th data-sort="final_phase">Final phase</th>
+              <th data-sort="total_pubs">Publications</th>
+              <th data-sort="nonzero_windows">Nonzero windows</th>
+              <th data-sort="phases_count">Phases</th>
+              <th data-sort="median_x0">Median x0</th>
+              <th data-sort="final_x0_year">Final x0 year</th>
+              <th data-sort="time_folds">Folds</th>
+              <th data-sort="source">Source</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const PADDED_BASE = 'lifepaths_output/sensitivity_analysis_comparison';
+    const NO_PADDING_BASE = 'lifepaths_output/sensitivity_analysis_comparison_no_padding';
+    const CONDITIONS = [
+      { key: 'pad_A_3M', label: 'Pad A 3M', root: PADDED_BASE, folder: 'aggregated_fit/3M', group: 'Padded · aggregated fit', color: '#2459a7' },
+      { key: 'pad_A_6M', label: 'Pad A 6M', root: PADDED_BASE, folder: 'aggregated_fit/6M', group: 'Padded · aggregated fit', color: '#1f7a57' },
+      { key: 'pad_A_12M', label: 'Pad A 12M', root: PADDED_BASE, folder: 'aggregated_fit/12M', group: 'Padded · aggregated fit', color: '#a96a00' },
+      { key: 'pad_B_3M', label: 'Pad B 3M', root: PADDED_BASE, folder: 'monthly_snapshot/3M', group: 'Padded · monthly snapshot', color: '#247b8f' },
+      { key: 'pad_B_6M', label: 'Pad B 6M', root: PADDED_BASE, folder: 'monthly_snapshot/6M', group: 'Padded · monthly snapshot', color: '#6a4aa4' },
+      { key: 'pad_B_12M', label: 'Pad B 12M', root: PADDED_BASE, folder: 'monthly_snapshot/12M', group: 'Padded · monthly snapshot', color: '#b33b3b' },
+      { key: 'nopad_A_3M', label: 'No pad A 3M', root: NO_PADDING_BASE, folder: 'aggregated_fit/3M', group: 'No padding · aggregated fit', color: '#2459a7' },
+      { key: 'nopad_A_6M', label: 'No pad A 6M', root: NO_PADDING_BASE, folder: 'aggregated_fit/6M', group: 'No padding · aggregated fit', color: '#1f7a57' },
+      { key: 'nopad_A_12M', label: 'No pad A 12M', root: NO_PADDING_BASE, folder: 'aggregated_fit/12M', group: 'No padding · aggregated fit', color: '#a96a00' },
+      { key: 'nopad_B_3M', label: 'No pad B 3M', root: NO_PADDING_BASE, folder: 'monthly_snapshot/3M', group: 'No padding · monthly snapshot', color: '#247b8f' },
+      { key: 'nopad_B_6M', label: 'No pad B 6M', root: NO_PADDING_BASE, folder: 'monthly_snapshot/6M', group: 'No padding · monthly snapshot', color: '#6a4aa4' },
+      { key: 'nopad_B_12M', label: 'No pad B 12M', root: NO_PADDING_BASE, folder: 'monthly_snapshot/12M', group: 'No padding · monthly snapshot', color: '#b33b3b' }
+    ];
+    const PHASE_COLORS = {
+      Acceleration: '#27ae60',
+      Inflection: '#2980b9',
+      Deceleration: '#e74c3c',
+      Deactivated: '#2c3e50'
+    };
+
+    const state = {
+      datasets: {},
+      rows: [],
+      selectedCountry: '',
+      selectedCondition: 'A_3M',
+      sortKey: 'total_pubs',
+      sortDir: 'desc',
+      auto: true,
+      timer: null,
+      plotView: 'traj',
+      plotPhases: new Set(['Acceleration', 'Inflection', 'Deceleration', 'Deactivated']),
+      highlighted: null
+    };
+
+    const $ = (id) => document.getElementById(id);
+    const fmt = (value, digits = 2) => {
+      if (value === null || value === undefined || Number.isNaN(Number(value))) return '--';
+      const n = Number(value);
+      return Number.isInteger(n) ? String(n) : n.toFixed(digits);
+    };
+
+    async function fetchText(path) {
+      const res = await fetch(path + '?t=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) throw new Error(String(res.status));
+      return res.text();
+    }
+
+    async function fetchJson(path) {
+      return JSON.parse(await fetchText(path));
+    }
+
+    async function loadCondition(condition) {
+      const root = `${condition.root}/${condition.folder}`;
+      let source = 'missing';
+      let data = null;
+      let error = '';
+      try {
+        data = await fetchJson(`${root}/country_results.json`);
+        source = 'final';
+      } catch (finalError) {
+        try {
+          data = await fetchJson(`${root}/country_results_partial.json`);
+          source = 'partial';
+        } catch (partialError) {
+          error = `No result JSON found (${partialError.message})`;
+        }
+      }
+
+      let status = '';
+      try { status = (await fetchText(`${root}/status.txt`)).trim(); } catch (_) {}
+
+      return { ...condition, data: data || {}, source, status, error, loadedAt: new Date() };
+    }
+
+    function parseProgress(status) {
+      const match = status && status.match(/processed\s+(\d+)\/(\d+)/i);
+      if (!match) return null;
+      const done = Number(match[1]);
+      const total = Number(match[2]);
+      return { done, total, pct: total ? Math.round((done / total) * 100) : 0 };
+    }
+
+    function flattenRows() {
+      const rows = [];
+      Object.values(state.datasets).forEach(ds => {
+        Object.entries(ds.data || {}).forEach(([country, r]) => {
+          rows.push({
+            country,
+            condition: ds.label,
+            conditionKey: ds.key,
+            group: ds.group,
+            source: ds.source,
+            final_phase: r.final_phase || '',
+            total_pubs: Number(r.total_pubs || 0),
+            nonzero_windows: Number(r.nonzero_windows || 0),
+            phases_count: Array.isArray(r.phases) ? r.phases.length : 0,
+            median_x0: Number(r.median_x0),
+            final_x0_year: Number(r.final_x0_year),
+            time_folds: Number(r.time_folds || 0),
+            raw: r
+          });
+        });
+      });
+      state.rows = rows;
+    }
+
+    async function refresh() {
+      $('warning').classList.remove('show');
+      const loaded = await Promise.all(CONDITIONS.map(loadCondition));
+      state.datasets = Object.fromEntries(loaded.map(ds => [ds.key, ds]));
+      flattenRows();
+      ensureSelections();
+      renderAll();
+    }
+
+    function ensureSelections() {
+      const countries = [...new Set(state.rows.map(r => r.country))].sort((a, b) => a.localeCompare(b));
+      if (!state.selectedCountry || !countries.includes(state.selectedCountry)) {
+        state.selectedCountry = countries.includes('Afghanistan') ? 'Afghanistan' : countries[0] || '';
+      }
+      if (!state.datasets[state.selectedCondition]) state.selectedCondition = CONDITIONS[0].key;
+    }
+
+    function renderAll() {
+      renderMetrics();
+      renderControls();
+      renderConditionGrid();
+      renderCountryDetail();
+      renderTable();
+      renderPhaseLegend();
+      drawLifepathPlot();
+    }
+
+    function renderMetrics() {
+      const loaded = Object.values(state.datasets).filter(ds => ds.source !== 'missing').length;
+      const countries = new Set(state.rows.map(r => r.country));
+      const progresses = Object.values(state.datasets).map(ds => parseProgress(ds.status)).filter(Boolean);
+      const active = progresses.length ? Math.round(progresses.reduce((a, p) => a + p.pct, 0) / progresses.length) : 0;
+      $('metricLoaded').textContent = `${loaded}/${CONDITIONS.length}`;
+      $('metricCountries').textContent = countries.size;
+      $('metricRows').textContent = state.rows.length;
+      $('metricProgress').textContent = `${active}%`;
+      $('metricProgressNote').textContent = progresses.length ? `${progresses.length} condition status file(s)` : 'no status file yet';
+      $('metricRefresh').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const anyMissing = loaded === 0;
+      if (anyMissing) {
+        $('warning').textContent = 'No JSON files loaded. Open this dashboard through a local web server from /Users/necsi/Sites/selenay, not directly as a file, so fetch() can read the result JSON files.';
+        $('warning').classList.add('show');
+      }
+    }
+
+    function renderControls() {
+      const countries = [...new Set(state.rows.map(r => r.country))].sort((a, b) => a.localeCompare(b));
+      $('countrySelect').innerHTML = countries.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+      $('countrySelect').value = state.selectedCountry;
+      $('conditionSelect').innerHTML = CONDITIONS.map(c => `<option value="${c.key}">${c.label}</option>`).join('');
+      $('conditionSelect').value = state.selectedCondition;
+      $('analysisFilter').innerHTML = '<option value="">All analyses</option>' + CONDITIONS.map(c => `<option value="${c.key}">${c.label}</option>`).join('');
+      $('autoBtn').setAttribute('aria-pressed', String(state.auto));
+    }
+
+    function renderConditionGrid() {
+      $('conditionGrid').innerHTML = CONDITIONS.map(c => {
+        const ds = state.datasets[c.key] || { data: {}, source: 'missing', status: '', error: '' };
+        const count = Object.keys(ds.data || {}).length;
+        const progress = parseProgress(ds.status);
+        const pct = progress ? progress.pct : (ds.source === 'final' ? 100 : 0);
+        const cls = ds.source === 'missing' ? 'missing' : 'ok';
+        const status = ds.source === 'final' ? `complete: ${count} countries` : (ds.status || ds.error || 'waiting for file');
+        return `<div class="condition ${cls}">
+          <div class="name">${c.label} <span class="chip">${escapeHtml(ds.source)}</span></div>
+          <div class="bar"><span style="width:${pct}%"></span></div>
+          <div class="meta">${escapeHtml(status)}</div>
+          <div class="chips"><span class="chip">${count} countries</span><span class="chip">${c.group}</span></div>
+        </div>`;
+      }).join('');
+    }
+
+    function renderCountryDetail() {
+      const country = state.selectedCountry;
+      $('countryTitle').textContent = country ? `${country} Detail` : 'Country Detail';
+      const rows = state.rows.filter(r => r.country === country).sort((a, b) => a.condition.localeCompare(b.condition));
+      const totalPubs = rows.length ? Math.max(...rows.map(r => r.total_pubs)) : 0;
+      $('countryChips').innerHTML = `<span class="chip">${rows.length} loaded analyses</span><span class="chip">max pubs ${fmt(totalPubs, 0)}</span>`;
+      $('countryCards').innerHTML = CONDITIONS.map(c => {
+        const row = rows.find(r => r.conditionKey === c.key);
+        if (!row) {
+          return `<div class="country-card"><div class="condition-name"><span>${c.label}</span><span class="chip">missing</span></div><div class="empty">No country result yet</div></div>`;
+        }
+        return `<div class="country-card">
+          <div class="condition-name"><span>${c.label}</span><span class="phase ${escapeHtml(row.final_phase)}">${escapeHtml(row.final_phase || '--')}</span></div>
+          <div class="kv">
+            <span>Publications</span><strong>${fmt(row.total_pubs, 0)}</strong>
+            <span>Nonzero windows</span><strong>${fmt(row.nonzero_windows, 0)}</strong>
+            <span>Phase records</span><strong>${fmt(row.phases_count, 0)}</strong>
+            <span>Median x0</span><strong>${fmt(row.median_x0, 3)}</strong>
+            <span>Final x0 year</span><strong>${fmt(row.final_x0_year, 1)}</strong>
+            <span>Folds</span><strong>${fmt(row.time_folds, 0)}</strong>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function getFilteredRows() {
+      const q = $('searchInput').value.trim().toLowerCase();
+      const phase = $('phaseFilter').value;
+      const analysis = $('analysisFilter').value;
+      return state.rows.filter(r => {
+        if (q && !r.country.toLowerCase().includes(q)) return false;
+        if (phase && r.final_phase !== phase) return false;
+        if (analysis && r.conditionKey !== analysis) return false;
+        return true;
+      }).sort((a, b) => compareRows(a, b));
+    }
+
+    function compareRows(a, b) {
+      const key = state.sortKey;
+      const av = a[key];
+      const bv = b[key];
+      const dir = state.sortDir === 'asc' ? 1 : -1;
+      if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * dir;
+      return String(av ?? '').localeCompare(String(bv ?? '')) * dir;
+    }
+
+    function renderTable() {
+      const rows = getFilteredRows();
+      const tbody = $('resultsTable').querySelector('tbody');
+      tbody.innerHTML = rows.map(r => `<tr class="${r.country === state.selectedCountry ? 'selected' : ''}" data-country="${escapeHtml(r.country)}" data-condition="${r.conditionKey}">
+        <td>${escapeHtml(r.country)}</td>
+        <td>${r.condition}</td>
+        <td><span class="phase ${escapeHtml(r.final_phase)}">${escapeHtml(r.final_phase || '--')}</span></td>
+        <td>${fmt(r.total_pubs, 0)}</td>
+        <td>${fmt(r.nonzero_windows, 0)}</td>
+        <td>${fmt(r.phases_count, 0)}</td>
+        <td>${fmt(r.median_x0, 3)}</td>
+        <td>${fmt(r.final_x0_year, 1)}</td>
+        <td>${fmt(r.time_folds, 0)}</td>
+        <td>${r.source}</td>
+      </tr>`).join('');
+      $('metricRows').textContent = rows.length;
+    }
+
+    function phaseColor(phase) {
+      return PHASE_COLORS[phase] || '#2c3e50';
+    }
+
+    function phaseToOldColor(phase) {
+      return {
+        Acceleration: 'green',
+        Inflection: 'blue',
+        Deceleration: 'red',
+        Deactivated: 'black'
+      }[phase] || 'black';
+    }
+
+    function dateFromYear(year) {
+      if (!Number.isFinite(year)) return null;
+      const y = Math.floor(year);
+      const days = Math.max(0, Math.min(365, Math.round((year - y) * 365.25)));
+      const d = new Date(Date.UTC(y, 0, 1));
+      d.setUTCDate(d.getUTCDate() + days);
+      return d;
+    }
+
+    function dateLabelFromYear(year) {
+      const d = dateFromYear(year);
+      if (!d) return '--';
+      return d.toISOString().slice(0, 10);
+    }
+
+    function yearLabel(year) {
+      if (!Number.isFinite(year)) return '--';
+      return String(Math.round(year * 10) / 10);
+    }
+
+    function lifepathCountries(ds) {
+      if (!ds || !ds.data) return [];
+      return Object.entries(ds.data).map(([name, raw]) => {
+        const params = Array.isArray(raw.window_params) ? raw.window_params : [];
+        let cumulative = 0;
+        const pts = params.map((p, idx) => {
+          const projected = Number(p.x0_year);
+          const k = Number(p.k);
+          const phase = p.phase || (raw.phases && raw.phases[idx]) || raw.final_phase || 'Deactivated';
+          cumulative = Math.max(cumulative, Number(p.A || raw.total_pubs || 1));
+          return {
+            idx,
+            projected,
+            snapshot: Number(p.snapshot_year),
+            y: Number.isFinite(k) && k > 0 ? Math.log(k) : null,
+            pubs: Math.max(1, Number(p.A || raw.total_pubs || 1)),
+            phase,
+            color: phaseToOldColor(phase)
+          };
+        }).filter(p => Number.isFinite(p.projected) && Number.isFinite(p.y));
+        const last = pts[pts.length - 1] || {};
+        return { name, raw, pts, finalPhase: raw.final_phase || last.phase || 'Deactivated', finalPubs: Number(raw.total_pubs || last.pubs || 1) };
+      }).filter(c => c.pts.length > 0);
+    }
+
+    function renderPhaseLegend() {
+      const phases = ['Acceleration', 'Inflection', 'Deceleration', 'Deactivated'];
+      $('phaseLegend').innerHTML = phases.map(phase => `<span class="legend-item ${state.plotPhases.has(phase) ? '' : 'off'}" data-phase="${phase}"><span class="legend-dot" style="background:${phaseColor(phase)}"></span>${phase}</span>`).join('') + '<span class="chip" id="plotCount">0 countries</span>';
+      $('phaseLegend').querySelectorAll('[data-phase]').forEach(el => {
+        el.addEventListener('click', () => {
+          const phase = el.dataset.phase;
+          if (state.plotPhases.has(phase) && state.plotPhases.size > 1) state.plotPhases.delete(phase);
+          else state.plotPhases.add(phase);
+          renderPhaseLegend();
+          drawLifepathPlot();
+        });
+      });
+    }
+
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+    function svgEl(tag, attrs, parent) {
+      const el = document.createElementNS(SVG_NS, tag);
+      Object.entries(attrs || {}).forEach(([k, v]) => el.setAttribute(k, v));
+      if (parent) parent.appendChild(el);
+      return el;
+    }
+
+    function drawLifepathPlot() {
+      const svg = $('lifepathChart');
+      const wrap = $('lifepathWrap');
+      const tip = $('plotTip');
+      const ds = state.datasets[state.selectedCondition];
+      const allCountries = lifepathCountries(ds);
+      const visibleCountries = allCountries.filter(c => state.plotPhases.has(c.finalPhase));
+      const selected = state.highlighted;
+      const width = Math.max(760, wrap.clientWidth || 1000);
+      const height = Math.max(460, Math.min(640, Math.round(window.innerHeight * 0.62)));
+      const M = { top: 70, right: 70, bottom: 58, left: 68 };
+      const IW = width - M.left - M.right;
+      const IH = height - M.top - M.bottom;
+      svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+      svg.innerHTML = '';
+      tip.style.display = 'none';
+
+      const allPts = visibleCountries.flatMap(c => c.pts);
+      if (!ds || ds.source === 'missing' || allPts.length === 0) {
+        svgEl('rect', { x: 0, y: 0, width, height, fill: '#f8f8f8' }, svg);
+        const t = svgEl('text', { x: 24, y: 42, fill: '#777', 'font-size': 14 }, svg);
+        t.textContent = 'No lifepath points loaded for this analysis yet.';
+        return;
+      }
+
+      const xYears = allPts.map(p => p.projected);
+      let minYear = Math.min(2006, Math.floor(Math.min(...xYears)) - 1);
+      let maxYear = Math.max(2030, Math.ceil(Math.max(...xYears)) + 1);
+      const yVals = allPts.map(p => p.y);
+      let minY = Math.floor(Math.min(...yVals) * 10) / 10;
+      let maxY = Math.ceil(Math.max(...yVals) * 10) / 10;
+      if (minY === maxY) { minY -= 1; maxY += 1; }
+      const xpx = y => ((y - minYear) / (maxYear - minYear)) * IW;
+      const ypx = v => ((v - minY) / (maxY - minY)) * IH;
+      const rSize = o => Math.max(2.5, Math.min(30, Math.pow(Math.max(1, o), 0.45) * 2.2));
+
+      const root = svgEl('g', { transform: `translate(${M.left},${M.top})` }, svg);
+      const defs = svgEl('defs', {}, svg);
+      const cp = svgEl('clipPath', { id: 'lifepathClip' }, defs);
+      svgEl('rect', { x: -10, y: -70, width: IW + 20, height: IH + 80 }, cp);
+      const grid = svgEl('g', {}, root);
+      const lines = svgEl('g', { 'clip-path': 'url(#lifepathClip)' }, root);
+      const dots = svgEl('g', { 'clip-path': 'url(#lifepathClip)' }, root);
+      const labels = svgEl('g', {}, root);
+
+      svgEl('rect', { x: 0, y: 0, width: IW, height: IH, fill: '#f8f8f8', stroke: '#ccc' }, grid);
+      const yStep = niceStep((maxY - minY) / 7);
+      for (let v = Math.ceil(minY / yStep) * yStep; v <= maxY + 1e-9; v += yStep) {
+        const py = ypx(v);
+        const gg = svgEl('g', { transform: `translate(0,${py})` }, grid);
+        svgEl('line', { x1: 0, y1: 0, x2: IW, y2: 0, stroke: '#ddd', 'stroke-dasharray': '3,3' }, gg);
+        const text = svgEl('text', { x: -7, y: 4, 'text-anchor': 'end', 'font-size': 11, fill: '#777' }, gg);
+        text.textContent = v.toFixed(yStep < 1 ? 1 : 0);
+      }
+      const xStep = Math.max(1, Math.ceil((maxYear - minYear) / 12));
+      for (let yr = Math.ceil(minYear / xStep) * xStep; yr <= maxYear; yr += xStep) {
+        const px = xpx(yr);
+        const gg = svgEl('g', { transform: `translate(${px},0)` }, grid);
+        svgEl('line', { x1: 0, y1: 0, x2: 0, y2: IH, stroke: '#ddd', 'stroke-dasharray': '3,3' }, gg);
+        svgEl('line', { x1: 0, y1: IH, x2: 0, y2: IH + 5, stroke: '#999' }, gg);
+        const text = svgEl('text', { x: 0, y: IH + 18, 'text-anchor': 'middle', 'font-size': 11, fill: '#666' }, gg);
+        text.textContent = yr;
+      }
+      svgEl('rect', { x: 0, y: 0, width: IW, height: IH, fill: 'none', stroke: '#bbb' }, grid);
+      const xl = svgEl('text', { x: IW / 2, y: IH + 46, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 600, fill: '#444' }, grid);
+      xl.textContent = 'Projected inflection date  t_inf';
+      const yl = svgEl('text', { transform: `translate(-50,${IH / 2}) rotate(-90)`, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 600, fill: '#444' }, grid);
+      yl.textContent = 'ln(k)  ↑ higher growth intensity';
+      const title = svgEl('text', { x: 0, y: -42, 'font-size': 17, 'font-weight': 700, fill: '#222' }, grid);
+      title.textContent = `${ds.label} lifepaths`;
+      const sub = svgEl('text', { x: 0, y: -21, 'font-size': 12, fill: '#777' }, grid);
+      sub.textContent = `${ds.source} · ${visibleCountries.length} countries · ${ds.status || 'no status text'}`;
+
+      const top20 = new Set([...visibleCountries].sort((a, b) => b.finalPubs - a.finalPubs).slice(0, 20).map(c => c.name));
+      const isDim = c => selected && c.name !== selected;
+      const drawOne = (c, dim) => {
+        const top = top20.has(c.name);
+        const hl = selected && c.name === selected;
+        const opacity = hl ? 1 : dim ? 0.08 : top ? 0.78 : 0.42;
+        const finalColor = phaseColor(c.finalPhase);
+        if (state.plotView === 'traj' && c.pts.length >= 2) {
+          const points = c.pts.map(p => `${xpx(p.projected).toFixed(1)},${ypx(p.y).toFixed(1)}`).join(' ');
+          svgEl('polyline', {
+            points, fill: 'none', stroke: dim ? '#bbb' : finalColor,
+            'stroke-width': hl ? 3 : top ? 1.8 : 0.5,
+            opacity, 'stroke-linejoin': 'round', 'stroke-linecap': 'round'
+          }, lines);
+        }
+        const pts = state.plotView === 'final' ? [c.pts[c.pts.length - 1]] : c.pts;
+        pts.forEach((p, i) => {
+          const isFinal = state.plotView === 'final' || i === pts.length - 1;
+          const r = rSize(p.pubs) * (isFinal ? (hl ? 2.4 : 1.9) : 0.85) * (top || hl ? 1.3 : 1.0);
+          const dot = svgEl('circle', {
+            cx: xpx(p.projected), cy: ypx(p.y), r,
+            fill: dim ? '#ccc' : phaseColor(p.phase),
+            opacity: hl ? 0.9 : dim ? 0.45 : 0.68,
+            stroke: hl ? 'black' : dim ? 'none' : 'black',
+            'stroke-width': hl ? (isFinal ? 2 : 1) : (isFinal ? 1.2 : 0.5),
+            cursor: 'pointer'
+          }, dots);
+          dot.addEventListener('mouseenter', ev => showPlotTip(ev, c, p, p.idx, wrap));
+          dot.addEventListener('mousemove', ev => movePlotTip(ev, wrap));
+          dot.addEventListener('mouseleave', hidePlotTip);
+          dot.addEventListener('click', () => {
+            state.selectedCountry = c.name;
+            state.highlighted = state.highlighted === c.name ? null : c.name;
+            renderAll();
+          });
+        });
+      };
+
+      visibleCountries.forEach(c => { if (selected && c.name !== selected) drawOne(c, true); });
+      visibleCountries.forEach(c => { if (!selected || c.name === selected) drawOne(c, false); });
+      visibleCountries.forEach(c => {
+        const hl = selected && c.name === selected;
+        if (!hl && !top20.has(c.name)) return;
+        if (selected && !hl) return;
+        const last = c.pts[c.pts.length - 1];
+        const text = svgEl('text', { x: xpx(last.projected) + 7, y: ypx(last.y) + 3, 'font-size': hl ? 11 : 9, 'font-weight': 'bold', fill: phaseColor(last.phase), 'pointer-events': 'none' }, labels);
+        text.textContent = c.name;
+      });
+      const plotCount = $('plotCount');
+      if (plotCount) plotCount.textContent = `${visibleCountries.length} countries`;
+    }
+
+    function niceStep(raw) {
+      const pow = Math.pow(10, Math.floor(Math.log10(Math.max(raw, 1e-9))));
+      const n = raw / pow;
+      const step = n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10;
+      return step * pow;
+    }
+
+    function showPlotTip(ev, c, p, idx, wrap) {
+      const tip = $('plotTip');
+      tip.innerHTML = `<b>${escapeHtml(c.name)}</b><br>
+        Snapshot: ${yearLabel(p.snapshot)}<br>
+        Proj. inflection: ${dateLabelFromYear(p.projected)}<br>
+        ln(k): ${fmt(p.y, 3)}<br>
+        Publications/scale: ${fmt(p.pubs, 0)}<br>
+        Phase: <span style="color:${phaseColor(p.phase)}">${escapeHtml(p.phase)}</span><br>
+        Point ${idx + 1}/${c.pts.length}`;
+      tip.style.display = 'block';
+      movePlotTip(ev, wrap);
+    }
+
+    function movePlotTip(ev, wrap) {
+      const tip = $('plotTip');
+      const rect = wrap.getBoundingClientRect();
+      let tx = ev.clientX - rect.left + 14;
+      let ty = ev.clientY - rect.top - 10;
+      if (tx + 250 > rect.width) tx -= 265;
+      tip.style.left = tx + 'px';
+      tip.style.top = ty + 'px';
+    }
+
+    function hidePlotTip() {
+      $('plotTip').style.display = 'none';
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>'"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[ch]));
+    }
+
+    $('refreshBtn').addEventListener('click', refresh);
+    $('autoBtn').addEventListener('click', () => {
+      state.auto = !state.auto;
+      $('autoBtn').setAttribute('aria-pressed', String(state.auto));
+      if (state.auto) startTimer(); else clearInterval(state.timer);
+    });
+    $('countrySelect').addEventListener('change', e => { state.selectedCountry = e.target.value; state.highlighted = null; renderAll(); });
+    $('conditionSelect').addEventListener('change', e => { state.selectedCondition = e.target.value; renderAll(); });
+    $('searchInput').addEventListener('input', renderTable);
+    $('phaseFilter').addEventListener('change', renderTable);
+    $('analysisFilter').addEventListener('change', renderTable);
+    $('resultsTable').addEventListener('click', e => {
+      const row = e.target.closest('tr[data-country]');
+      if (!row) return;
+      state.selectedCountry = row.dataset.country;
+      state.selectedCondition = row.dataset.condition;
+      state.highlighted = row.dataset.country;
+      renderAll();
+    });
+    document.querySelectorAll('th[data-sort]').forEach(th => {
+      th.addEventListener('click', () => {
+        const key = th.dataset.sort;
+        if (state.sortKey === key) state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
+        else { state.sortKey = key; state.sortDir = 'asc'; }
+        renderTable();
+      });
+    });
+    $('plotTrajBtn').addEventListener('click', () => {
+      state.plotView = 'traj';
+      $('plotTrajBtn').classList.add('active');
+      $('plotFinalBtn').classList.remove('active');
+      drawLifepathPlot();
+    });
+    $('plotFinalBtn').addEventListener('click', () => {
+      state.plotView = 'final';
+      $('plotFinalBtn').classList.add('active');
+      $('plotTrajBtn').classList.remove('active');
+      drawLifepathPlot();
+    });
+    window.addEventListener('resize', drawLifepathPlot);
+
+    function startTimer() {
+      clearInterval(state.timer);
+      state.timer = setInterval(() => { if (state.auto) refresh(); }, 10000);
+    }
+
+    refresh();
+    startTimer();
+  </script>
+</body>
+</html>
