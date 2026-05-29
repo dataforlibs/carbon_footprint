@@ -28,6 +28,9 @@
     "time_folds": 0,
     "fold_years": [],
     "saturation_fold_years": [],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2022.03832991102,
     "median_x0": 0.9283198534250153,
     "pct_x0_le1": 100.0,
@@ -134,6 +137,11 @@
       2017.9171800136892,
       2021.9171800136892
     ],
+    "time_folds_forward": 1,
+    "forward_fold_years": [
+      2018.9171800136892
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2018.0766598220398,
     "median_x0": 0.8235162971294295,
     "pct_x0_le1": 100.0,
@@ -250,6 +258,11 @@
       2016.9199178644765,
       2020.9199178644765
     ],
+    "time_folds_forward": 1,
+    "forward_fold_years": [
+      2022.9171800136892
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2028.4462696783025,
     "median_x0": 0.8343635624100436,
     "pct_x0_le1": 88.88888888888889,
@@ -314,6 +327,9 @@
     "saturation_fold_years": [
       2021.9171800136892
     ],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2020.041067761807,
     "median_x0": 0.8468330867520464,
     "pct_x0_le1": 100.0,
@@ -439,6 +455,9 @@
     "saturation_fold_years": [
       2015.9171800136892
     ],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2021.5722108145105,
     "median_x0": 0.879990087743655,
     "pct_x0_le1": 80.0,
@@ -619,6 +638,13 @@
     "time_folds": 0,
     "fold_years": [],
     "saturation_fold_years": [],
+    "time_folds_forward": 3,
+    "forward_fold_years": [
+      2009.9171800136892,
+      2010.9171800136892,
+      2012.9199178644765
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2020.084873374401,
     "median_x0": 0.7560356225400249,
     "pct_x0_le1": 100.0,
@@ -784,6 +810,12 @@
     "saturation_fold_years": [
       2012.9199178644765
     ],
+    "time_folds_forward": 2,
+    "forward_fold_years": [
+      2017.9171800136892,
+      2021.9171800136892
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2024.5749486652978,
     "median_x0": 0.8044602606036877,
     "pct_x0_le1": 85.71428571428571,
@@ -844,6 +876,9 @@
     "time_folds": 0,
     "fold_years": [],
     "saturation_fold_years": [],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2021.1779603011637,
     "median_x0": 0.9103678966715305,
     "pct_x0_le1": 100.0,
@@ -1001,6 +1036,13 @@
       2012.9199178644765,
       2013.9171800136892,
       2014.9171800136892
+    ],
+    "time_folds_forward": 1,
+    "forward_fold_years": [
+      2016.9199178644765
+    ],
+    "fwd_sat_fold_years": [
+      2016.9199178644765
     ],
     "final_x0_year": 2028.4462696783025,
     "median_x0": 1.057638104435225,
@@ -1164,6 +1206,17 @@
       2014.9171800136892
     ],
     "saturation_fold_years": [],
+    "time_folds_forward": 4,
+    "forward_fold_years": [
+      2012.9199178644765,
+      2021.9171800136892,
+      2022.9171800136892,
+      2023.498288843258
+    ],
+    "fwd_sat_fold_years": [
+      2021.9171800136892,
+      2022.9171800136892
+    ],
     "final_x0_year": 2022.520191649555,
     "median_x0": 0.7917829485307607,
     "pct_x0_le1": 100.0,
@@ -1224,6 +1277,9 @@
     "time_folds": 0,
     "fold_years": [],
     "saturation_fold_years": [],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2019.8733744010951,
     "median_x0": 0.8360150484297526,
     "pct_x0_le1": 100.0,
@@ -1400,6 +1456,9 @@
       2011.9171800136892,
       2012.9199178644765
     ],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2023.7501711156742,
     "median_x0": 0.9674381856389176,
     "pct_x0_le1": 60.0,
@@ -1440,6 +1499,9 @@
     "time_folds": 0,
     "fold_years": [],
     "saturation_fold_years": [],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2023.0492813141684,
     "median_x0": 0.9824896555211604,
     "pct_x0_le1": 100.0,
@@ -1536,6 +1598,9 @@
       2018.9171800136892,
       2019.9171800136892
     ],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2028.4462696783025,
     "median_x0": 0.9198418565385801,
     "pct_x0_le1": 57.14285714285714,
@@ -1610,6 +1675,9 @@
     "saturation_fold_years": [
       2020.9199178644765
     ],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2019.624229979466,
     "median_x0": 0.8463721693899302,
     "pct_x0_le1": 100.0,
@@ -1684,6 +1752,9 @@
     "saturation_fold_years": [
       2020.9199178644765
     ],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2028.4462696783025,
     "median_x0": 0.9903132726094819,
     "pct_x0_le1": 60.0,
@@ -1867,6 +1938,12 @@
       2015.9171800136892
     ],
     "saturation_fold_years": [],
+    "time_folds_forward": 2,
+    "forward_fold_years": [
+      2009.9171800136892,
+      2012.9199178644765
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2022.4626967830254,
     "median_x0": 0.8265543218605871,
     "pct_x0_le1": 100.0,
@@ -2030,6 +2107,12 @@
       2020.9199178644765
     ],
     "saturation_fold_years": [],
+    "time_folds_forward": 2,
+    "forward_fold_years": [
+      2021.9171800136892,
+      2022.9171800136892
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2022.8131416837782,
     "median_x0": 0.8543401912535817,
     "pct_x0_le1": 85.71428571428571,
@@ -2185,6 +2268,9 @@
     "saturation_fold_years": [
       2013.9171800136892
     ],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2025.01916495551,
     "median_x0": 0.8583289996547993,
     "pct_x0_le1": 69.23076923076923,
@@ -2265,6 +2351,9 @@
     "time_folds": 0,
     "fold_years": [],
     "saturation_fold_years": [],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2020.870636550308,
     "median_x0": 0.8943660611660345,
     "pct_x0_le1": 83.33333333333334,
@@ -2305,6 +2394,9 @@
     "time_folds": 0,
     "fold_years": [],
     "saturation_fold_years": [],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2022.7885010266941,
     "median_x0": 0.9746049419218332,
     "pct_x0_le1": 100.0,
@@ -2433,6 +2525,11 @@
       2016.9199178644765,
       2018.9171800136892
     ],
+    "time_folds_forward": 1,
+    "forward_fold_years": [
+      2017.9171800136892
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2028.4462696783025,
     "median_x0": 0.8556108989565756,
     "pct_x0_le1": 60.0,
@@ -2483,6 +2580,9 @@
     "time_folds": 0,
     "fold_years": [],
     "saturation_fold_years": [],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2020.955509924709,
     "median_x0": 0.8769585747191261,
     "pct_x0_le1": 100.0,
@@ -2587,6 +2687,9 @@
     "saturation_fold_years": [
       2017.9171800136892
     ],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2020.914442162902,
     "median_x0": 0.851119989938955,
     "pct_x0_le1": 100.0,
@@ -2765,6 +2868,14 @@
       2012.9199178644765,
       2013.9171800136892
     ],
+    "time_folds_forward": 2,
+    "forward_fold_years": [
+      2010.9171800136892,
+      2016.9199178644765
+    ],
+    "fwd_sat_fold_years": [
+      2010.9171800136892
+    ],
     "final_x0_year": 2023.2245037645448,
     "median_x0": 0.7787139104550524,
     "pct_x0_le1": 60.0,
@@ -2815,6 +2926,9 @@
     "time_folds": 0,
     "fold_years": [],
     "saturation_fold_years": [],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2021.536618754278,
     "median_x0": 0.9136103076671216,
     "pct_x0_le1": 100.0,
@@ -2999,6 +3113,14 @@
     "saturation_fold_years": [
       2011.9171800136892
     ],
+    "time_folds_forward": 4,
+    "forward_fold_years": [
+      2010.9171800136892,
+      2012.9199178644765,
+      2013.9171800136892,
+      2017.9171800136892
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2021.996577686516,
     "median_x0": 0.8632696030999193,
     "pct_x0_le1": 93.75,
@@ -3103,6 +3225,9 @@
     "saturation_fold_years": [
       2017.9171800136892
     ],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2022.9199178644765,
     "median_x0": 0.9383958134255066,
     "pct_x0_le1": 62.5,
@@ -3197,6 +3322,9 @@
     "saturation_fold_years": [
       2018.9171800136892
     ],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2024.3121149897331,
     "median_x0": 1.0240819234743066,
     "pct_x0_le1": 28.57142857142857,
@@ -3247,6 +3375,9 @@
     "time_folds": 0,
     "fold_years": [],
     "saturation_fold_years": [],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2023.5639972621493,
     "median_x0": 0.986028839135477,
     "pct_x0_le1": 66.66666666666666,
@@ -3394,6 +3525,11 @@
       2013.9171800136892,
       2014.9171800136892
     ],
+    "time_folds_forward": 1,
+    "forward_fold_years": [
+      2015.9171800136892
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2021.3449691991786,
     "median_x0": 0.8679195501230466,
     "pct_x0_le1": 83.33333333333334,
@@ -3444,6 +3580,9 @@
     "time_folds": 0,
     "fold_years": [],
     "saturation_fold_years": [],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2020.8733744010951,
     "median_x0": 0.8717269510739175,
     "pct_x0_le1": 100.0,
@@ -3518,6 +3657,9 @@
     "saturation_fold_years": [
       2020.9199178644765
     ],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2021.9171800136892,
     "median_x0": 0.9357352320000372,
     "pct_x0_le1": 80.0,
@@ -3700,6 +3842,9 @@
       2022.9171800136892,
       2023.498288843258
     ],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2018.1916495550993,
     "median_x0": 0.6713890794692569,
     "pct_x0_le1": 73.33333333333333,
@@ -3877,6 +4022,13 @@
     "saturation_fold_years": [
       2010.9171800136892
     ],
+    "time_folds_forward": 3,
+    "forward_fold_years": [
+      2014.9171800136892,
+      2019.9171800136892,
+      2020.9199178644765
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2026.892539356605,
     "median_x0": 0.7938755138154443,
     "pct_x0_le1": 80.0,
@@ -4059,6 +4211,12 @@
       2016.9199178644765
     ],
     "saturation_fold_years": [],
+    "time_folds_forward": 2,
+    "forward_fold_years": [
+      2010.9171800136892,
+      2012.9199178644765
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2028.4462696783025,
     "median_x0": 0.815198794498847,
     "pct_x0_le1": 68.75,
@@ -4231,6 +4389,12 @@
       2013.9171800136892
     ],
     "saturation_fold_years": [],
+    "time_folds_forward": 2,
+    "forward_fold_years": [
+      2010.9171800136892,
+      2021.9171800136892
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2026.350444900753,
     "median_x0": 0.7977320402729154,
     "pct_x0_le1": 86.66666666666667,
@@ -4359,6 +4523,9 @@
       2016.9199178644765,
       2017.9171800136892
     ],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2028.4462696783025,
     "median_x0": 0.7676545840289675,
     "pct_x0_le1": 70.0,
@@ -4536,6 +4703,13 @@
     "saturation_fold_years": [
       2010.9171800136892
     ],
+    "time_folds_forward": 3,
+    "forward_fold_years": [
+      2011.9171800136892,
+      2016.9199178644765,
+      2022.9171800136892
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2025.3969883641341,
     "median_x0": 0.7814864105665975,
     "pct_x0_le1": 86.66666666666667,
@@ -4722,6 +4896,14 @@
       2009.9171800136892,
       2011.9171800136892
     ],
+    "time_folds_forward": 2,
+    "forward_fold_years": [
+      2010.9171800136892,
+      2023.498288843258
+    ],
+    "fwd_sat_fold_years": [
+      2023.498288843258
+    ],
     "final_x0_year": 2015.5667351129364,
     "median_x0": 0.49966399605068584,
     "pct_x0_le1": 100.0,
@@ -4826,6 +5008,9 @@
     "saturation_fold_years": [
       2017.9171800136892
     ],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2020.5968514715948,
     "median_x0": 0.8915115292946334,
     "pct_x0_le1": 87.5,
@@ -4991,6 +5176,13 @@
     "saturation_fold_years": [
       2012.9199178644765
     ],
+    "time_folds_forward": 3,
+    "forward_fold_years": [
+      2011.9171800136892,
+      2013.9171800136892,
+      2021.9171800136892
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2028.4462696783025,
     "median_x0": 0.8469771372342263,
     "pct_x0_le1": 85.71428571428571,
@@ -5125,6 +5317,9 @@
     "saturation_fold_years": [
       2021.9171800136892
     ],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2019.5722108145105,
     "median_x0": 0.8671520001845429,
     "pct_x0_le1": 90.9090909090909,
@@ -5270,6 +5465,11 @@
     "saturation_fold_years": [
       2014.9171800136892
     ],
+    "time_folds_forward": 1,
+    "forward_fold_years": [
+      2016.9199178644765
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2022.955509924709,
     "median_x0": 0.9117082613384031,
     "pct_x0_le1": 83.33333333333334,
@@ -5355,6 +5555,11 @@
     "saturation_fold_years": [
       2019.9171800136892
     ],
+    "time_folds_forward": 1,
+    "forward_fold_years": [
+      2020.9199178644765
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2025.2409308692677,
     "median_x0": 0.9521892030997647,
     "pct_x0_le1": 66.66666666666666,
@@ -5531,6 +5736,14 @@
       2010.9171800136892,
       2011.9171800136892
     ],
+    "time_folds_forward": 2,
+    "forward_fold_years": [
+      2012.9199178644765,
+      2017.9171800136892
+    ],
+    "fwd_sat_fold_years": [
+      2012.9199178644765
+    ],
     "final_x0_year": 2022.6872005475702,
     "median_x0": 0.8796340969872196,
     "pct_x0_le1": 73.33333333333333,
@@ -5661,6 +5874,12 @@
       2016.9199178644765,
       2017.9171800136892
     ],
+    "time_folds_forward": 2,
+    "forward_fold_years": [
+      2018.9171800136892,
+      2022.9171800136892
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2028.4462696783025,
     "median_x0": 0.8584422944032268,
     "pct_x0_le1": 90.0,
@@ -5833,6 +6052,11 @@
       2018.9171800136892
     ],
     "saturation_fold_years": [],
+    "time_folds_forward": 1,
+    "forward_fold_years": [
+      2013.9171800136892
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2022.9445585215606,
     "median_x0": 0.892937133570032,
     "pct_x0_le1": 93.33333333333333,
@@ -6011,6 +6235,15 @@
       2014.9171800136892,
       2015.9171800136892
     ],
+    "time_folds_forward": 3,
+    "forward_fold_years": [
+      2018.9171800136892,
+      2019.9171800136892,
+      2020.9199178644765
+    ],
+    "fwd_sat_fold_years": [
+      2018.9171800136892
+    ],
     "final_x0_year": 2028.4462696783025,
     "median_x0": 0.7754926304292055,
     "pct_x0_le1": 66.66666666666666,
@@ -6093,6 +6326,9 @@
       2019.9171800136892
     ],
     "saturation_fold_years": [],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2021.2765229295003,
     "median_x0": 0.8601941494021305,
     "pct_x0_le1": 100.0,
@@ -6153,6 +6389,9 @@
     "time_folds": 0,
     "fold_years": [],
     "saturation_fold_years": [],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2021.6105407255304,
     "median_x0": 0.9402417152981252,
     "pct_x0_le1": 100.0,
@@ -6245,6 +6484,9 @@
       2018.9171800136892
     ],
     "saturation_fold_years": [],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2018.9637234770705,
     "median_x0": 0.7748581919713594,
     "pct_x0_le1": 100.0,
@@ -6361,6 +6603,14 @@
     "saturation_fold_years": [
       2016.9199178644765,
       2019.9171800136892
+    ],
+    "time_folds_forward": 2,
+    "forward_fold_years": [
+      2017.9171800136892,
+      2023.498288843258
+    ],
+    "fwd_sat_fold_years": [
+      2023.498288843258
     ],
     "final_x0_year": 2019.2819986310747,
     "median_x0": 0.7578488844712484,
@@ -6522,6 +6772,13 @@
       2013.9171800136892,
       2014.9171800136892
     ],
+    "time_folds_forward": 3,
+    "forward_fold_years": [
+      2015.9171800136892,
+      2017.9171800136892,
+      2019.9171800136892
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2028.4462696783025,
     "median_x0": 0.8050663570494903,
     "pct_x0_le1": 69.23076923076923,
@@ -6667,6 +6924,11 @@
     "saturation_fold_years": [
       2013.9171800136892
     ],
+    "time_folds_forward": 1,
+    "forward_fold_years": [
+      2014.9171800136892
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2022.0492813141684,
     "median_x0": 0.9192945790917855,
     "pct_x0_le1": 75.0,
@@ -6817,6 +7079,9 @@
       2015.9171800136892,
       2019.9171800136892
     ],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2021.583162217659,
     "median_x0": 0.8721168193580658,
     "pct_x0_le1": 75.0,
@@ -6955,6 +7220,9 @@
       2015.9171800136892,
       2016.9199178644765
     ],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2014.9637234770705,
     "median_x0": 0.5797200935843043,
     "pct_x0_le1": 100.0,
@@ -7050,6 +7318,13 @@
     "saturation_fold_years": [
       2018.9171800136892,
       2019.9171800136892
+    ],
+    "time_folds_forward": 1,
+    "forward_fold_years": [
+      2022.9171800136892
+    ],
+    "fwd_sat_fold_years": [
+      2022.9171800136892
     ],
     "final_x0_year": 2019.9637234770705,
     "median_x0": 0.7858475137869056,
@@ -7227,6 +7502,12 @@
     "saturation_fold_years": [
       2012.9199178644765
     ],
+    "time_folds_forward": 2,
+    "forward_fold_years": [
+      2010.9171800136892,
+      2017.9171800136892
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2021.5639972621493,
     "median_x0": 0.8539386268310625,
     "pct_x0_le1": 93.33333333333333,
@@ -7277,6 +7558,9 @@
     "time_folds": 0,
     "fold_years": [],
     "saturation_fold_years": [],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2021.2053388090349,
     "median_x0": 0.892671390504862,
     "pct_x0_le1": 100.0,
@@ -7444,6 +7728,11 @@
       2011.9171800136892,
       2014.9171800136892
     ],
+    "time_folds_forward": 1,
+    "forward_fold_years": [
+      2012.9199178644765
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2028.4462696783025,
     "median_x0": 0.5536363398448987,
     "pct_x0_le1": 78.57142857142857,
@@ -7550,6 +7839,11 @@
       2017.9171800136892,
       2022.9171800136892
     ],
+    "time_folds_forward": 1,
+    "forward_fold_years": [
+      2021.9171800136892
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2020.2984257357973,
     "median_x0": 0.8645261840815142,
     "pct_x0_le1": 87.5,
@@ -7680,6 +7974,9 @@
     "time_folds": 0,
     "fold_years": [],
     "saturation_fold_years": [],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2023.2518822724162,
     "median_x0": 0.8956116137778138,
     "pct_x0_le1": 100.0,
@@ -7782,6 +8079,9 @@
       2021.9171800136892
     ],
     "saturation_fold_years": [],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2028.4462696783025,
     "median_x0": 0.9235212523682002,
     "pct_x0_le1": 75.0,
@@ -7822,6 +8122,9 @@
     "time_folds": 0,
     "fold_years": [],
     "saturation_fold_years": [],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2022.2053388090349,
     "median_x0": 0.9386093184916865,
     "pct_x0_le1": 100.0,
@@ -7952,6 +8255,9 @@
       2017.9171800136892,
       2023.498288843258
     ],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2019.476386036961,
     "median_x0": 0.7823470783159976,
     "pct_x0_le1": 80.0,
@@ -8126,6 +8432,13 @@
       2017.9171800136892
     ],
     "saturation_fold_years": [],
+    "time_folds_forward": 3,
+    "forward_fold_years": [
+      2011.9171800136892,
+      2012.9199178644765,
+      2016.9199178644765
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2021.3066392881587,
     "median_x0": 0.8036715278333649,
     "pct_x0_le1": 100.0,
@@ -8315,6 +8628,14 @@
       2010.9171800136892,
       2012.9199178644765
     ],
+    "time_folds_forward": 2,
+    "forward_fold_years": [
+      2011.9171800136892,
+      2023.498288843258
+    ],
+    "fwd_sat_fold_years": [
+      2023.498288843258
+    ],
     "final_x0_year": 2021.4106776180697,
     "median_x0": 0.7549030133312605,
     "pct_x0_le1": 81.25,
@@ -8443,6 +8764,9 @@
       2016.9199178644765,
       2017.9171800136892
     ],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2014.7063655030802,
     "median_x0": 0.6218105662545999,
     "pct_x0_le1": 100.0,
@@ -8597,6 +8921,12 @@
     "saturation_fold_years": [
       2012.9199178644765
     ],
+    "time_folds_forward": 2,
+    "forward_fold_years": [
+      2013.9171800136892,
+      2016.9199178644765
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2022.0465434633813,
     "median_x0": 0.9121052998616979,
     "pct_x0_le1": 61.53846153846154,
@@ -8647,6 +8977,9 @@
     "time_folds": 0,
     "fold_years": [],
     "saturation_fold_years": [],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2028.4462696783025,
     "median_x0": 0.9469199540850184,
     "pct_x0_le1": 66.66666666666666,
@@ -8795,6 +9128,9 @@
       2014.9171800136892,
       2015.9171800136892
     ],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2011.9801505817934,
     "median_x0": 0.43513219768192923,
     "pct_x0_le1": 100.0,
@@ -8967,6 +9303,17 @@
       2012.9199178644765
     ],
     "saturation_fold_years": [],
+    "time_folds_forward": 5,
+    "forward_fold_years": [
+      2011.9171800136892,
+      2018.9171800136892,
+      2019.9171800136892,
+      2020.9199178644765,
+      2021.9171800136892
+    ],
+    "fwd_sat_fold_years": [
+      2018.9171800136892
+    ],
     "final_x0_year": 2024.5503080082135,
     "median_x0": 0.7547686901085101,
     "pct_x0_le1": 86.66666666666667,
@@ -9027,6 +9374,9 @@
     "time_folds": 0,
     "fold_years": [],
     "saturation_fold_years": [],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2022.2135523613963,
     "median_x0": 0.9693878153604325,
     "pct_x0_le1": 100.0,
@@ -9157,6 +9507,11 @@
     "time_folds": 0,
     "fold_years": [],
     "saturation_fold_years": [],
+    "time_folds_forward": 1,
+    "forward_fold_years": [
+      2018.9171800136892
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2025.7967145790553,
     "median_x0": 0.9123402415063232,
     "pct_x0_le1": 63.63636363636363,
@@ -9231,6 +9586,9 @@
     "saturation_fold_years": [
       2020.9199178644765
     ],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2019.7063655030802,
     "median_x0": 0.8519575185920458,
     "pct_x0_le1": 100.0,
@@ -9291,6 +9649,9 @@
     "time_folds": 0,
     "fold_years": [],
     "saturation_fold_years": [],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2021.1834360027378,
     "median_x0": 0.8847165318232473,
     "pct_x0_le1": 100.0,
@@ -9461,6 +9822,14 @@
     "time_folds": 0,
     "fold_years": [],
     "saturation_fold_years": [],
+    "time_folds_forward": 2,
+    "forward_fold_years": [
+      2010.9171800136892,
+      2021.9171800136892
+    ],
+    "fwd_sat_fold_years": [
+      2010.9171800136892
+    ],
     "final_x0_year": 2028.4462696783025,
     "median_x0": 0.8410240127503857,
     "pct_x0_le1": 86.66666666666667,
@@ -9573,6 +9942,9 @@
       2016.9199178644765
     ],
     "saturation_fold_years": [],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2024.950034223135,
     "median_x0": 0.875779707519274,
     "pct_x0_le1": 77.77777777777779,
@@ -9751,6 +10123,14 @@
       2010.9171800136892,
       2013.9171800136892
     ],
+    "time_folds_forward": 4,
+    "forward_fold_years": [
+      2012.9199178644765,
+      2015.9171800136892,
+      2016.9199178644765,
+      2017.9171800136892
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2018.4626967830254,
     "median_x0": 0.7193981915367862,
     "pct_x0_le1": 100.0,
@@ -9917,6 +10297,11 @@
     "saturation_fold_years": [
       2011.9171800136892
     ],
+    "time_folds_forward": 1,
+    "forward_fold_years": [
+      2016.9199178644765
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2028.4462696783025,
     "median_x0": 0.8602978653794133,
     "pct_x0_le1": 64.28571428571429,
@@ -10062,6 +10447,11 @@
     "saturation_fold_years": [
       2015.9171800136892
     ],
+    "time_folds_forward": 1,
+    "forward_fold_years": [
+      2022.9171800136892
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2026.3668720054757,
     "median_x0": 0.8135027568547529,
     "pct_x0_le1": 91.66666666666666,
@@ -10197,6 +10587,12 @@
     "saturation_fold_years": [
       2014.9171800136892
     ],
+    "time_folds_forward": 2,
+    "forward_fold_years": [
+      2015.9171800136892,
+      2020.9199178644765
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2023.7748117727583,
     "median_x0": 0.9084224094824481,
     "pct_x0_le1": 72.72727272727273,
@@ -10362,6 +10758,11 @@
     "saturation_fold_years": [
       2012.9199178644765
     ],
+    "time_folds_forward": 1,
+    "forward_fold_years": [
+      2013.9171800136892
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2021.6105407255304,
     "median_x0": 0.8255036488519338,
     "pct_x0_le1": 92.85714285714286,
@@ -10494,6 +10895,11 @@
       2018.9171800136892
     ],
     "saturation_fold_years": [],
+    "time_folds_forward": 1,
+    "forward_fold_years": [
+      2020.9199178644765
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2024.8049281314168,
     "median_x0": 0.8328301907075011,
     "pct_x0_le1": 72.72727272727273,
@@ -10641,6 +11047,11 @@
       2014.9171800136892,
       2015.9171800136892
     ],
+    "time_folds_forward": 1,
+    "forward_fold_years": [
+      2021.9171800136892
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2028.4462696783025,
     "median_x0": 0.961754829815892,
     "pct_x0_le1": 66.66666666666666,
@@ -10779,6 +11190,9 @@
       2015.9171800136892,
       2016.9199178644765
     ],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2012.9582477754961,
     "median_x0": 0.5000149028824148,
     "pct_x0_le1": 100.0,
@@ -10948,6 +11362,11 @@
       2012.9199178644765,
       2013.9171800136892
     ],
+    "time_folds_forward": 1,
+    "forward_fold_years": [
+      2014.9171800136892
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2019.5503080082135,
     "median_x0": 0.7616770830713386,
     "pct_x0_le1": 71.42857142857143,
@@ -11133,6 +11552,16 @@
     "saturation_fold_years": [
       2009.9171800136892
     ],
+    "time_folds_forward": 3,
+    "forward_fold_years": [
+      2013.9171800136892,
+      2022.9171800136892,
+      2023.498288843258
+    ],
+    "fwd_sat_fold_years": [
+      2022.9171800136892,
+      2023.498288843258
+    ],
     "final_x0_year": 2021.1697467488023,
     "median_x0": 0.7578827503635416,
     "pct_x0_le1": 93.75,
@@ -11286,6 +11715,16 @@
     ],
     "saturation_fold_years": [
       2016.9199178644765
+    ],
+    "time_folds_forward": 3,
+    "forward_fold_years": [
+      2021.9171800136892,
+      2022.9171800136892,
+      2023.498288843258
+    ],
+    "fwd_sat_fold_years": [
+      2021.9171800136892,
+      2022.9171800136892
     ],
     "final_x0_year": 2022.908966461328,
     "median_x0": 0.7278228007736407,
@@ -11449,6 +11888,11 @@
       2013.9171800136892
     ],
     "saturation_fold_years": [],
+    "time_folds_forward": 1,
+    "forward_fold_years": [
+      2016.9199178644765
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2017.6488706365503,
     "median_x0": 0.6657585017890966,
     "pct_x0_le1": 100.0,
@@ -11626,6 +12070,14 @@
       2010.9171800136892,
       2015.9171800136892
     ],
+    "time_folds_forward": 4,
+    "forward_fold_years": [
+      2011.9171800136892,
+      2012.9199178644765,
+      2017.9171800136892,
+      2018.9171800136892
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2020.6899383983573,
     "median_x0": 0.8366394222728983,
     "pct_x0_le1": 93.33333333333333,
@@ -11815,6 +12267,9 @@
       2010.9171800136892,
       2011.9171800136892
     ],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2028.4462696783025,
     "median_x0": 0.9041214936395497,
     "pct_x0_le1": 56.25,
@@ -11980,6 +12435,13 @@
     "saturation_fold_years": [
       2011.9171800136892
     ],
+    "time_folds_forward": 3,
+    "forward_fold_years": [
+      2014.9171800136892,
+      2015.9171800136892,
+      2020.9199178644765
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2024.1916495550993,
     "median_x0": 0.8894754762351305,
     "pct_x0_le1": 78.57142857142857,
@@ -12130,6 +12592,12 @@
       2017.9171800136892,
       2022.9171800136892
     ],
+    "time_folds_forward": 2,
+    "forward_fold_years": [
+      2014.9171800136892,
+      2016.9199178644765
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2019.624229979466,
     "median_x0": 0.8035062868809577,
     "pct_x0_le1": 91.66666666666666,
@@ -12296,6 +12764,11 @@
     "saturation_fold_years": [
       2012.9199178644765
     ],
+    "time_folds_forward": 1,
+    "forward_fold_years": [
+      2013.9171800136892
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2021.4407939767282,
     "median_x0": 0.8430644038765924,
     "pct_x0_le1": 100.0,
@@ -12482,6 +12955,12 @@
     "saturation_fold_years": [
       2011.9171800136892
     ],
+    "time_folds_forward": 2,
+    "forward_fold_years": [
+      2016.9199178644765,
+      2018.9171800136892
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2028.002737850787,
     "median_x0": 0.8855560398107103,
     "pct_x0_le1": 75.0,
@@ -12632,6 +13111,9 @@
     "time_folds": 0,
     "fold_years": [],
     "saturation_fold_years": [],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2020.060232717317,
     "median_x0": 0.7684574647942899,
     "pct_x0_le1": 100.0,
@@ -12749,6 +13231,9 @@
       2016.9199178644765,
       2019.9171800136892
     ],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2017.186173853525,
     "median_x0": 0.6985561580796666,
     "pct_x0_le1": 100.0,
@@ -12905,6 +13390,13 @@
     "saturation_fold_years": [
       2012.9199178644765
     ],
+    "time_folds_forward": 3,
+    "forward_fold_years": [
+      2015.9171800136892,
+      2017.9171800136892,
+      2021.9171800136892
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2021.8213552361397,
     "median_x0": 0.8262740851779024,
     "pct_x0_le1": 100.0,
@@ -13001,6 +13493,9 @@
       2018.9171800136892,
       2019.9171800136892
     ],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2016.9582477754961,
     "median_x0": 0.715571751133129,
     "pct_x0_le1": 100.0,
@@ -13130,6 +13625,11 @@
       2016.9199178644765,
       2019.9171800136892
     ],
+    "time_folds_forward": 1,
+    "forward_fold_years": [
+      2017.9171800136892
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2019.4709103353866,
     "median_x0": 0.7279059911815371,
     "pct_x0_le1": 100.0,
@@ -13226,6 +13726,9 @@
       2018.9171800136892,
       2019.9171800136892
     ],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2022.7693360711842,
     "median_x0": 0.9503859767109136,
     "pct_x0_le1": 71.42857142857143,
@@ -13395,6 +13898,11 @@
       2012.9199178644765,
       2013.9171800136892
     ],
+    "time_folds_forward": 1,
+    "forward_fold_years": [
+      2020.9199178644765
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2026.084873374401,
     "median_x0": 0.937841459820946,
     "pct_x0_le1": 64.28571428571429,
@@ -13574,6 +14082,11 @@
       2014.9171800136892,
       2015.9171800136892
     ],
+    "time_folds_forward": 1,
+    "forward_fold_years": [
+      2018.9171800136892
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2028.4462696783025,
     "median_x0": 0.7189080477565477,
     "pct_x0_le1": 60.0,
@@ -13712,6 +14225,9 @@
       2015.9171800136892,
       2016.9199178644765
     ],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2028.4462696783025,
     "median_x0": 0.6176348396407382,
     "pct_x0_le1": 81.81818181818183,
@@ -13782,6 +14298,9 @@
     "time_folds": 0,
     "fold_years": [],
     "saturation_fold_years": [],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2023.0465434633813,
     "median_x0": 0.9195307419868229,
     "pct_x0_le1": 100.0,
@@ -13920,6 +14439,15 @@
       2016.9199178644765,
       2017.9171800136892
     ],
+    "time_folds_forward": 2,
+    "forward_fold_years": [
+      2022.9171800136892,
+      2023.498288843258
+    ],
+    "fwd_sat_fold_years": [
+      2022.9171800136892,
+      2023.498288843258
+    ],
     "final_x0_year": 2020.3394934976043,
     "median_x0": 0.6552131476300599,
     "pct_x0_le1": 100.0,
@@ -14048,6 +14576,15 @@
       2016.9199178644765,
       2017.9171800136892
     ],
+    "time_folds_forward": 2,
+    "forward_fold_years": [
+      2022.9171800136892,
+      2023.498288843258
+    ],
+    "fwd_sat_fold_years": [
+      2022.9171800136892,
+      2023.498288843258
+    ],
     "final_x0_year": 2020.1752224503764,
     "median_x0": 0.6695412021674747,
     "pct_x0_le1": 100.0,
@@ -14174,6 +14711,11 @@
       2015.9171800136892,
       2016.9199178644765
     ],
+    "time_folds_forward": 1,
+    "forward_fold_years": [
+      2021.9171800136892
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2026.911704312115,
     "median_x0": 0.9225822130087586,
     "pct_x0_le1": 60.0,
@@ -14214,6 +14756,9 @@
     "time_folds": 0,
     "fold_years": [],
     "saturation_fold_years": [],
+    "time_folds_forward": 0,
+    "forward_fold_years": [],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2022.3860369609856,
     "median_x0": 0.9519469934814243,
     "pct_x0_le1": 100.0,
@@ -14354,6 +14899,11 @@
       2016.9199178644765,
       2023.498288843258
     ],
+    "time_folds_forward": 1,
+    "forward_fold_years": [
+      2020.9199178644765
+    ],
+    "fwd_sat_fold_years": [],
     "final_x0_year": 2020.7200547570158,
     "median_x0": 0.7947492058181246,
     "pct_x0_le1": 90.9090909090909,
@@ -14534,6 +15084,17 @@
     "time_folds": 0,
     "fold_years": [],
     "saturation_fold_years": [],
+    "time_folds_forward": 4,
+    "forward_fold_years": [
+      2010.9171800136892,
+      2012.9199178644765,
+      2022.9171800136892,
+      2023.498288843258
+    ],
+    "fwd_sat_fold_years": [
+      2022.9171800136892,
+      2023.498288843258
+    ],
     "final_x0_year": 2022.2628336755647,
     "median_x0": 0.7152160160344956,
     "pct_x0_le1": 100.0,
@@ -14716,6 +15277,15 @@
       2012.9199178644765
     ],
     "saturation_fold_years": [],
+    "time_folds_forward": 3,
+    "forward_fold_years": [
+      2011.9171800136892,
+      2021.9171800136892,
+      2022.9171800136892
+    ],
+    "fwd_sat_fold_years": [
+      2021.9171800136892
+    ],
     "final_x0_year": 2025.1286789869953,
     "median_x0": 0.6941507610622152,
     "pct_x0_le1": 93.75,

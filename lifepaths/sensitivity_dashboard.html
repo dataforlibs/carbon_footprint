@@ -494,7 +494,8 @@
               <th data-sort="phases_count">Phases</th>
               <th data-sort="median_x0">Median x0</th>
               <th data-sort="final_x0_year">Final x0 year</th>
-              <th data-sort="time_folds">Folds</th>
+              <th data-sort="time_folds">Bwd Folds</th>
+              <th data-sort="time_folds_forward">Fwd Folds</th>
               <th data-sort="source">Source</th>
             </tr>
           </thead>
@@ -607,6 +608,7 @@
             median_x0: Number(r.median_x0),
             final_x0_year: Number(r.final_x0_year),
             time_folds: Number(r.time_folds || 0),
+            time_folds_forward: Number(r.time_folds_forward || 0),
             raw: r
           });
         });
@@ -705,7 +707,8 @@
             <span>Phase records</span><strong>${fmt(row.phases_count, 0)}</strong>
             <span>Median x0</span><strong>${fmt(row.median_x0, 3)}</strong>
             <span>Final x0 year</span><strong>${fmt(row.final_x0_year, 1)}</strong>
-            <span>Folds</span><strong>${fmt(row.time_folds, 0)}</strong>
+            <span>Bwd Folds</span><strong>${fmt(row.time_folds, 0)}</strong>
+            <span>Fwd Folds</span><strong>${fmt(row.time_folds_forward, 0)}</strong>
           </div>
         </div>`;
       }).join('');
@@ -745,6 +748,7 @@
         <td>${fmt(r.median_x0, 3)}</td>
         <td>${fmt(r.final_x0_year, 1)}</td>
         <td>${fmt(r.time_folds, 0)}</td>
+        <td>${fmt(r.time_folds_forward, 0)}</td>
         <td>${r.source}</td>
       </tr>`).join('');
       $('metricRows').textContent = rows.length;
@@ -788,11 +792,23 @@
       return Object.entries(ds.data).map(([name, raw]) => {
         const params = Array.isArray(raw.window_params) ? raw.window_params : [];
         let cumulative = 0;
+        const deltaNorm = params.length > 1 ? 1 / (params.length - 1) : 1;
         const pts = params.map((p, idx) => {
           const projected = Number(p.x0_year);
           const k = Number(p.k);
           const phase = p.phase || (raw.phases && raw.phases[idx]) || raw.final_phase || 'Deactivated';
           cumulative = Math.max(cumulative, Number(p.A || raw.total_pubs || 1));
+          // Detect fold direction vs previous point
+          let foldType = 'none';
+          if (idx > 0) {
+            const x0cur  = Number(p.x0_norm);
+            const x0prev = Number(params[idx - 1].x0_norm);
+            if (Number.isFinite(x0cur) && Number.isFinite(x0prev) && x0cur <= 1.0 && x0prev <= 1.0) {
+              const diff = x0cur - x0prev;
+              if (diff < -deltaNorm) foldType = 'backward';
+              else if (diff > deltaNorm) foldType = 'forward';
+            }
+          }
           return {
             idx,
             projected,
@@ -800,6 +816,7 @@
             y: Number.isFinite(k) && k > 0 ? Math.log(k) : null,
             pubs: Math.max(1, Number(p.A || raw.total_pubs || 1)),
             phase,
+            foldType,
             color: phaseToOldColor(phase)
           };
         }).filter(p => Number.isFinite(p.projected) && Number.isFinite(p.y));
@@ -810,7 +827,10 @@
 
     function renderPhaseLegend() {
       const phases = ['Acceleration', 'Inflection', 'Deceleration', 'Deactivated'];
-      $('phaseLegend').innerHTML = phases.map(phase => `<span class="legend-item ${state.plotPhases.has(phase) ? '' : 'off'}" data-phase="${phase}"><span class="legend-dot" style="background:${phaseColor(phase)}"></span>${phase}</span>`).join('') + '<span class="chip" id="plotCount">0 countries</span>';
+      $('phaseLegend').innerHTML = phases.map(phase => `<span class="legend-item ${state.plotPhases.has(phase) ? '' : 'off'}" data-phase="${phase}"><span class="legend-dot" style="background:${phaseColor(phase)}"></span>${phase}</span>`).join('')
+        + '<span class="legend-item"><span class="legend-dot" style="background:#e74c3c;border-radius:2px"></span>Bwd fold</span>'
+        + '<span class="legend-item"><span class="legend-dot" style="background:#f39c12;border-radius:2px"></span>Fwd fold</span>'
+        + '<span class="chip" id="plotCount">0 countries</span>';
       $('phaseLegend').querySelectorAll('[data-phase]').forEach(el => {
         el.addEventListener('click', () => {
           const phase = el.dataset.phase;
@@ -911,12 +931,29 @@
         const opacity = hl ? 1 : dim ? 0.08 : top ? 0.78 : 0.42;
         const finalColor = phaseColor(c.finalPhase);
         if (state.plotView === 'traj' && c.pts.length >= 2) {
-          const points = c.pts.map(p => `${xpx(p.projected).toFixed(1)},${ypx(p.y).toFixed(1)}`).join(' ');
-          svgEl('polyline', {
-            points, fill: 'none', stroke: dim ? '#bbb' : finalColor,
-            'stroke-width': hl ? 3 : top ? 1.8 : 0.5,
-            opacity, 'stroke-linejoin': 'round', 'stroke-linecap': 'round'
-          }, lines);
+          // Draw segment-by-segment so fold segments can be highlighted
+          for (let si = 1; si < c.pts.length; si++) {
+            const pa = c.pts[si - 1], pb = c.pts[si];
+            const ft = pb.foldType;
+            let segColor, segWidth, segDash;
+            if (dim) {
+              segColor = '#bbb'; segWidth = 0.5; segDash = 'none';
+            } else if (ft === 'backward') {
+              segColor = '#e74c3c'; segWidth = hl ? 3.5 : top ? 2.5 : 1.5; segDash = 'none';
+            } else if (ft === 'forward') {
+              segColor = '#f39c12'; segWidth = hl ? 3.5 : top ? 2.5 : 1.5; segDash = '4,2';
+            } else {
+              segColor = dim ? '#bbb' : finalColor; segWidth = hl ? 3 : top ? 1.8 : 0.5; segDash = 'none';
+            }
+            const seg = svgEl('line', {
+              x1: xpx(pa.projected).toFixed(1), y1: ypx(pa.y).toFixed(1),
+              x2: xpx(pb.projected).toFixed(1), y2: ypx(pb.y).toFixed(1),
+              stroke: segColor, 'stroke-width': segWidth,
+              opacity: ft !== 'none' && !dim ? Math.min(1, opacity + 0.2) : opacity,
+              'stroke-linecap': 'round',
+              ...(segDash !== 'none' ? { 'stroke-dasharray': segDash } : {})
+            }, lines);
+          }
         }
         const pts = state.plotView === 'final' ? [c.pts[c.pts.length - 1]] : c.pts;
         pts.forEach((p, i) => {
@@ -964,12 +1001,15 @@
 
     function showPlotTip(ev, c, p, idx, wrap) {
       const tip = $('plotTip');
+      const foldLabel = p.foldType === 'backward' ? ' <span style="color:#e74c3c">⟵ backward fold</span>'
+                       : p.foldType === 'forward'  ? ' <span style="color:#f39c12">⟶ forward fold</span>'
+                       : '';
       tip.innerHTML = `<b>${escapeHtml(c.name)}</b><br>
         Snapshot: ${yearLabel(p.snapshot)}<br>
         Proj. inflection: ${dateLabelFromYear(p.projected)}<br>
         ln(k): ${fmt(p.y, 3)}<br>
         Publications/scale: ${fmt(p.pubs, 0)}<br>
-        Phase: <span style="color:${phaseColor(p.phase)}">${escapeHtml(p.phase)}</span><br>
+        Phase: <span style="color:${phaseColor(p.phase)}">${escapeHtml(p.phase)}</span>${foldLabel}<br>
         Point ${idx + 1}/${c.pts.length}`;
       tip.style.display = 'block';
       movePlotTip(ev, wrap);
