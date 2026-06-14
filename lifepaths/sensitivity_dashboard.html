@@ -450,7 +450,7 @@
       <div class="panel-head">
         <div>
           <div class="panel-title">Lifepath Plot</div>
-          <div class="subtitle">x-axis: projected inflection date | y-axis: ln(k) growth intensity | size proportional to publications</div>
+          <div class="subtitle">x-axis: projected inflection date (x0_year) or saturation date (95% of A) — toggle below | y-axis: ln(k) = ln(params[1]), growth intensity | size proportional to publications</div>
         </div>
         <div class="chips"><span class="chip">selected analysis</span><span class="chip">live partial JSON</span></div>
       </div>
@@ -461,6 +461,10 @@
             <button class="pill-btn" id="plotFinalBtn">Final snapshot</button>
           </div>
           <div class="phase-legend" id="phaseLegend"></div>
+          <div class="plot-buttons" id="xAxisModeButtons" style="margin-left:auto;">
+            <button class="pill-btn active" id="xAxisInflBtn">x: Inflection</button>
+            <button class="pill-btn" id="xAxisSatBtn">x: Saturation (95%)</button>
+          </div>
         </div>
         <div id="lifepathWrap"><svg id="lifepathChart"></svg><div class="tip" id="plotTip"></div></div>
       </div>
@@ -506,8 +510,8 @@
   </main>
 
   <script>
-    const PADDED_BASE = 'lifepaths_output/sensitivity_analysis_comparison';
-    const NO_PADDING_BASE = 'lifepaths_output/sensitivity_analysis_comparison_no_padding';
+    const PADDED_BASE = 'lifepaths_output2/sensitivity_analysis_comparison';
+    const NO_PADDING_BASE = 'lifepaths_output2/sensitivity_analysis_comparison_no_padding';
     const CONDITIONS = [
       { key: 'pad_A_3M', label: 'Pad A 3M', root: PADDED_BASE, folder: 'aggregated_fit/3M', group: 'Padded · aggregated fit', color: '#2459a7' },
       { key: 'pad_A_6M', label: 'Pad A 6M', root: PADDED_BASE, folder: 'aggregated_fit/6M', group: 'Padded · aggregated fit', color: '#1f7a57' },
@@ -539,6 +543,7 @@
       auto: true,
       timer: null,
       plotView: 'traj',
+      xAxisMode: 'inflection',
       plotPhases: new Set(['Acceleration', 'Inflection', 'Deceleration', 'Deactivated']),
       highlighted: null
     };
@@ -787,22 +792,75 @@
       return String(Math.round(year * 10) / 10);
     }
 
+    const MIN_FIT_POINTS = 1;
+
+    function windowWi(ds, idx) {
+      // Approach A (aggregated_fit): wi = idx + MIN_FIT_POINTS
+      // Approach B (monthly_snapshot/{M}): wi = idx-th value of
+      //   { i >= MIN_FIT_POINTS : i % M === 0 }, in increasing order
+      const folder = (ds && ds.folder) || '';
+      if (folder.startsWith('monthly_snapshot')) {
+        const m = parseInt(folder.split('/')[1], 10) || 1; // e.g. '6M' -> 6
+        let count = 0;
+        for (let i = MIN_FIT_POINTS; ; i++) {
+          if (i % m === 0) {
+            if (count === idx) return i;
+            count++;
+          }
+        }
+      }
+      return idx + MIN_FIT_POINTS;
+    }
+
+    function windowMonths(ds) {
+      // aggregated_fit/{X}M: each indexed unit = X months
+      // monthly_snapshot: each indexed unit = 1 month
+      const folder = (ds && ds.folder) || '';
+      if (folder.startsWith('aggregated_fit')) {
+        return parseInt(folder.split('/')[1], 10) || 1;
+      }
+      return 1;
+    }
+
+    const X0_CAP = 1.19;
+    const K_MAX = 3000; // exclude extreme-k degenerate early-window fits
+    const A_RATIO_MAX = 50; // exclude points where A is wildly larger than total_pubs
+
     function lifepathCountries(ds) {
       if (!ds || !ds.data) return [];
-      return Object.entries(ds.data).map(([name, raw]) => {
+      const countries = Object.entries(ds.data).map(([name, raw]) => {
         const params = Array.isArray(raw.window_params) ? raw.window_params : [];
         let cumulative = 0;
         const deltaNorm = params.length > 1 ? 1 / (params.length - 1) : 1;
         const pts = params.map((p, idx) => {
-          const projected = Number(p.x0_year);
+          const wi = Number.isFinite(Number(p.wi)) ? Number(p.wi) : windowWi(ds, idx);
+          const x0year = Number(p.x0_year);
+          const x0norm = Math.min(Number(p.x0_norm), X0_CAP);
+          const inflectionYear = Number.isFinite(x0year) ? x0year
+            : 2016 + (x0norm * wi * windowMonths(ds)) / 12;
+          // Saturation date: x where sigmoid reaches 95% of A.
+          // x_sat_norm = x0_norm + ln(0.95/0.05)/k  (same normalized units as x0_norm)
+          // delta in calendar years = ln(19)/k * wi * windowMonths(ds) / 12
+          const kVal = Number(p.k);
+          const satDelta = (Number.isFinite(kVal) && kVal > 0)
+            ? (Math.log(19) / kVal) * wi * windowMonths(ds) / 12
+            : NaN;
+          // Sanity bound: total observed span is TOTAL_MONTHS/12 years (~199/12 ≈ 16.6).
+          // Projecting saturation more than 2x that span ahead is unreliable extrapolation.
+          const TOTAL_SPAN_YEARS = 199 / 12;
+          const satTooFar = !Number.isFinite(satDelta) || satDelta > 2 * TOTAL_SPAN_YEARS;
+          const saturationYear = (Number.isFinite(inflectionYear) && Number.isFinite(satDelta) && !satTooFar)
+            ? inflectionYear + satDelta : NaN;
+          const projected = state.xAxisMode === 'saturation' ? saturationYear : inflectionYear;
           const k = Number(p.k);
+          const y = Number.isFinite(k) && k > 0 ? Math.log(k) : null;
           const phase = p.phase || (raw.phases && raw.phases[idx]) || raw.final_phase || 'Deactivated';
           cumulative = Math.max(cumulative, Number(p.A || raw.total_pubs || 1));
           // Detect fold direction vs previous point
           let foldType = 'none';
           if (idx > 0) {
-            const x0cur  = Number(p.x0_norm);
-            const x0prev = Number(params[idx - 1].x0_norm);
+            const x0cur  = Math.min(Number(p.x0_norm), X0_CAP);
+            const x0prev = Math.min(Number(params[idx - 1].x0_norm), X0_CAP);
             if (Number.isFinite(x0cur) && Number.isFinite(x0prev) && x0cur <= 1.0 && x0prev <= 1.0) {
               const diff = x0cur - x0prev;
               if (diff < -deltaNorm) foldType = 'backward';
@@ -812,17 +870,26 @@
           return {
             idx,
             projected,
+            inflectionYear,
+            saturationYear,
             snapshot: Number(p.snapshot_year),
-            y: Number.isFinite(k) && k > 0 ? Math.log(k) : null,
+            y: y,
             pubs: Math.max(1, Number(p.A || raw.total_pubs || 1)),
+            cumPubs: Number.isFinite(Number(p.cum_pubs)) ? Number(p.cum_pubs) : null,
+            aNorm: Number.isFinite(Number(p.A_norm)) ? Number(p.A_norm) : null,
             phase,
             foldType,
-            color: phaseToOldColor(phase)
+            color: phaseToOldColor(phase),
+            capped: Number(p.x0_norm) >= X0_CAP,
+            kTooHigh: Number(p.k) > K_MAX,
+            aTooHigh: Number(raw.total_pubs) > 0 && (Number(p.A) / Number(raw.total_pubs)) > A_RATIO_MAX
           };
-        }).filter(p => Number.isFinite(p.projected) && Number.isFinite(p.y));
+        }).filter(p => Number.isFinite(p.y) && !p.capped && !p.kTooHigh && !p.aTooHigh
+          && Number.isFinite(state.xAxisMode === 'saturation' ? p.saturationYear : p.inflectionYear));
         const last = pts[pts.length - 1] || {};
         return { name, raw, pts, finalPhase: raw.final_phase || last.phase || 'Deactivated', finalPubs: Number(raw.total_pubs || last.pubs || 1) };
       }).filter(c => c.pts.length > 0);
+      return countries;
     }
 
     function renderPhaseLegend() {
@@ -876,11 +943,11 @@
       }
 
       const xYears = allPts.map(p => p.projected);
-      let minYear = Math.min(2006, Math.floor(Math.min(...xYears)) - 1);
-      let maxYear = Math.max(2030, Math.ceil(Math.max(...xYears)) + 1);
+      let minYear = Math.floor(Math.min(...xYears) * 10) / 10 - 0.2;
+      let maxYear = Math.ceil(Math.max(...xYears) * 10) / 10 + 0.2;
       const yVals = allPts.map(p => p.y);
-      let minY = Math.floor(Math.min(...yVals) * 10) / 10;
-      let maxY = Math.ceil(Math.max(...yVals) * 10) / 10;
+      let minY = 0; //Math.floor(Math.min(...yVals) * 10) / 10;
+      let maxY = 10; //Math.ceil(Math.max(...yVals) * 10) / 10;
       if (minY === maxY) { minY -= 1; maxY += 1; }
       const xpx = y => ((y - minYear) / (maxYear - minYear)) * IW;
       const ypx = v => ((v - minY) / (maxY - minY)) * IH;
@@ -904,18 +971,24 @@
         const text = svgEl('text', { x: -7, y: 4, 'text-anchor': 'end', 'font-size': 11, fill: '#777' }, gg);
         text.textContent = v.toFixed(yStep < 1 ? 1 : 0);
       }
-      const xStep = Math.max(1, Math.ceil((maxYear - minYear) / 12));
-      for (let yr = Math.ceil(minYear / xStep) * xStep; yr <= maxYear; yr += xStep) {
+      const xStep = niceStep((maxYear - minYear) / 10);
+      for (let yr = Math.ceil(minYear / xStep) * xStep; yr <= maxYear + 1e-9; yr += xStep) {
         const px = xpx(yr);
         const gg = svgEl('g', { transform: `translate(${px},0)` }, grid);
         svgEl('line', { x1: 0, y1: 0, x2: 0, y2: IH, stroke: '#ddd', 'stroke-dasharray': '3,3' }, gg);
         svgEl('line', { x1: 0, y1: IH, x2: 0, y2: IH + 5, stroke: '#999' }, gg);
         const text = svgEl('text', { x: 0, y: IH + 18, 'text-anchor': 'middle', 'font-size': 11, fill: '#666' }, gg);
-        text.textContent = yr;
+        text.textContent = yr.toFixed(xStep < 1 ? 1 : 0);
+        // For sub-year steps, also show as a date for clarity
+        if (xStep < 1) {
+          text.textContent = dateLabelFromYear(yr).slice(0, 7); // YYYY-MM
+        }
       }
       svgEl('rect', { x: 0, y: 0, width: IW, height: IH, fill: 'none', stroke: '#bbb' }, grid);
       const xl = svgEl('text', { x: IW / 2, y: IH + 46, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 600, fill: '#444' }, grid);
-      xl.textContent = 'Projected inflection date  t_inf';
+      xl.textContent = state.xAxisMode === 'saturation'
+        ? 'Projected saturation date (95% of A)  t_sat'
+        : 'Projected inflection date  t_inf';
       const yl = svgEl('text', { transform: `translate(-50,${IH / 2}) rotate(-90)`, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 600, fill: '#444' }, grid);
       yl.textContent = 'ln(k)  ↑ higher growth intensity';
       const title = svgEl('text', { x: 0, y: -42, 'font-size': 17, 'font-weight': 700, fill: '#222' }, grid);
@@ -1005,10 +1078,10 @@
                        : p.foldType === 'forward'  ? ' <span style="color:#f39c12">⟶ forward fold</span>'
                        : '';
       tip.innerHTML = `<b>${escapeHtml(c.name)}</b><br>
-        Snapshot: ${yearLabel(p.snapshot)}<br>
-        Proj. inflection: ${dateLabelFromYear(p.projected)}<br>
+        ${state.xAxisMode === 'saturation' ? 'Proj. saturation (95%)' : 'Proj. inflection'}: ${dateLabelFromYear(p.projected)}<br>
         ln(k): ${fmt(p.y, 3)}<br>
-        Publications/scale: ${fmt(p.pubs, 0)}<br>
+        Publications (actual, this window): ${p.cumPubs !== null ? fmt(p.cumPubs, 0) : 'n/a'}<br>
+        Fitted ceiling A: ${fmt(p.pubs, 0)}<br>
         Phase: <span style="color:${phaseColor(p.phase)}">${escapeHtml(p.phase)}</span>${foldLabel}<br>
         Point ${idx + 1}/${c.pts.length}`;
       tip.style.display = 'block';
@@ -1070,6 +1143,18 @@
       state.plotView = 'final';
       $('plotFinalBtn').classList.add('active');
       $('plotTrajBtn').classList.remove('active');
+      drawLifepathPlot();
+    });
+    $('xAxisInflBtn').addEventListener('click', () => {
+      state.xAxisMode = 'inflection';
+      $('xAxisInflBtn').classList.add('active');
+      $('xAxisSatBtn').classList.remove('active');
+      drawLifepathPlot();
+    });
+    $('xAxisSatBtn').addEventListener('click', () => {
+      state.xAxisMode = 'saturation';
+      $('xAxisSatBtn').classList.add('active');
+      $('xAxisInflBtn').classList.remove('active');
       drawLifepathPlot();
     });
     window.addEventListener('resize', drawLifepathPlot);
