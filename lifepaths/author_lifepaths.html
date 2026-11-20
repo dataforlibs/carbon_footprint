@@ -21,6 +21,18 @@
      <!----<link rel="stylesheet" type="text/css" href="final_style.css">--->
 
       <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.js"></script>
+<style>#cf-loading{padding:14px 20px;margin:10px 16px;background:#fff7e0;border:1px solid #f0d58a;border-radius:8px;font:14px system-ui,sans-serif}.cf-ready #cf-loading{display:none}</style>
+<script>
+/* Start both data downloads at once, as soon as d3 is available (they used to load one after the other,
+   after all scripts), and rebuild the compact points file into the objects the page expects. */
+(function(){var W={};
+function get(k,u,post){var o=W[k]={done:false,cbs:[]};d3.json(u,function(e,d){o.data=post?post(d):d;o.done=true;o.cbs.splice(0).forEach(function(f){f(o.data)});});}
+window.cfLoad=function(k,cb){var o=W[k];var run=function(d){setTimeout(function(){try{cb(d);}finally{document.documentElement.classList.add('cf-ready');}},0);};o.done?run(o.data):o.cbs.push(run);};
+get('cust','customers_more1_Gore_chem.json');
+get('pts','authors_points.min.json',function(m){if(!m)return {};var o={},c=m.colors;for(var k in m.d){var a=m.d[k],r=new Array(a.length);for(var i=0;i<a.length;i++){var p=a[i];r[i]={x:p[0]+' 00:00:00',y:p[1],yr:p[2],c:k,o:p[3],color:c[p[4]],o2:p[5]};}o[k]=r;}return o;});
+})();
+</script>
+
 
       <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
       <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
@@ -219,22 +231,11 @@ width:80%;
 
 
   
+<script src="../nav.js" defer></script>
 </head>
 <body>
 
-  <div class="top-bar">
-    <div class="top-bar-left">
-      <ul class="dropdown menu" data-dropdown-menu="" role="menubar" data-e="uqku92-e">
-        <li class="menu-text" role="menuitem">Carbon Footprint Research Analysis</li>
-        <li role="menuitem"><a href="https://dataforlibs.github.io/carbon_footprint/lifepaths/countries_lifepaths.html">Countries' Lifepaths</a></li>
-        <li role="menuitem"><a href="https://dataforlibs.github.io/carbon_footprint/lifepaths/author_lifepaths.html">Authors' Lifepaths</a></li>
-        <li role="menuitem"><a href="https://dataforlibs.github.io/carbon_footprint/topics/index.html">Topics</a></li>
-      </ul>
-    </div>
-    <div class="top-bar-right">
-     
-    </div>
-</div>
+  <div id="cf-loading">Loading author lifepaths… (first visit downloads about 1 MB)</div>
 
 
 
@@ -567,12 +568,12 @@ var line = d3.line()
     .y(function(d) { return yScale(d.y); }) // set the y values for the line generator 
     .curve(d3.curveMonotoneX) // apply smoothing to the line
 
-d3.json("customers_more1_Gore_chem.json", function(treeData) {
+cfLoad('cust', function(treeData) {
     //console.log(treeData);
     
     cust_names = treeData;
     
-d3.json("all_years_shipped_to_final_saturation_final_circles3_Gore1.json", function(allOptions) {    
+cfLoad('pts', function(allOptions) {    
     
     all_points = allOptions;
    // console.log(all_points);
@@ -1355,6 +1356,7 @@ d3.select("#ts").html("");
 			.range([4, 22]);
 		var maxes = [];
 		points=[];
+		var _xcache = {};
 		translated9.map(function(d) {
 			//if (typeof cust_names[d.c.replace(" ","")]!=="undefined") {
 
@@ -1372,6 +1374,7 @@ d3.select("#ts").html("");
 
                                         //temp.start = cust_names[d[o]["c"]][1];
 					temp.end = "2023";
+					if (!cust_names[d[o]["c"]]) continue;   /* authors missing from the details file were skipped via a thrown-and-caught error (~190,000 exceptions); skip directly, same result */
 					temp.start = cust_names[d[o]["c"]][1];
 					temp.life = cust_names[d[o]["c"]][3];
 					temp.sel = 1;
@@ -1381,7 +1384,9 @@ d3.select("#ts").html("");
                     temp["x1"]=d[o]["x"];
 					if (d[o]["x"].toString().indexOf("-") > -1) {
                         //console.log(+d[o]["x"].toString().split("-")[0], +d[o]["x"].toString().split("-")[1], +d[o]["x"].toString().replace(" 00:00:00","").split("-")[2]);
-						temp.x = x1(new Date(+d[o]["x"].toString().split("-")[0], +d[o]["x"].toString().split("-")[1], +d[o]["x"].toString().replace(" 00:00:00","").split("-")[2]))-30;
+						var xk = d[o]["x"];   /* only a few dozen distinct dates: compute the scaled x once per date */
+						if (_xcache[xk] === undefined) _xcache[xk] = x1(new Date(+xk.toString().split("-")[0], +xk.toString().split("-")[1], +xk.toString().replace(" 00:00:00","").split("-")[2]))-30;
+						temp.x = _xcache[xk];
 						temp.y = y(d[o]["y"]);// + 35;
 					} else {
                         console.log(d[o]);
@@ -1574,7 +1579,7 @@ for (var i=0; i<d.length; i++) {
     //console.log(treeData[d[i]]);
     if (d[i]!="e") {
        // console.log(d[i]);
-    if (d3.keys(all_points).indexOf(d[i])>-1) {
+    if (Object.prototype.hasOwnProperty.call(all_points,d[i])) { /* was d3.keys(all_points).indexOf(...)>-1: rebuilt a 32,770-key array on every pass (~40 s) */
    //console.log(d[i],d3.keys(all_points).indexOf(d[i]));
      //console.log(all_points[d[i]][all_points[d[i]].length-1]["o"]);
     temp["of articles"]=all_points[d[i]][all_points[d[i]].length-1]["o"];
