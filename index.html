@@ -73,7 +73,7 @@ footer{border-top:1px solid var(--line);color:var(--mut);font-size:13px;padding:
 <p>A lifepath depends on how the curve is fitted, so we checked whether the conclusions survive reasonable alternative choices. Each dashboard varies the same few settings and shows what changes:</p>
 <dl>
   <dt>Padding</dt><dd>whether a run of zero-publication months (100) is added before each entity's first publication, so every curve starts from a common baseline, or not.</dd>
-  <dt>Fitting rule</dt><dd><b>aggregate then fit</b> sums publications into windows and fits the windows; <b>monthly snapshot</b> fits the monthly series and records the result at the end of each window.</dd>
+  <dt>Fitting rule</dt><dd><b>aggregate then fit (A)</b> sums publications into 3-, 6- or 12-month windows and fits the curve to those sums, so the window size also sets the resolution of the data; <b>monthly snapshot (B)</b> always fits the monthly series and only records the result at the end of each window, so the window size changes how often results are recorded, not the data.</dd>
   <dt>Window size</dt><dd>3, 6 or 12 months between refits.</dd>
   <dt>First-fit rules</dt><dd>how many documents (0 to 5) and how many months an entity needs before its first fit counts.</dd>
 </dl>
