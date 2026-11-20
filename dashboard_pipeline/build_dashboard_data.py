@@ -102,6 +102,7 @@ def summarise(res, base, paper_rows, kept):
     cols = {'back': 'fold_years', 'back_sat': 'saturation_fold_years', 'fwd': 'forward_fold_years', 'fwd_sat': 'fwd_sat_fold_years'}
     allf = {k: [y for r in res.values() for y in r[c]] for k, c in cols.items()}
     allf['total'] = allf['back'] + allf['fwd']
+    allf['total_sat'] = allf['back_sat'] + allf['fwd_sat']
     s['folds'] = {}
     for k, ys in allf.items():
         P = perm_test(ys, *PARIS); C = perm_test(ys, *COVID)

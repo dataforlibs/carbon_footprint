@@ -186,7 +186,7 @@ function renderCount(){const [s,b]=cur();
 function renderFolds(){const [s,b]=cur();
  const sfx=st.sat?'_sat':'',kb='back'+sfx,kf='fwd'+sfx,F=s.folds,Bf=(b||s).folds;
  const mk=(k,col,t)=>`<div style="flex:1 1 280px;min-width:0">${histChart(F[k].by_year,Bf[k].by_year,col,F[k],`${t} (n = ${F[k].n})`)}</div>`;
- const totCard=st.sat?`<div style="flex:1 1 280px;min-width:0">${histChart(F.back_sat.by_year.map((v,i)=>v+F.fwd_sat.by_year[i]),Bf.back_sat.by_year.map((v,i)=>v+Bf.fwd_sat.by_year[i]),'#667085',{paris:{n:F.back_sat.paris.n+F.fwd_sat.paris.n,p:null},covid:{n:F.back_sat.covid.n+F.fwd_sat.covid.n,p:null}},`Total (n = ${F.back_sat.n+F.fwd_sat.n})`)}</div>`:mk('total','#667085','Total');
+ const totCard=st.sat?`<div style="flex:1 1 280px;min-width:0">${histChart(F.back_sat.by_year.map((v,i)=>v+F.fwd_sat.by_year[i]),Bf.back_sat.by_year.map((v,i)=>v+Bf.fwd_sat.by_year[i]),'#667085',(F.total_sat||{paris:{n:F.back_sat.paris.n+F.fwd_sat.paris.n,p:null},covid:{n:F.back_sat.covid.n+F.fwd_sat.covid.n,p:null}}),`Total (n = ${F.back_sat.n+F.fwd_sat.n})`)}</div>`:mk('total','#667085','Total');
  $('folds').innerHTML=mk(kb,'#d98a3d','Backward folds')+mk(kf,'#2a8c8c','Forward folds')+totCard;}
 function renderKde(){const [s,b]=cur();
  $('ch-kde').innerHTML=kde([s.final_inflection_years,(b||s).final_inflection_years],['#2b4fa0','#667085'],'Final inflection years')+`<div class="leg"><span style="color:#2b4fa0">━ scenario</span><span>┅ baseline</span></div>`;}
