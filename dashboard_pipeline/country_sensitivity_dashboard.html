@@ -33,6 +33,8 @@ tr.sel td{background:#eef3fb} tbody tr.click{cursor:pointer}
 input[type=text],select{font:inherit;font-size:13px;padding:7px 9px;border:1px solid var(--line);border-radius:6px;min-height:34px}
 .leg{display:flex;flex-wrap:wrap;gap:12px;font-size:11.5px;color:var(--mut)} .leg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
 svg text{font-family:inherit}
+#cl-tbl tbody tr{cursor:pointer}#cl-tbl tbody tr:hover{background:#eaf0fb}#cl-tbl td:first-child{white-space:normal;min-width:250px}#cl-tbl td.num,#cl-tbl th.num{text-align:right}
+#cl-tbl th.grp{text-align:center;border-bottom:1px solid var(--line)}#cl-tbl .g1{background:#f1f4fb}#cl-tbl .g2{background:#fbf3f1}#cl-tbl tbody tr:hover td{background:#eaf0fb}
 </style>
 <script src="../nav.js" defer></script>
 </head>
@@ -85,7 +87,7 @@ svg text{font-family:inherit}
 <section><h2>4 · Do folds really cluster around Paris and COVID?</h2>
 <div class="note">The fold histograms above label Paris (2015–16) and COVID (2019–21) with a permutation p-value: how often would the same number of folds, placed at random years, put at least as many inside that window. This section repeats the test across <b>every</b> scenario, so you can see whether any choice of parameters produces a clustering that is not an accident.</div>
 <div class="row" id="cl-kpis"></div>
-<div class="card" style="overflow-x:auto"><h3>Strongest 15 results across all scenarios</h3><div class="help">Fold types with at least 20 folds only. <b>BH q</b> is the p-value corrected for having looked at many scenarios (Benjamini-Hochberg). <b>Placebo</b> is the share of other windows of the same width, anywhere in 2007–2023, that hold at least as many folds: a small value means the event window stands out, a large one means ordinary years look just as busy.</div><div id="cl-tbl"></div></div>
+<div class="card" style="overflow-x:auto"><h3>Strongest 15 results across all scenarios</h3><div class="help">Fold types with at least 20 folds only. <b>BH q</b> is the p-value corrected for having looked at many scenarios (Benjamini-Hochberg). <b>Placebo</b> is the share of other windows of the same width, anywhere in 2007–2023, that hold at least as many folds: a small value means the event window stands out, a large one means ordinary years look just as busy. Each row is one scenario, with its total, backward (Back.) and forward (Fwd.) folds overall, inside Paris 2015–16 and inside COVID 2019–21. Rows are ranked by the smallest p-value among that scenario's tests. <b>Click a row</b> to load that scenario into the fold charts above.</div><div id="cl-tbl"></div></div>
 <div class="card note" id="cl-read"></div></section>
 
 <section><h2>5 · Where the numbers come from</h2>
@@ -282,6 +284,7 @@ function renderPaper(){
 }
 
 
+function scnWords(k){const m=/^p(\d+)_([AB])_(\d+)_d(\d+)_m(\d+)$/.exec(k);if(!m)return k;return (m[1]==='0'?'No padding':m[1]+' zero-months padding')+' · '+(m[2]==='A'?'aggregate then fit':'monthly snapshot')+' · '+m[3]+'-month windows · ≥ '+m[4]+' documents · ≥ '+m[5]+' month(s) since first publication';}
 function renderClusters(){
  const EV={paris:[2015,2016],covid:[2019,2021]},KINDS=['back','fwd','total','back_sat','fwd_sat'];
  const KN={back:'backward',fwd:'forward',total:'total',back_sat:'backward, saturation',fwd_sat:'forward, saturation'};
@@ -290,15 +293,18 @@ function renderClusters(){
   for(const [ev,[lo,hi]] of Object.entries(EV)){const p=f[ev]&&f[ev].p;if(p==null)continue;
    const w=hi-lo,by=f.by_year,obs=by.slice(lo-2007,hi-2007+1).reduce((a,b)=>a+b,0);let tot=0,ge=0;
    for(let s0=2007;s0<=2023-w;s0++){tot++;if(by.slice(s0-2007,s0-2007+w+1).reduce((a,b)=>a+b,0)>=obs)ge++;}
-   rows.push({k,kind,ev,n:f[ev].n,N:f.n,p,pl:ge/tot});}}
+   rows.push({k,kind,ev,n:f[ev].n,N:f.n,p,pl:ge/tot,ex:f.n*(w+1)/by.length});}}
  const n=rows.length;if(!n){$('cl-tbl').innerHTML='<div class="note">No scenario has 20 or more folds.</div>';return;}
  const ord=rows.map((r,i)=>i).sort((a,b)=>rows[a].p-rows[b].p);
  let run=1;for(let j=n-1;j>=0;j--){const i=ord[j];run=Math.min(run,rows[i].p*n/(j+1));rows[i].q=run;}
  const sig=rows.filter(r=>r.p<0.05).length,sigq=rows.filter(r=>r.q<0.05).length;
  const card=(l,v,d)=>`<div class="card kpi" style="flex:1 1 150px"><div class="help" style="font-size:12px">${l}</div><div class="v">${v}</div><div class="d">${d||''}</div></div>`;
  $('cl-kpis').innerHTML=card('Scenarios',fmt(Object.keys(SUM).length))+card('Tests run',fmt(n),'scenario × fold type × event')+card('Significant (p < 0.05)',fmt(sig),`≈ ${fmt(0.05*n)} expected by chance`)+card('After correction (q < 0.05)',fmt(sigq),'survive the many-scenario search');
- const top=ord.slice(0,15).map(i=>rows[i]);
- $('cl-tbl').innerHTML=`<table><thead><tr><th>Scenario</th><th>Folds</th><th>Event</th><th>n in window</th><th>of</th><th>perm p</th><th>BH q</th><th>Placebo</th></tr></thead><tbody>${top.map(r=>`<tr><td>${esc(r.k)}</td><td>${KN[r.kind]}</td><td>${r.ev==='paris'?'Paris 2015–16':'COVID 2019–21'}</td><td>${fmt(r.n)}</td><td>${fmt(r.N)}</td><td>${fmt(r.p,3)}</td><td>${fmt(r.q,3)}</td><td>${fmt(r.pl,2)}</td></tr>`).join('')}</tbody></table>`;
+ const seen=new Set(),top=[];for(const i of ord){const r=rows[i];if(seen.has(r.k))continue;seen.add(r.k);top.push(r);if(top.length===15)break;}
+ const G=(k,x)=>{const f=SUM[k].folds[x];return f?[f.n,f.paris?f.paris.n:0,f.covid?f.covid.n:0]:[0,0,0];};
+ const hd=(t,c)=>`<th colspan="3" class="grp ${c}">${t}</th>`,sub=c=>['Total','Back.','Fwd.'].map(x=>`<th class="num ${c}">${x}</th>`).join('');
+ $('cl-tbl').innerHTML=`<table><thead><tr><th rowspan="2">Scenario</th>${hd('All folds','g0')}${hd('In Paris 2015–16','g1')}${hd('In COVID 2019–21','g2')}<th rowspan="2" title="The test with the smallest p-value in this scenario">Strongest test</th><th rowspan="2" class="num">perm p</th><th rowspan="2" class="num">BH q</th><th rowspan="2" class="num" title="Share of other windows of the same width that hold at least as many folds">Placebo</th></tr><tr>${sub('g0')}${sub('g1')}${sub('g2')}</tr></thead><tbody>${top.map(r=>{const T=G(r.k,'total'),B=G(r.k,'back'),F=G(r.k,'fwd');const c=(i)=>`<td class="num g${i}">${fmt(T[i])}</td><td class="num g${i}">${fmt(B[i])}</td><td class="num g${i}">${fmt(F[i])}</td>`;return `<tr data-k="${esc(r.k)}" data-kind="${r.kind}" title="${esc(scnWords(r.k))}. All folds: ${fmt(T[0])} (${fmt(B[0])} backward, ${fmt(F[0])} forward). Paris 2015–16: ${fmt(T[1])} (${fmt(B[1])} backward, ${fmt(F[1])} forward). COVID 2019–21: ${fmt(T[2])} (${fmt(B[2])} backward, ${fmt(F[2])} forward). Strongest test: ${KN[r.kind]} folds, ${r.ev==='paris'?'Paris':'COVID'}, permutation p ${fmt(r.p,3)}. Click to load this scenario into the charts above."><td>${esc(scnWords(r.k))}</td>${c(0)}${c(1)}${c(2)}<td>${KN[r.kind]}, ${r.ev==='paris'?'Paris':'COVID'}</td><td class="num">${fmt(r.p,3)}</td><td class="num">${fmt(r.q,3)}</td><td class="num">${fmt(r.pl,2)}</td></tr>`;}).join('')}</tbody></table>`;
+ $('cl-tbl').onclick=e=>{const tr=e.target.closest('tr[data-k]');if(!tr)return;const m=/^p(\d+)_([AB])_(\d+)_d(\d+)_m(\d+)$/.exec(tr.dataset.k);if(!m)return;Object.assign(st,{pad:+m[1],ap:m[2],W:+m[3],docs:+m[4],months:+m[5],sat:/_sat$/.test(tr.dataset.kind)});update();const f=$('folds');if(f)f.scrollIntoView({behavior:'smooth',block:'center'});};
  const cs=rows.filter(r=>r.ev==='covid'),ps=rows.filter(r=>r.ev==='paris');
  $('cl-read').innerHTML=`<b style="color:var(--ink)">How to read this.</b> Across ${fmt(n)} tests, ${fmt(sig)} reach p < 0.05 where about ${fmt(0.05*n)} would be expected by chance alone, and ${fmt(sigq)} survive correction. Paris: ${fmt(ps.filter(r=>r.p<0.05).length)} of ${fmt(ps.length)} tests below 0.05; COVID: ${fmt(cs.filter(r=>r.p<0.05).length)} of ${fmt(cs.length)}. `+(sig===0?'No choice of padding, snapshot rule, frequency, minimum documents or minimum months produces a significant clustering of folds at either event. ':'')+`Several rows share exactly the same p-value because they are the same fits under slightly different rules, so they are not independent findings: they are the same bump keeps reappearing. The tallest bars in the histograms (for example backward folds in 2015) are real counts, but similar-sized bars occur in other years, which is what the placebo column measures. The page therefore shows the counts and does not claim that Paris or COVID caused fold clustering.`;
 }
