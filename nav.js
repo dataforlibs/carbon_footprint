@@ -28,6 +28,7 @@
     ["Authors' Lifepaths", 'lifepaths/author_lifepaths.html'],
     ['Topics', 'topics/index.html'],
     ['Country sensitivity', 'dashboard_pipeline/country_sensitivity_dashboard.html'],
+    ['Author sensitivity', 'author_pipeline/author_sensitivity_dashboard.html'],
     ['Sensitivity analysis', 'lifepaths/sensitivity_dashboard.html'],
     ['Code &amp; data', 'https://github.com/dataforlibs/carbon_footprint/tree/main/package']
   ];
@@ -53,7 +54,7 @@
     if (/^https?:/.test(p)) return false;
     var path = location.pathname.replace(/\/+$/, '/');
     if (/\/$/.test(path)) path += 'index.html';
-    return path.slice(-p.length) === p && (p !== 'index.html' || !/\/(lifepaths|topics|dashboard_pipeline)\//.test(path));
+    return path.slice(-p.length) === p && (p !== 'index.html' || !/\/(lifepaths|topics|dashboard_pipeline|author_pipeline)\//.test(path));
   }
   function build() {
     if (document.querySelector('.cfnav')) return;

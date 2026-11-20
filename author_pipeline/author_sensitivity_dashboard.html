@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Author sensitivity dashboard</title>
+<style>
+:root{--ink:#1d2433;--mut:#667085;--line:#dfe3dc;--bg:#f6f7f4;--blue:#2b4fa0;--gold:#9a7418;--red:#b3402a;--green:#2f7d4f;--org:#d98a3d;--teal:#2a8c8c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.4 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif}
+header{border-bottom:1px solid var(--line);background:#fbfcfa}
+.wrap{max-width:1280px;margin:0 auto;padding:16px 20px}
+h1{margin:0;font-size:22px;font-weight:760} h2{margin:0;font-size:16px;font-weight:700} h3{margin:0;font-size:14px;font-weight:700}
+.sub{font-size:13px;color:var(--mut);margin-top:2px}
+main{max-width:1280px;margin:0 auto;padding:20px;display:flex;flex-direction:column;gap:22px}
+section{display:flex;flex-direction:column;gap:10px}
+.row{display:flex;flex-wrap:wrap;gap:10px}
+.card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px 14px;min-width:0;display:flex;flex-direction:column;gap:8px}
+.card .help{font-size:11px;color:var(--mut);line-height:1.35}
+.src{font-size:10.5px;color:var(--mut);border-top:1px solid var(--line);padding-top:6px;margin-top:auto}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+button.o{font:inherit;font-size:12px;padding:7px 10px;min-height:34px;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:6px;cursor:pointer}
+button.o[aria-pressed=true]{background:var(--blue);border-color:var(--blue);color:#fff}
+button.pre{font:inherit;font-size:12px;padding:6px 12px;min-height:34px;border:1px solid var(--line);background:#fff;border-radius:999px;cursor:pointer}
+.kpi{flex:1 1 150px} .kpi .v{font-size:24px;font-weight:700} .kpi .d{font-size:11.5px;color:var(--mut)}
+.up{color:var(--red)} .dn{color:var(--green)}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;color:var(--mut);font-size:11px;padding:6px 8px;font-weight:600;cursor:default}
+td{padding:6px 8px;border-top:1px solid var(--line);white-space:nowrap}
+tr.sel td{background:#eef3fb} tbody tr.click{cursor:pointer}
+.ok{color:var(--green);font-weight:600}.bad{color:var(--red);font-weight:600}
+.note{font-size:12px;color:var(--mut)} .box{font-size:12px;background:#fff;border:1px solid var(--gold);border-radius:8px;padding:10px 14px}
+input[type=text],select{font:inherit;font-size:13px;padding:7px 9px;border:1px solid var(--line);border-radius:6px;min-height:34px}
+.leg{display:flex;flex-wrap:wrap;gap:12px;font-size:11.5px;color:var(--mut)} .leg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+svg text{font-family:inherit}
+#cl-tbl tbody tr{cursor:pointer}#cl-tbl tbody tr:hover{background:#eaf0fb}#cl-tbl td:first-child{white-space:normal;min-width:250px}#cl-tbl td.num,#cl-tbl th.num{text-align:right}
+#cl-tbl th.grp{text-align:center;border-bottom:1px solid var(--line)}#cl-tbl .g1{background:#f1f4fb}#cl-tbl .g2{background:#fbf3f1}#cl-tbl tbody tr:hover td{background:#eaf0fb}
+#cl-tbl .pv{font-size:11px;color:var(--mut)}#cl-tbl td.num{line-height:1.25}
+</style>
+<script src="../nav.js" defer></script>
+</head>
+<body>
+<header><div class="wrap"><h1>Author sensitivity dashboard</h1>
+<div class="sub">How padding, snapshots, frequency and first-fit rules change author lifepaths and fold counts. All numbers are pregenerated; nothing is fitted in this page.</div></div></header>
+<main>
+<details class="card" style="margin-bottom:12px" open><summary style="cursor:pointer;font-weight:600;color:var(--ink)">About this dashboard</summary>
+<div class="note" style="line-height:1.55;margin-top:8px">
+<p>This dashboard accompanies the paper "Sigmoid-parameterized lifepaths…". The paper tracks research output as a logistic (sigmoid) curve, refitted over time as new publications arrive. Each refit gives an inflection point, x₀ (the estimated moment of fastest growth), and a phase: acceleration, inflection, deceleration or deactivated. A <b>fold</b> happens when a new fit moves x₀ earlier (backward) or later (forward) by more than one window step while x₀ stays inside the observed period. This page is the author-level counterpart of the country sensitivity dashboard: it asks whether folds, and the lifepaths themselves, depend on analysis choices. All results are pregenerated; nothing is refitted in your browser.</p>
+<p><b>Which authors.</b> The 1,755 authors with at least 4 publications through July 2023 (monthly publication counts, 2007–2023). Authors with fewer publications are left out because their curves are too short to fit.</p>
+<p><b>What you can change.</b> <i>Padding:</i> none, or 100 zero-months before the data begin. <i>Snapshot rule:</i> only <b>A (aggregated)</b> was run for authors: publications are summed into 3-, 6- or 12-month buckets and the curve is fitted to those buckets, so the window size also sets the resolution of the data. The monthly-snapshot rule (B) was not run for authors because it is very slow at this scale. <i>Frequency:</i> a new fit every 3, 6 or 12 months. <i>Minimum documents:</i> an author enters once they have 0–5 publications. <i>Minimum months:</i> an author enters after a set number of months since their first publication. A fit at any window uses all data up to that window, so the two minimum rules only choose which windows count and never change a fit. The minimum-document and minimum-month settings were run at the 6-month frequency; 3 and 12 months were run without them.</p>
+<p><b>What you see.</b> (1) Summary tiles compared with the baseline setting. (2) Aggregate results: authors analyzed at each window, backward, forward and total folds per year (optionally saturation phase only), the distribution of final inflection years, and the final phase mix. (3) Individual lifepaths: pick an author to see their lifepath and how x₀ moves across windows. (4) Cluster tests for Paris 2015–16 and COVID 2019–21.</p>
+<p><b>How to read the cluster tests.</b> For each setting and fold type, a permutation test asks how often the same number of folds, placed at random years, would put at least as many inside the event window. Because many settings are tested, the page also reports how many results would be significant by chance alone, p-values corrected for that (Benjamini-Hochberg), and a placebo: the share of other windows of the same width that hold as many folds. Read the counts in the table and the summary under it for what these data show.</p>
+<p><b>Reading the numbers.</b> Fits use the same logistic model and caps as the paper: x₀ is capped at 1.3 in fitting, and a fold requires x₀ ≤ 1 in both windows. Windows are counted from each author's first publication. One window step is about six months at 6-month frequency.</p>
+</div></details>
+<div class="box" id="err" style="display:none;border-color:var(--red);color:var(--red)"></div>
+<section><h2>1 · Choose a scenario</h2>
+<div class="row" id="presets"></div>
+<div class="row" id="controls"></div>
+<div class="card note"><div id="scenario-note"></div></div></section>
+
+<section><h2>2 · Aggregate level</h2>
+<div class="row" id="kpis"></div>
+<div class="row"><div class="card" style="flex:1 1 100%"><h3>Authors analyzed at each window</h3>
+<div class="help">How many authors have a fit at each window under the chosen rules (solid) and under the baseline (dashed).</div><div id="ch-count"></div></div></div>
+<div class="card" style="flex:1 1 100%"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:center"><h3>Fold events by year: backward, forward, total</h3>
+<div class="seg" id="satseg"></div></div>
+<div class="help">Folds with x₀ ≤ 1 in both windows. Bars: chosen scenario; line: baseline. Paris and COVID windows shaded, with the permutation test (10,000 iterations) on each band.</div>
+<div class="row" id="folds"></div></div>
+<div class="row">
+<div class="card" style="flex:1 1 420px"><h3>Inflection cluster distribution</h3><div class="help">Final inflection year per author (density), scenario against baseline.</div><div id="ch-kde"></div></div>
+<div class="card" style="flex:1 1 360px"><h3>Final phase mix</h3><div class="help">Share of authors in each phase at the last window.</div><div id="phase-tbl"></div></div></div></section>
+
+<section><h2>3 · Individual lifepaths</h2>
+<div class="note" id="country-msg"></div>
+<div class="row" style="align-items:stretch">
+<div class="card" style="flex:1 1 480px"><h3>Authors</h3><input type="text" id="q" placeholder="Search authors" aria-label="Search authors">
+<div style="max-height:430px;overflow:auto"><table><thead><tr><th>Author</th><th>Phase</th><th>Baseline</th><th>Folds b/f</th><th>Final x₀ year</th><th>Shift (yr)</th></tr></thead><tbody id="ctbl"></tbody></table></div></div>
+<div style="flex:3 1 640px;display:flex;flex-direction:column;gap:10px">
+<div class="row"><div class="card" style="flex:1 1 300px"><h3 id="cname">Author</h3><div class="help">Lifepath: projected inflection date against ln(k), y-axis reversed, coloured by phase. Backward folds are solid red, forward folds dashed orange; capped or degenerate fits are left out.</div><div id="ch-life"></div>
+<div class="leg"><span><i style="background:green"></i>Acceleration</span><span><i style="background:blue"></i>Inflection</span><span><i style="background:red"></i>Deceleration</span><span><i style="background:black"></i>Deactivated</span></div></div>
+<div class="card" style="flex:1 1 300px"><h3>Inflection point x₀ over time</h3><div class="help">x₀ refitted at each window. Dashed lines: window edge (1.0) and cap (1.3). Scenario solid, baseline grey.</div><div id="ch-x0"></div></div></div></div></div></section>
+
+
+
+<section><h2>4 · Do folds really cluster around Paris and COVID?</h2>
+<div class="note">The fold histograms above label Paris (2015–16) and COVID (2019–21) with a permutation p-value: how often would the same number of folds, placed at random years, put at least as many inside that window. This section repeats the test across <b>every</b> scenario, so you can see whether any choice of parameters produces a clustering that is not an accident.</div>
+<div class="row" id="cl-kpis"></div>
+<div class="card" style="overflow-x:auto"><h3>Strongest 15 results across all scenarios</h3><div class="help">Fold types with at least 20 folds only. <b>BH q</b> is the p-value corrected for having looked at many scenarios (Benjamini-Hochberg). <b>Placebo</b> is the share of other windows of the same width, anywhere in 2007–2023, that hold at least as many folds: a small value means the event window stands out, a large one means ordinary years look just as busy. Each row is one scenario, with its total, backward (Back.) and forward (Fwd.) folds overall, and inside Paris 2015–16 and COVID 2019–21, each with its own permutation p-value (– where there are no folds to test). Rows are ranked by the smallest p-value among that scenario's tests, so the strongest test is often a Paris one; the COVID p-values are in the same row. <b>Click a row</b> to load that scenario into the fold charts above.</div><div id="cl-tbl"></div></div>
+<div class="card note" id="cl-read"></div></section>
+
+<section><h2>5 · Where the numbers come from</h2>
+<div class="card note" id="prov"></div></section>
+</main>
+<script>
+const DATA = new URLSearchParams(location.search).get('data') || 'dashboard_data';
+const BASE = {pad:0, ap:'A', W:6, docs:0, months:1};
+const st = Object.assign({}, BASE, {sat:false, country:''});
+{const q=new URLSearchParams(location.search);['pad','W','docs','months'].forEach(k=>{if(q.has(k))st[k]=+q.get(k);});if(q.has('ap'))st.ap=q.get('ap');}
+const key = s => `p${s.pad}_${s.ap}_${s.W}_d${s.docs}_m${s.months}`;
+let SUM = {}, MAN = {}, CACHE = {};
+const PHASES = ['Acceleration','Inflection','Deceleration','Deactivated'];
+const PCOL = {Acceleration:'green', Inflection:'blue', Deceleration:'red', Deactivated:'black'};
+const X0_CAP=1.19, K_MAX=3000, A_RATIO_MAX=50;
+const fmt=(v,d=0)=>v==null||isNaN(v)?'–':Number(v).toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d});
+const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const $=id=>document.getElementById(id);
+
+/* ---------- controls ---------- */
+const CONTROLS=[
+ {id:'pad',label:'Padding',help:'Zero-months prepended before the first observation.',opts:[[0,'none'],[100,'100 zero-months']]},
+ {id:'ap',label:'Time snapshots',help:'A: sum publications into windows, then fit the windows. (The monthly-snapshot rule B was not run for authors.)',opts:[['A','A · aggregated']]},
+ {id:'W',label:'Analysis frequency',help:'Window size between fits.',opts:[[3,'3 months'],[6,'6 months'],[12,'12 months']]},
+ {id:'months',label:'Min. months before first fit',help:'Months since the author’s first publication (1 = no rule).',opts:[[1,'1'],[6,'6'],[12,'12'],[24,'24']]}];
+const PRESETS=[['Fit every window from the start',{pad:0,ap:'A',W:6,docs:0,months:1}],['Start at the first publication',{pad:0,ap:'A',W:6,docs:1,months:1}],['Wait for 3 publications',{pad:0,ap:'A',W:6,docs:3,months:1}],['With 100 zero-months padding',{pad:100,ap:'A',W:6,docs:0,months:1}]];
+function buildControls(){
+ $('presets').innerHTML=PRESETS.map((p,i)=>`<button class="pre" data-p="${i}">${p[0]}</button>`).join('');
+ $('presets').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;Object.assign(st,PRESETS[b.dataset.p][1]);update();};
+ $('controls').innerHTML=CONTROLS.map(c=>`<div class="card" style="flex:1 1 230px"><b style="font-size:12px">${c.label}</b><div class="seg" data-c="${c.id}">${c.opts.map(o=>`<button class="o" data-v="${o[0]}">${o[1]}</button>`).join('')}</div><div class="help">${c.help}</div></div>`).join('')+
+ `<div class="card" style="flex:1 1 230px"><div style="display:flex;justify-content:space-between"><label for="docs" style="font-size:12px;font-weight:700">Min. documents before first fit</label><output id="docsv" style="font-weight:700;color:var(--blue)"></output></div><input id="docs" type="range" min="0" max="5" step="1" style="width:100%;accent-color:var(--blue)"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--mut)"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div><div class="help">Cumulative publications per author before the first fit (0 = fit every window).</div></div>`;
+ $('controls').onclick=e=>{const b=e.target.closest('button.o');if(!b)return;const c=b.parentElement.dataset.c;st[c]=c==='ap'?b.dataset.v:+b.dataset.v;update();};
+ $('docs').oninput=e=>{st.docs=+e.target.value;update();};
+ $('satseg').innerHTML=`<button class="o" data-s="0">All folds</button><button class="o" data-s="1">Saturation phase only</button>`;
+ $('satseg').onclick=e=>{const b=e.target.closest('[data-s]');if(!b)return;st.sat=b.dataset.s==='1';update();};
+ $('q').oninput=()=>renderCountries();
+}
+function syncControls(){
+ document.querySelectorAll('#controls [data-c]').forEach(g=>g.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(String(st[g.dataset.c])===b.dataset.v))));
+ $('docs').value=st.docs;$('docsv').textContent=st.docs;
+ $('satseg').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.s==='1')===st.sat)));
+}
+
+/* ---------- svg helpers ---------- */
+function frame(w,h,L,R,T,B){return {w,h,L,R,T,B,pw:w-L-R,ph:h-T-B};}
+function axisX(f,x0,x1,ticks,fmtf=(v)=>v){const px=v=>f.L+(v-x0)/(x1-x0)*f.pw;return {px,svg:`<line x1="${f.L}" x2="${f.w-f.R}" y1="${f.h-f.B}" y2="${f.h-f.B}" stroke="#dfe3dc"/>`+ticks.map(t=>`<text x="${px(t)}" y="${f.h-f.B+15}" text-anchor="middle" font-size="10.5" fill="#1d2433">${fmtf(t)}</text>`).join('')};}
+function axisY(f,y0,y1,n=4,rev=false,fmtf=v=>fmt(v)){const py=v=>rev?f.T+(v-y0)/(y1-y0)*f.ph:f.h-f.B-(v-y0)/(y1-y0)*f.ph;let s='';for(let i=0;i<=n;i++){const v=y0+(y1-y0)*i/n;s+=`<line x1="${f.L}" x2="${f.w-f.R}" y1="${py(v)}" y2="${py(v)}" stroke="#dfe3dc" opacity=".6"/><text x="${f.L-5}" y="${py(v)+3.5}" text-anchor="end" font-size="10" fill="#667085">${fmtf(v)}</text>`;}return {py,svg:s};}
+const svgWrap=(f,body,title)=>`<svg viewBox="0 0 ${f.w} ${f.h}" width="100%" role="img" aria-label="${esc(title)}">${body}</svg>`;
+function niceMax(v){const e=Math.pow(10,Math.floor(Math.log10(Math.max(v,1))));const m=v/e;return (m<=1?1:m<=2?2:m<=5?5:10)*e;}
+
+function lineChart(xs,series,title){
+ const f=frame(1200,230,48,24,14,30),ymax=niceMax(Math.max(1,...series.flatMap(s=>s.y)));
+ const ax=axisX(f,Math.min(...xs),Math.max(...xs),xs.filter((_,i)=>i%Math.ceil(xs.length/8)===0).map(v=>v),v=>Math.round(v)),ay=axisY(f,0,ymax,4);
+ let b=ay.svg+ax.svg;
+ series.forEach(s=>{b+=`<polyline fill="none" stroke="${s.color}" stroke-width="${s.w||2}" ${s.dash?'stroke-dasharray="5 4"':''} points="${xs.map((x,i)=>`${ax.px(x)},${ay.py(s.y[i])}`).join(' ')}"/>`;});
+ return svgWrap(f,b,title);
+}
+function histChart(by,baseBy,color,sm,title){
+ const f=frame(400,220,34,16,40,28),YEARS=by.map((_,i)=>2007+i),ymax=niceMax(Math.max(1,...by,...baseBy)*1.05);
+ const ax=axisX(f,2007,2024,[2008,2012,2016,2020,2024]),ay=axisY(f,0,ymax,4);
+ let b=`<text x="${f.L}" y="13" font-size="12" font-weight="700">${title}</text>`+ay.svg;
+ [[2015,2016,'#2b4fa0','Paris',sm.paris],[2019,2021,'#b3402a','COVID',sm.covid]].forEach(([lo,hi,c,n,t])=>{
+  b+=`<rect x="${ax.px(lo)}" y="${f.T}" width="${ax.px(hi+1)-ax.px(lo)}" height="${f.ph}" fill="${c}" opacity=".12"/><text x="${(ax.px(lo)+ax.px(hi+1))/2}" y="${f.T-17}" text-anchor="middle" font-size="9.5" fill="${c}" font-weight="600">${n} n=${t.n}</text><text x="${(ax.px(lo)+ax.px(hi+1))/2}" y="${f.T-6}" text-anchor="middle" font-size="9.5" fill="${c}" font-weight="600">p=${t.p==null?'–':t.p.toFixed(2)}</text>`;});
+ const bw=f.pw/17-2;by.forEach((v,i)=>{if(v)b+=`<rect x="${ax.px(YEARS[i])+1}" y="${ay.py(v)}" width="${bw}" height="${f.h-f.B-ay.py(v)}" fill="${color}" opacity=".85"/>`;});
+ b+=`<polyline fill="none" stroke="#1d2433" stroke-width="1.3" points="${baseBy.map((v,i)=>`${ax.px(YEARS[i])+1+bw/2},${ay.py(v)}`).join(' ')}"/>`+ax.svg;
+ return svgWrap(f,b,title);
+}
+function kde(arrs,colors,title){
+ const f=frame(520,230,40,12,14,30),x0=2005,x1=2036,xs=[...Array(200)].map((_,i)=>x0+(x1-x0)*i/199);
+ const dens=a=>{a=a.filter(v=>v>2000&&v<2040);if(a.length<2)return xs.map(_=>0);const m=a.reduce((s,v)=>s+v,0)/a.length,sd=Math.sqrt(a.reduce((s,v)=>s+(v-m)**2,0)/a.length)||1,h=sd*Math.pow(a.length,-0.2)*0.8;return xs.map(x=>a.reduce((s,v)=>s+Math.exp(-0.5*((x-v)/h)**2),0)/(a.length*h*2.5066));};
+ const D=arrs.map(dens),ymax=Math.max(0.01,...D.flat())*1.15,ax=axisX(f,x0,x1,[2005,2010,2015,2020,2025,2030,2035]),ay=axisY(f,0,ymax,4,false,v=>v.toFixed(2));
+ let b=ay.svg;[[2015,2016,'#2b4fa0'],[2019,2021,'#b3402a']].forEach(([lo,hi,c])=>b+=`<rect x="${ax.px(lo)}" y="${f.T}" width="${ax.px(hi+1)-ax.px(lo)}" height="${f.ph}" fill="${c}" opacity=".12"/>`);
+ D.forEach((d,i)=>{const pts=xs.map((x,j)=>`${ax.px(x)},${ay.py(d[j])}`).join(' ');b+=`<polygon points="${f.L},${f.h-f.B} ${pts} ${f.w-f.R},${f.h-f.B}" fill="${colors[i]}" opacity="${i?0.05:0.12}"/><polyline fill="none" stroke="${colors[i]}" stroke-width="2" ${i?'stroke-dasharray="5 4"':''} points="${pts}"/>`;});
+ return svgWrap(f,b+ax.svg,title);
+}
+
+/* ---------- data ---------- */
+async function getJSON(p){const r=await fetch(`${DATA}/${p}`);if(!r.ok)throw new Error(p+' '+r.status);return r.json();}
+async function countryFile(k){
+ if(CACHE[k]!==undefined)return CACHE[k];
+ const sc=(MAN.scenarios||[]).find(s=>s.key===k);
+ if(!sc||!sc.country_results){CACHE[k]=null;return null;}
+ try{CACHE[k]=await getJSON(sc.country_results);}catch(e){CACHE[k]=null;}return CACHE[k];
+}
+
+/* ---------- panels ---------- */
+function kpiHTML(){
+ const s=SUM[key(st)],b=SUM[key(BASE)];if(!s)return '';
+ const item=(label,v,bv,d=0,pct=false)=>{const diff=(b&&bv!=null)?v-bv:null;const dtxt=diff==null?'':(diff===0?'same as baseline':`${diff>0?'+':''}${fmt(diff,d)} vs baseline`);return `<div class="card kpi"><div class="help" style="font-size:12px">${label}</div><div class="v">${fmt(v,d)}${pct?'%':''}</div><div class="d">${dtxt}</div></div>`;};
+ return item('Authors analyzed',s.countries_analyzed,b&&b.countries_analyzed)+item('Window fits',s.windows,b&&b.windows)+item('Backward folds',s.folds.back.n,b&&b.folds.back.n)+item('Forward folds',s.folds.fwd.n,b&&b.folds.fwd.n)+item('Authors with a backward fold',s.entities_with_folds,b&&b.entities_with_folds)+item('Windows with x₀ ≤ 1',s.pct_x0_le1,b&&b.pct_x0_le1,1,true);
+}
+function cur(){const s=SUM[key(st)];if(!s)throw new Error('this scenario has not been generated');return [s,SUM[key(BASE)]];}
+function renderCount(){const [s,b]=cur();
+ if(!s.countries_by_window){$('ch-count').innerHTML='<div class="note">Missing countries_by_window in scenario_summaries.json: re-run build_dashboard_data.py (the latest copy).</div>';return;}
+ const xs=s.window_years.slice(1);
+ const ser=[{y:s.countries_by_window.slice(1),color:'#2b4fa0',w:2.4}];
+ if(b&&b.countries_by_window&&key(st)!==key(BASE)&&b.window_years.length===s.window_years.length)ser.push({y:b.countries_by_window.slice(1),color:'#667085',dash:true});
+ $('ch-count').innerHTML=lineChart(xs,ser,'Authors analyzed at each window');}
+function renderFolds(){const [s,b]=cur();
+ const sfx=st.sat?'_sat':'',kb='back'+sfx,kf='fwd'+sfx,F=s.folds,Bf=(b||s).folds;
+ const mk=(k,col,t)=>`<div style="flex:1 1 280px;min-width:0">${histChart(F[k].by_year,Bf[k].by_year,col,F[k],`${t} (n = ${F[k].n})`)}</div>`;
+ const totCard=st.sat?`<div style="flex:1 1 280px;min-width:0">${histChart(F.back_sat.by_year.map((v,i)=>v+F.fwd_sat.by_year[i]),Bf.back_sat.by_year.map((v,i)=>v+Bf.fwd_sat.by_year[i]),'#667085',(F.total_sat||{paris:{n:F.back_sat.paris.n+F.fwd_sat.paris.n,p:null},covid:{n:F.back_sat.covid.n+F.fwd_sat.covid.n,p:null}}),`Total (n = ${F.back_sat.n+F.fwd_sat.n})`)}</div>`:mk('total','#667085','Total');
+ $('folds').innerHTML=mk(kb,'#d98a3d','Backward folds')+mk(kf,'#2a8c8c','Forward folds')+totCard;}
+function renderKde(){const [s,b]=cur();
+ $('ch-kde').innerHTML=kde([s.final_inflection_years,(b||s).final_inflection_years],['#2b4fa0','#667085'],'Final inflection years')+`<div class="leg"><span style="color:#2b4fa0">━ scenario</span><span>┅ baseline</span></div>`;}
+function renderPhase(){const [s,b]=cur();
+ $('phase-tbl').innerHTML=`<table><thead><tr><th>Phase</th><th>Scenario</th><th>Baseline</th></tr></thead><tbody>${PHASES.map(p=>`<tr><td><span style="color:${PCOL[p]}">●</span> ${p}</td><td>${fmt(s.final_phase_pct[p]||0,1)}%</td><td>${b?fmt(b.final_phase_pct[p]||0,1)+'%':'–'}</td></tr>`).join('')}</tbody></table>`;}
+function points(rec){
+ const wp=rec.window_params,delta=wp.length>1?1/(wp.length-1):1,pts=[];
+ wp.forEach((p,i)=>{const k=p.k,x0=Math.min(p.x0_norm,1.3);
+  if(!(k>0)||x0>=X0_CAP||k>K_MAX)return;if(rec.total_pubs&&p.A/rec.total_pubs>A_RATIO_MAX)return;
+  let fold='none';if(i){const a=Math.min(wp[i-1].x0_norm,1.3);if(a<=1&&x0<=1)fold=x0<a-delta?'back':x0>a+delta?'fwd':'none';}
+  pts.push({x:p.x0_year,y:Math.log(k),ph:p.phase,fold});});return pts;
+}
+function lifeChart(rec){
+ const pts=points(rec);if(pts.length<2)return '<div class="note">No usable fit for this author under these rules.</div>';
+ const f=frame(520,330,44,14,14,34),xs=pts.map(p=>p.x),ys=pts.map(p=>p.y);
+ const x0=Math.floor(Math.min(...xs))-1,x1=Math.ceil(Math.max(...xs))+1,y0=Math.min(...ys)-.2,y1=Math.max(...ys)+.2;
+ const ax=axisX(f,x0,x1,[...Array(6)].map((_,i)=>Math.round(x0+(x1-x0)*i/5)),v=>v),ay=axisY(f,y0,y1,5,true,v=>v.toFixed(1));
+ let b=ay.svg+ax.svg;
+ for(let i=1;i<pts.length;i++){const a=pts[i-1],c=pts[i];b+=`<line x1="${ax.px(a.x)}" y1="${ay.py(a.y)}" x2="${ax.px(c.x)}" y2="${ay.py(c.y)}" stroke="${c.fold==='none'?'#888':c.fold==='back'?'red':'orange'}" stroke-width="${c.fold==='none'?1:2.6}" ${c.fold==='fwd'?'stroke-dasharray="5 4"':''} opacity=".85"/>`;}
+ pts.forEach(p=>b+=`<circle cx="${ax.px(p.x)}" cy="${ay.py(p.y)}" r="3.6" fill="${PCOL[p.ph]}"/>`);
+ b+=`<text x="${f.w/2}" y="${f.h-3}" text-anchor="middle" font-size="10.5" fill="#667085">Projected inflection date</text><text transform="rotate(-90)" x="${-f.h/2}" y="11" text-anchor="middle" font-size="10.5" fill="#667085">ln(k), axis reversed</text>`;
+ return svgWrap(f,b,'Lifepath');
+}
+function x0Chart(rec,brec){
+ const f=frame(520,330,40,14,14,34),all=[...(rec?rec.window_params:[]),...(brec?brec.window_params:[])];if(!all.length)return '<div class="note">No fit.</div>';
+ const yrs=all.map(p=>p.snapshot_year),x0=Math.floor(Math.min(...yrs)),x1=Math.ceil(Math.max(...yrs));
+ const ax=axisX(f,x0,x1,[...Array(6)].map((_,i)=>Math.round(x0+(x1-x0)*i/5))),ay=axisY(f,0,1.3,4,false,v=>v.toFixed(2));
+ let b=ay.svg+ax.svg+[1,1.3].map(v=>`<line x1="${f.L}" x2="${f.w-f.R}" y1="${ay.py(v)}" y2="${ay.py(v)}" stroke="#b3402a" stroke-dasharray="4 4"/>`).join('');
+ const line=(r,col,w)=>r&&r.window_params.length?`<polyline fill="none" stroke="${col}" stroke-width="${w}" points="${r.window_params.map(p=>`${ax.px(p.snapshot_year)},${ay.py(Math.min(Math.max(p.x0_norm,0),1.3))}`).join(' ')}"/>`:'';
+ b+=line(brec,'#9aa3b2',1.6)+line(rec,'#2b4fa0',2.4);
+ if(rec){const wp=rec.window_params,d=wp.length>1?1/(wp.length-1):1;wp.forEach((p,i)=>{if(!i)return;const a=wp[i-1].x0_norm,c=p.x0_norm;if(a<=1&&c<=1&&c<a-d)b+=`<circle cx="${ax.px(p.snapshot_year)}" cy="${ay.py(c)}" r="4" fill="red"/>`;});}
+ return svgWrap(f,b,'x0 over time');
+}
+async function renderCountries(){
+ const k=key(st),rec=await countryFile(k),brec=await countryFile(key(BASE));
+ if(!rec||!brec){$('ctbl').innerHTML='';$('country-msg').textContent=!SUM[k]?'This scenario has not been generated yet.':'Author-level files are only available for the base conditions (3, 6 or 12 months, no minimum rules) and for the minimum-rule sweeps at 6 months. Pick one of those to see individual lifepaths.';$('ch-life').innerHTML='';$('ch-x0').innerHTML='';return;}
+ $('country-msg').textContent='';
+ const q=$('q').value.toLowerCase();
+ const rows=Object.keys(rec).filter(c=>c.toLowerCase().includes(q)).map(c=>{const r=rec[c],b=brec[c]||{};const fy=r.final_x0_year,by=b.final_x0_year;return {c,ph:r.final_phase,bph:b.final_phase,fb:r.time_folds,ff:r.time_folds_forward,fy,sh:(fy!=null&&by!=null)?fy-by:null};});
+ rows.sort((a,b)=>Math.abs(b.sh??-1)-Math.abs(a.sh??-1));
+ if(!rec[st.country])st.country=rows.length?rows[0].c:st.country;
+ $('ctbl').innerHTML=rows.map(r=>`<tr class="click ${r.c===st.country?'sel':''}" data-c="${esc(r.c)}"><td>${esc(r.c)}</td><td>${r.ph?`<span style="color:${PCOL[r.ph]}">● ${r.ph}</span>`:'–'}</td><td>${r.bph||'–'}</td><td>${r.fb}/${r.ff}</td><td>${fmt(r.fy,1)}</td><td>${r.sh==null?'–':(r.sh>0?'+':'')+fmt(r.sh,1)}</td></tr>`).join('');
+ $('ctbl').onclick=e=>{const tr=e.target.closest('tr');if(!tr)return;st.country=tr.dataset.c;renderCountries();};
+ $('cname').textContent=st.country;
+ $('ch-life').innerHTML=rec[st.country]?lifeChart(rec[st.country]):'';
+ $('ch-x0').innerHTML=x0Chart(rec[st.country],brec[st.country]);
+}
+
+/* ---------- paper check ---------- */
+const ORDER=['A-3M','A-6M','A-12M','B-3M','B-6M','B-12M'];
+const PAPER={0:{windows:[4504,2302,1163,4570,2361,1192],median:[.850,.857,.863,.848,.846,.833],le1:[80.7,78.3,73.2,82.3,82.4,84.2],ewf:[113,109,86,114,112,90],folds:[1382,552,159,1440,630,214],x0cv:[.386,.182,.186,.176,.174,.166],kcv:[2.255,1.894,1.385,2.377,2.112,1.710]},
+ 100:{windows:[4480,2259,1088,4570,2361,1192],median:[.959,.977,.987,.919,.918,.912],le1:[82.3,80.7,79.6,83.2,83.2,84.8],ewf:[50,0,0,86,79,38],folds:[86,0,0,704,272,53],x0cv:[.074,.057,.037,.105,.103,.097],kcv:[2.369,2.100,1.639,2.371,2.132,1.710]}};
+const TOL={windows:0,median:.0006,le1:.06,ewf:0,folds:0,x0cv:.0006,kcv:.0006},DEC={windows:0,median:3,le1:1,ewf:0,folds:0,x0cv:3,kcv:3};
+const COLS=[['windows','Windows'],['median','Median x₀'],['le1','x₀ ≤ 1 (%)'],['ewf','Countries with folds'],['folds','Total folds'],['x0cv','x₀ CV'],['kcv','k CV']];
+const sk=(pad,lab)=>`p${pad}_${lab[0]}_${lab.slice(2,-1)}_d0_m1`;
+function got(s){return {windows:s.paper_definition.windows,median:s.paper_definition.median_x0,le1:s.paper_definition.pct_x0_le1,ewf:s.entities_with_folds,folds:s.folds.back.n,x0cv:s.paper_definition.x0_cv,kcv:s.paper_definition.k_cv};}
+function cell(p,g,k){const ok=Math.abs(p-g)<=TOL[k];return ok?`<span class="ok">${fmt(g,DEC[k])} ✓</span>`:`<span class="bad">${fmt(g,DEC[k])} ✗</span> <span class="note">paper ${fmt(p,DEC[k])}</span>`;}
+function renderPaper(){
+ let n=0,bad=0,html='';
+ [[0,'Table S2, no padding'],[100,'Table S1, padded']].forEach(([pad,t])=>{
+  html+=`<div style="font-weight:600;margin:6px 0">${t}</div><table><thead><tr><th>Condition</th>${COLS.map(c=>`<th>${c[1]}</th>`).join('')}</tr></thead><tbody>`;
+  ORDER.forEach((lab,i)=>{const s=SUM[sk(pad,lab)];if(!s){html+=`<tr><td>${lab}</td><td colspan="7" class="note">not generated</td></tr>`;return;}
+   const g=got(s);html+=`<tr><td>${lab}</td>${COLS.map(([k])=>{n++;if(Math.abs(PAPER[pad][k][i]-g[k])>TOL[k])bad++;return `<td>${cell(PAPER[pad][k][i],g[k],k)}</td>`;}).join('')}</tr>`;});
+  html+='</tbody></table>';});
+ $('paper-tbl').innerHTML=`<div class="note" style="margin-bottom:6px">${n-bad} of ${n} table numbers match.</div>`+html;
+ // text numbers
+ const S=SUM,g=(k)=>S[k],rows=[];
+ const add=(label,paper,data,tol=0.051,d=Number.isInteger(paper)?0:1)=>{if(data==null||isNaN(data)){rows.push(`<tr><td>${label}</td><td>${paper}</td><td class="note">not generated</td><td></td></tr>`);return;}const ok=Math.abs(paper-data)<=tol;rows.push(`<tr><td>${label}</td><td>${paper}</td><td>${fmt(data,d)}</td><td class="${ok?'ok':'bad'}">${ok?'✓':'✗'}</td></tr>`);};
+ const fo=(k)=>g(k)?g(k).folds.back.n:null,r=(a,b)=>fo(a)&&fo(b)?fo(a)/fo(b):null;
+ add('Folds 3M vs 12M, aggregated, no padding (×)',8.7,r('p0_A_3_d0_m1','p0_A_12_d0_m1'));
+ add('Folds 3M vs 12M, monthly, no padding (×)',6.7,r('p0_B_3_d0_m1','p0_B_12_d0_m1'));
+ add('Range of folds across conditions (×, “≈9×”)',9,r('p0_B_3_d0_m1','p0_A_12_d0_m1'),0.51,1);
+ const A6=g('p0_A_6_d0_m1');
+ if(A6){add('Paris 2015–16 backward folds (n)',139,A6.folds.back.paris.n,0);add('COVID 2019–21 backward folds (n)',135,A6.folds.back.covid.n,0);add('Paris forward folds (n)',14,A6.folds.fwd.paris.n,0);add('COVID forward folds (n)',44,A6.folds.fwd.covid.n,0);
+  rows.push(`<tr><td>Paris / COVID backward, permutation p</td><td>n.s.</td><td>${A6.folds.back.paris.p.toFixed(3)} / ${A6.folds.back.covid.p.toFixed(3)}</td><td class="${A6.folds.back.paris.p>0.05&&A6.folds.back.covid.p>0.05?'ok':'bad'}">${A6.folds.back.paris.p>0.05&&A6.folds.back.covid.p>0.05?'✓':'✗'}</td></tr>`);}
+ const ewf=k=>g(k)?g(k).entities_with_folds:null;
+ add('Countries with folds, A-6M no padding',109,ewf('p0_A_6_d0_m1'),0);add('Countries with folds, A-3M no padding (of 114)',113,ewf('p0_A_3_d0_m1'),0);add('Countries with folds, A-3M padded',50,ewf('p100_A_3_d0_m1'),0);
+ add('Folds, A-3M padded vs unpadded: padded',86,fo('p100_A_3_d0_m1'),0);add('Folds, A-6M padded (backward)',0,fo('p100_A_6_d0_m1'),0);
+ {const f=g('p100_A_6_d0_m1');if(f)add('Forward folds, A-6M padded (supplement says 0)',0,f.folds.fwd.n,0);}
+ {const c=['p0_A_6_d0_m1','p0_B_6_d0_m1','p0_A_12_d0_m1','p0_B_12_d0_m1'].map(k=>g(k)&&g(k).x0_cv);if(c.every(v=>v!=null)){const lo=Math.min(...c),hi=Math.max(...c);const ok=lo>=0.2225&&hi<=0.2275;rows.push(`<tr><td>x₀ CV across 6M and 12M, no padding, all windows (Discussion)</td><td>0.223–0.227</td><td>${lo.toFixed(3)}–${hi.toFixed(3)}</td><td class="${ok?'ok':'bad'}">${ok?'✓':'✗'}</td></tr>`);}}
+ const ph=(k,p)=>g(k)?g(k).final_phase_pct[p]:null;
+ add('12M, aggregated, no padding: Decelerating (%)',44.7,ph('p0_A_12_d0_m1','Deceleration'));
+ add('12M, monthly, no padding: Decelerating (%)',29.8,ph('p0_B_12_d0_m1','Deceleration'));
+ add('12M, aggregated, padded: Inflection (%)',72.8,ph('p100_A_12_d0_m1','Inflection'));
+ [3,6,12].forEach(w=>add(`${w}M, monthly, padded: Deactivated (%)`,25.4,ph(`p100_B_${w}_d0_m1`,'Deactivated')));
+ $('text-tbl').innerHTML=`<table><thead><tr><th>Cited number</th><th>Paper</th><th>Data</th><th></th></tr></thead><tbody>${rows.join('')}</tbody></table>`;
+ // S3
+ const S3={'A-3M':[27.2,10.5,39.5,22.8],'A-6M':[11.4,38.6,27.2,22.8],'A-12M':[4.4,72.8,0,22.8],'B-3M':[30.7,6.1,37.7,25.4],'B-6M':[29.8,12.3,32.5,25.4],'B-12M':[24.6,24.6,25.4,25.4]};
+ let m=0,t=0;const rs=ORDER.map(lab=>{const s=SUM[sk(100,lab)];if(!s)return `<tr><td>${lab}</td><td colspan="4" class="note">not generated</td></tr>`;
+  return `<tr><td>${lab}</td>${PHASES.map((p,i)=>{const d=s.final_phase_pct[p]||0,ok=Math.abs(d-S3[lab][i])<=0.051;t++;if(ok)m++;return `<td class="${ok?'ok':'bad'}">${fmt(d,1)} ${ok?'✓':'✗ <span class="note">'+S3[lab][i]+'</span>'}</td>`;}).join('')}</tr>`;});
+ $('s3-tbl').innerHTML=`<div class="note" style="margin-bottom:6px">${m} of ${t} values match.</div><table><thead><tr><th>Condition</th>${PHASES.map(p=>`<th>${p}</th>`).join('')}</tr></thead><tbody>${rs.join('')}</tbody></table>`;
+}
+
+
+function scnWords(k){const m=/^p(\d+)_([AB])_(\d+)_d(\d+)_m(\d+)$/.exec(k);if(!m)return k;return (m[1]==='0'?'No padding':m[1]+' zero-months padding')+' · '+(m[2]==='A'?'aggregate then fit':'monthly snapshot')+' · '+m[3]+'-month windows · ≥ '+m[4]+' documents · ≥ '+m[5]+' month(s) since first publication';}
+function renderClusters(){
+ const EV={paris:[2015,2016],covid:[2019,2021]},KINDS=['back','fwd','total','back_sat','fwd_sat'];
+ const KN={back:'backward',fwd:'forward',total:'total',back_sat:'backward, saturation',fwd_sat:'forward, saturation'};
+ const rows=[];
+ for(const [k,sc] of Object.entries(SUM))for(const kind of KINDS){const f=sc.folds[kind];if(!f||f.n<20)continue;
+  for(const [ev,[lo,hi]] of Object.entries(EV)){const p=f[ev]&&f[ev].p;if(p==null)continue;
+   const w=hi-lo,by=f.by_year,obs=by.slice(lo-2007,hi-2007+1).reduce((a,b)=>a+b,0);let tot=0,ge=0;
+   for(let s0=2007;s0<=2023-w;s0++){tot++;if(by.slice(s0-2007,s0-2007+w+1).reduce((a,b)=>a+b,0)>=obs)ge++;}
+   rows.push({k,kind,ev,n:f[ev].n,N:f.n,p,pl:ge/tot,ex:f.n*(w+1)/by.length});}}
+ const n=rows.length;if(!n){$('cl-tbl').innerHTML='<div class="note">No scenario has 20 or more folds.</div>';return;}
+ const ord=rows.map((r,i)=>i).sort((a,b)=>rows[a].p-rows[b].p);
+ let run=1;for(let j=n-1;j>=0;j--){const i=ord[j];run=Math.min(run,rows[i].p*n/(j+1));rows[i].q=run;}
+ const sig=rows.filter(r=>r.p<0.05).length,sigq=rows.filter(r=>r.q<0.05).length;
+ const card=(l,v,d)=>`<div class="card kpi" style="flex:1 1 150px"><div class="help" style="font-size:12px">${l}</div><div class="v">${v}</div><div class="d">${d||''}</div></div>`;
+ $('cl-kpis').innerHTML=card('Scenarios',fmt(Object.keys(SUM).length))+card('Tests run',fmt(n),'scenario × fold type × event')+card('Significant (p < 0.05)',fmt(sig),`≈ ${fmt(0.05*n)} expected by chance`)+card('After correction (q < 0.05)',fmt(sigq),'survive the many-scenario search');
+ const seen=new Set(),top=[];for(const i of ord){const r=rows[i];if(seen.has(r.k))continue;seen.add(r.k);top.push(r);if(top.length===15)break;}
+ const G=(k,x)=>{const f=SUM[k].folds[x];return f?[f.n,f.paris?f.paris.n:0,f.covid?f.covid.n:0,f.paris?f.paris.p:null,f.covid?f.covid.p:null]:[0,0,0,null,null];};
+ const pf=v=>v==null?'–':fmt(v,3);
+ const hd=(t,c)=>`<th colspan="3" class="grp ${c}">${t}</th>`,sub=c=>['Total','Back.','Fwd.'].map(x=>`<th class="num ${c}">${x}</th>`).join('');
+ $('cl-tbl').innerHTML=`<table><thead><tr><th rowspan="2">Scenario</th>${hd('All folds','g0')}${hd('In Paris 2015–16: folds (perm p)','g1')}${hd('In COVID 2019–21: folds (perm p)','g2')}<th rowspan="2" title="The test with the smallest p-value in this scenario">Strongest test</th><th rowspan="2" class="num" title="Benjamini-Hochberg q-value of the strongest test">BH q</th></tr><tr>${sub('g0')}${sub('g1')}${sub('g2')}</tr></thead><tbody>${top.map(r=>{const T=G(r.k,'total'),B=G(r.k,'back'),F=G(r.k,'fwd');const a=(i)=>`<td class="num g${i}">${fmt(T[i])}</td><td class="num g${i}">${fmt(B[i])}</td><td class="num g${i}">${fmt(F[i])}</td>`;const c=(i,pi)=>[T,B,F].map(X=>`<td class="num g${i}"><b>${fmt(X[i])}</b><br><span class="pv">p ${pf(X[pi])}</span></td>`).join('');return `<tr data-k="${esc(r.k)}" data-kind="${r.kind}" title="${esc(scnWords(r.k))}. All folds: ${fmt(T[0])} (${fmt(B[0])} backward, ${fmt(F[0])} forward). Paris 2015–16: total ${fmt(T[1])} (p ${pf(T[3])}), backward ${fmt(B[1])} (p ${pf(B[3])}), forward ${fmt(F[1])} (p ${pf(F[3])}). COVID 2019–21: total ${fmt(T[2])} (p ${pf(T[4])}), backward ${fmt(B[2])} (p ${pf(B[4])}), forward ${fmt(F[2])} (p ${pf(F[4])}). Strongest test: ${KN[r.kind]} folds, ${r.ev==='paris'?'Paris':'COVID'}; ${fmt(100*r.pl,0)}% of other windows of the same width hold at least as many folds. Click to load this scenario into the charts above."><td>${esc(scnWords(r.k))}</td>${a(0)}${c(1,3)}${c(2,4)}<td>${KN[r.kind]}, ${r.ev==='paris'?'Paris':'COVID'}</td><td class="num">${fmt(r.q,3)}</td></tr>`;}).join('')}</tbody></table>`;
+ $('cl-tbl').onclick=e=>{const tr=e.target.closest('tr[data-k]');if(!tr)return;const m=/^p(\d+)_([AB])_(\d+)_d(\d+)_m(\d+)$/.exec(tr.dataset.k);if(!m)return;Object.assign(st,{pad:+m[1],ap:m[2],W:+m[3],docs:+m[4],months:+m[5],sat:/_sat$/.test(tr.dataset.kind)});update();const f=$('folds');if(f)f.scrollIntoView({behavior:'smooth',block:'center'});};
+ const cs=rows.filter(r=>r.ev==='covid'),ps=rows.filter(r=>r.ev==='paris');
+ $('cl-read').innerHTML=`<b style="color:var(--ink)">How to read this.</b> Across ${fmt(n)} tests, ${fmt(sig)} reach p < 0.05 where about ${fmt(0.05*n)} would be expected by chance alone, and ${fmt(sigq)} survive correction. Paris: ${fmt(ps.filter(r=>r.p<0.05).length)} of ${fmt(ps.length)} tests below 0.05; COVID: ${fmt(cs.filter(r=>r.p<0.05).length)} of ${fmt(cs.length)}. `+(sig===0?'No choice of padding, frequency, minimum documents or minimum months produces a significant clustering of folds at either event. ':'')+`Several rows share exactly the same p-value because they are the same fits under slightly different rules, so they are not independent findings: they are the same bump keeps reappearing. The tallest bars in the histograms (for example backward folds in 2015) are real counts, but similar-sized bars occur in other years, which is what the placebo column measures. The page therefore shows the counts and does not claim that Paris or COVID caused fold clustering.`;
+}
+/* ---------- main ---------- */
+function renderNote(){
+ const s=SUM[key(st)];
+ $('scenario-note').innerHTML=`<b style="color:var(--ink)">Scenario:</b> ${st.pad?'100 zero-months':'no padding'} · ${st.ap==='A'?'A aggregated':'B monthly snapshot'} · ${st.W}M · ≥ ${st.docs} documents · ≥ ${st.months} month(s). <b style="color:var(--blue)">Baseline:</b> no padding · A · 6M · 0 documents · fit from the first window. Moving a control changes only the scenario.`+(s?'':' <b class="bad">This scenario has not been generated.</b>');
+}
+function safe(name,fn){try{return fn();}catch(e){console.error(name,e);const m=document.getElementById('err');m.style.display='block';m.innerHTML+=`<div>${esc(name)}: ${esc(e.message)}</div>`;}}
+async function update(){document.getElementById('err').innerHTML='';document.getElementById('err').style.display='none';
+ safe('Controls',syncControls);safe('Scenario note',renderNote);safe('Tiles',()=>{$('kpis').innerHTML=kpiHTML();});
+ safe('Authors analyzed',renderCount);safe('Fold events',renderFolds);safe('Inflection clusters',renderKde);safe('Phase mix',renderPhase);
+ try{await renderCountries();}catch(e){safe('Countries',()=>{throw e;});}}
+async function init(){
+ buildControls();
+ try{[MAN,SUM]=await Promise.all([getJSON('manifest.json'),getJSON('scenario_summaries.json')]);}
+ catch(e){document.querySelector('main').insertAdjacentHTML('afterbegin',`<div class="box">The data for this page could not be loaded. Please try again later.</div>`);return;}
+ $('prov').innerHTML=`Data file: <b>${esc(MAN.data_file||'')}</b> (${fmt(MAN.data_bytes)} bytes, md5 ${esc((MAN.data_md5||'').slice(0,10))}…). Built ${esc(MAN.built||'')}. ${fmt(Object.keys(SUM).length)} scenarios, ${fmt(MAN.n_entities)} entities. <br><b>Rules in force:</b> 199 data months (July 2023 end); padded runs prepend 100 zero-months (299 in total); window step δ = 1/(n−1), which at A-6M (34 windows) is 0.030 of 199 months ≈ 6.0 months ≈ 183 days; x₀ capped at 1.3; a fold needs x₀ ≤ 1 in both windows. <br>Fits come from <code>sensitivity_analysis_comparison_2_1_2_1_with_forward.py</code>; min documents and min months only choose which windows are kept.`;
+ safe("Cluster tests",renderClusters);update();
+}
+init();
+</script>
+</body>
+</html>
