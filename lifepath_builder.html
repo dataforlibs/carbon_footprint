@@ -78,6 +78,7 @@ code{background:#eef1f6;border-radius:4px;padding:1px 5px;font-size:13.5px}
 <h2>3. The lifepaths</h2>
 <div class="card" id="res" style="display:none">
   <div class="note" id="title" style="font-weight:700;color:var(--ink);font-size:16px"></div>
+  <div class="row" style="margin-bottom:8px"><span class="note">Count folds by</span><select id="fm"><option value="cal">calendar rule: x₀ moves back more than the threshold</option><option value="post">post-convergence: x₀ ≤ 1 before and after</option><option value="pers">persistence: the lower x₀ also holds at the next snapshot</option></select><span class="note">threshold (days)</span><input id="thr" type="number" min="1" max="2000" value="183" style="width:80px"></div>
   <div class="chips" id="chips"></div>
   <div class="leg"><span><i style="background:var(--teal);border-radius:2px;width:16px;height:4px"></i>Fold, calendar rule</span><span><i style="background:var(--purple);border-radius:2px;width:16px;height:4px"></i>Also post-convergence</span></div>
   <svg id="plot" viewBox="0 0 1000 470" role="img" aria-label="Lifepaths with phases and folds" style="border:1.5px solid #e9826c;border-radius:18px;box-shadow:0 4px 14px rgba(0,0,0,.18);background:#fff"></svg>
@@ -145,6 +146,12 @@ function lifepath(dates,counts,N){ // dates: window-end ms on the common grid; c
     if(back>183){var nx=pts[i+1];folds.push({i:i,s:b.s,x0d:a.x,x1d:b.x,back:back,phase:b.c,post:(a.x0<=1&&b.x0<=1),holds:nx?nx.x<a.x:null});}}
   return {pts:pts,folds:folds};
 }
+function foldsOf(pts,method,thr){var out=[];
+  for(var i=1;i<pts.length;i++){var a=pts[i-1],b=pts[i],back=(a.x-b.x)/DAY;if(!(back>thr))continue;
+    var nx=pts[i+1],post=(a.x0<=1&&b.x0<=1),holds=nx?nx.x<a.x:null;
+    if(method==='post'&&!post)continue;if(method==='pers'&&holds!==true)continue;
+    out.push({i:i,s:b.s,x0d:a.x,x1d:b.x,back:back,phase:b.c,post:post,holds:holds});}
+  return out;}
 function eom(y,m){return Date.UTC(y,m,0);} // last day of month m (1-12)
 function buildGrid(sy,sm,ey,em,f){var out=[],y=sy,m=sm,end=Date.UTC(ey,em,0);
   while(true){var t=eom(y,m);if(t>end)break;out.push(t);m+=f;while(m>12){m-=12;y++;}}
@@ -221,18 +228,19 @@ function add(name,res,src,npub,n){
 }
 function render(){
   $('res').style.display='block';
+  var FM=$('fm').value,TH=Math.max(1,parseFloat($('thr').value)||183);SER.forEach(function(e){e.folds=foldsOf(e.pts,FM,TH);});
   var A=SER.filter(function(e){return e.name===active;})[0]||SER[SER.length-1];if(!A)return;
   $('act').innerHTML=SER.map(function(e){return '<option'+(e.name===A.name?' selected':'')+'>'+e.name+'</option>';}).join('');
-  $('title').textContent=SER.length===1?A.name+' · '+A.src:SER.length+' lifepaths on the same grid: '+SER.map(function(e){return e.name;}).join(', ');
-  var pts=A.pts,res=A.res,cnt={green:0,blue:0,red:0,black:0};pts.forEach(function(p){cnt[p.c]++;});
+  $('title').textContent=SER.length===1?A.name+' · '+A.src:SER.length+' lifepaths on the same grid: '+SER.map(function(e){return e.name;}).join(', ')+' (cards below total all of them)';
+  var pts=A.pts,res={folds:A.folds},cnt={green:0,blue:0,red:0,black:0},allF=[],anyPts=0;SER.forEach(function(e){anyPts+=e.pts.length;e.pts.forEach(function(p){cnt[p.c]++;});allF=allF.concat(e.folds);});
   var F={green:'#639922',blue:'#4169e1',red:'#e9735a',black:'#2b2b2b'};
-  var post=res.folds.filter(function(f){return f.post;}).length;
-  $('chips').innerHTML=pts.length?'<div class="chip" style="--c:var(--teal)"><b>'+res.folds.length+'</b>fold'+(res.folds.length===1?'':'s')+', calendar rule</div><div class="chip" style="--c:var(--purple)"><b>'+post+'</b>post-convergence</div>'+['green','blue','red','black'].map(function(c){return '<div class="chip" style="--c:'+F[c]+'"><b>'+cnt[c]+'</b>'+PH[c].toLowerCase()+'</div>';}).join(''):'<span class="err">No fit possible: not enough publications.</span>';
+  var post=allF.filter(function(f){return f.post;}).length;
+  $('chips').innerHTML=anyPts?'<div class="chip" style="--c:var(--teal)"><b>'+allF.length+'</b>fold'+(allF.length===1?'':'s')+', '+({cal:'calendar rule',post:'post-convergence rule',pers:'persistence rule'})[FM]+'</div><div class="chip" style="--c:var(--purple)"><b>'+post+'</b>post-convergence</div>'+['green','blue','red','black'].map(function(c){return '<div class="chip" style="--c:'+F[c]+'"><b>'+cnt[c]+'</b>'+PH[c].toLowerCase()+'</div>';}).join(''):'<span class="err">No fit possible: not enough publications.</span>';
   drawLifepath($('plot'),SER.filter(function(e){return e.pts.length;}));
   $('ctab').querySelector('tbody').innerHTML=SER.map(function(e){var l=e.pts[e.pts.length-1];return '<tr><td><span style="display:inline-block;width:14px;height:3px;background:'+(e.line||'#9a9a9a')+';vertical-align:middle;margin-right:6px"></span>'+e.name+'</td><td>'+e.pts.length+'</td><td>'+e.npub+'</td><td>'+e.folds.length+'</td><td>'+e.folds.filter(function(f){return f.post;}).length+'</td><td>'+(l?PH[l.c]:'n/a')+'</td></tr>';}).join('');
   $('ftab').querySelector('tbody').innerHTML=res.folds.length?res.folds.map(function(f){return '<tr><td>'+fd(f.s)+'</td><td>'+fd(f.x0d)+'</td><td>'+fd(f.x1d)+'</td><td><b>'+Math.round(f.back)+' days</b></td><td>'+PH[f.phase]+'</td><td>'+(f.post?'yes':'no')+'</td><td>'+(f.holds===null?'n/a':(f.holds?'yes':'no'))+'</td></tr>';}).join(''):'<tr><td colspan="7">No backward move of more than 183 days.</td></tr>';
 }
-$('act').onchange=function(){active=this.value;render();};
+$('act').onchange=function(){active=this.value;render();};$('fm').onchange=render;$('thr').onchange=render;
 $('clr').onclick=function(){SER=[];active=null;$('res').style.display='none';};
 function runOwn(){
   var m=$('msg');m.className='note';m.textContent='';
