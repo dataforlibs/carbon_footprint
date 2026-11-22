@@ -78,3 +78,15 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', build); else build();
 })();
+
+/* Visit counting with GoatCounter (cookieless; country, referrer, page). Loaded from here so that
+   every page that includes nav.js is counted. Local previews and admin.html are not counted. */
+(function () {
+  var CODE = 'dataforlibs';
+  var h = location.hostname, p = location.pathname;
+  if (!CODE || h === 'localhost' || h === '127.0.0.1' || h === '[::1]' || h === '' || /\/admin\.html$/.test(p)) return;
+  var g = document.createElement('script');
+  g.async = true; g.src = 'https://gc.zgo.at/count.js';
+  g.setAttribute('data-goatcounter', 'https://' + CODE + '.goatcounter.com/count');
+  document.head.appendChild(g);
+})();

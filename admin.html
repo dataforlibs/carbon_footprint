@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Visitor analytics (admin)</title>
+<style>
+  :root{--ink:#1f2933;--mut:#52606d;--line:#d9e2ec;--bar:#3174f4;--bg:#f5f7fa}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+  .wrap{max-width:1100px;margin:0 auto;padding:24px 16px}
+  h1{font-size:24px;margin:0 0 4px} .sub{color:var(--mut);margin:0 0 18px;font-size:14px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:16px}
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+  label{font-size:13px;color:var(--mut)} input,select{display:block;margin-top:2px;padding:8px 10px;border:1px solid #9aa5b1;border-radius:6px;font-size:14px;min-width:230px}
+  button{padding:9px 16px;border:0;border-radius:6px;background:#1d4fb8;color:#fff;font-size:14px;cursor:pointer} button:disabled{opacity:.6}
+  .note{font-size:13px;color:var(--mut);line-height:1.5;margin:10px 0 0}
+  .err{background:#fdecea;border:1px solid #f5c2c0;color:#7a1f1a;padding:12px;border-radius:6px;margin:12px 0;font-size:14px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-top:16px}
+  .big{font-size:34px;font-weight:700;margin:0} h3{margin:0 0 10px;font-size:16px}
+  .it{margin-bottom:6px}.it .t{display:flex;justify-content:space-between;font-size:13px;gap:8px}
+  .it .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap} .trk{height:6px;background:#e4e7eb;border-radius:3px}.fil{height:6px;background:var(--bar);border-radius:3px}
+  svg{width:100%;height:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Visitor analytics</h1>
+  <p class="sub">Who visits the Carbon Footprint Research site, from which countries and which referring sites. Admin only: not linked from the menu.</p>
+  <div class="card">
+    <div class="row">
+      <label>GoatCounter site code<input id="code" value="dataforlibs"></label>
+      <label>API key (read-only)<input id="tok" type="password" autocomplete="off" placeholder="paste key; kept only in this tab"></label>
+      <label>Period<select id="days"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option><option value="365">Last 365 days</option></select></label>
+      <label style="align-self:flex-end"><input id="only" type="checkbox" style="display:inline;min-width:0;margin-right:6px">only this site's pages</label>
+      <button id="go">Load statistics</button>
+    </div>
+    <p class="note">The key is typed here and stays in this browser tab only; it is not stored in the site files. Counting is cookieless; countries are derived from IP addresses and are approximate. Visits from localhost and to this page are not counted. "Only this site's pages" keeps pages whose address starts with /carbon_footprint/ (the same GoatCounter account also counts other dataforlibs sites).</p>
+  </div>
+  <div id="err" class="err" hidden></div>
+  <div id="out"></div>
+</div>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var PREFIX = '/carbon_footprint/';
+  try { $('tok').value = sessionStorage.getItem('gcTokC') || ''; $('code').value = sessionStorage.getItem('gcCodeC') || 'dataforlibs'; } catch (e) {}
+  function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function gc(base, tok, path, params) {
+    var q = new URLSearchParams(params);
+    return fetch(base + '/api/v0/' + path + '?' + q.toString(), { headers: { Authorization: 'Bearer ' + tok, 'Content-Type': 'application/json' } }).then(function (r) {
+      if (r.status === 429) throw new Error('GoatCounter rate limit (4 requests/second); try again in a moment.');
+      if (r.status === 401 || r.status === 403) throw new Error('GoatCounter rejected the API key (check the key and that it can read statistics).');
+      if (!r.ok) throw new Error('GoatCounter returned HTTP ' + r.status);
+      return r.json();
+    });
+  }
+  function bars(title, rows, note) {
+    var max = Math.max.apply(null, [1].concat(rows.map(function (r) { return r.count; })));
+    var h = '<div class="card"><h3>' + esc(title) + '</h3>' + (note ? '<p class="note" style="margin:0 0 8px">' + esc(note) + '</p>' : '');
+    if (!rows.length) h += '<p class="note">No data in this period.</p>';
+    rows.forEach(function (r) {
+      var nm = r.name || '(direct / unknown)';
+      h += '<div class="it"><div class="t"><span class="n" title="' + esc(nm) + '">' + esc(nm) + '</span><strong>' + r.count.toLocaleString() + '</strong></div><div class="trk"><div class="fil" style="width:' + (100 * r.count / max) + '%"></div></div></div>';
+    });
+    return h + '</div>';
+  }
+  function daily(days) {
+    var W = 640, H = 150, P = 24, max = Math.max.apply(null, [1].concat(days.map(function (d) { return d.count; }))), bw = days.length ? (W - 2 * P) / days.length : 0;
+    var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Page views per day">';
+    days.forEach(function (d, i) { var h = (H - 2 * P) * d.count / max; s += '<rect x="' + (P + i * bw + .5) + '" y="' + (H - P - h) + '" width="' + Math.max(1, bw - 1) + '" height="' + h + '" fill="#3174f4"><title>' + d.day + ': ' + d.count + '</title></rect>'; });
+    s += '<line x1="' + P + '" y1="' + (H - P) + '" x2="' + (W - P) + '" y2="' + (H - P) + '" stroke="#9aa5b1"/>';
+    if (days.length) s += '<text x="' + P + '" y="' + (H - 6) + '" font-size="11" fill="#52606d">' + days[0].day + '</text><text x="' + (W - P) + '" y="' + (H - 6) + '" font-size="11" fill="#52606d" text-anchor="end">' + days[days.length - 1].day + '</text>';
+    return s + '<text x="' + P + '" y="14" font-size="11" fill="#52606d">peak ' + max + '/day</text></svg>';
+  }
+  async function load() {
+    var code = $('code').value.trim(), tok = $('tok').value.trim(), days = Number($('days').value);
+    var err = $('err'); err.hidden = true; $('out').innerHTML = '';
+    if (!code || !tok) { err.textContent = 'Enter the GoatCounter site code and an API key first.'; err.hidden = false; return; }
+    try { sessionStorage.setItem('gcTokC', tok); sessionStorage.setItem('gcCodeC', code); } catch (e) {}
+    var base = 'https://' + code + '.goatcounter.com', btn = $('go'); btn.disabled = true; btn.textContent = 'Loading…';
+    var end = new Date(), start = new Date(end.getTime() - days * 86400000), range = { start: start.toISOString(), end: end.toISOString() };
+    var notice = '';
+    try {
+      if ($('only').checked) {
+        try {
+          var pj = await gc(base, tok, 'paths', { limit: 200 }); await sleep(300);
+          var ids = (pj.paths || []).filter(function (p) { return !p.event && p.path.indexOf(PREFIX) === 0; }).map(function (p) { return p.id; });
+          if (ids.length) { range['include_paths'] = ids.join(','); } else { notice = 'No pages with the /carbon_footprint/ prefix were found yet, so all pages are shown.'; }
+          if (pj.more) notice += ' (More than 200 paths exist; the filter covers the first 200.)';
+        } catch (e) { notice = 'Could not filter to this site (' + e.message + '); showing all pages.'; }
+      }
+      var total = await gc(base, tok, 'stats/total', Object.assign({ group: 'day' }, range)); await sleep(300);
+      var hits = await gc(base, tok, 'stats/hits', Object.assign({ limit: 20 }, range)); await sleep(300);
+      var loc = await gc(base, tok, 'stats/locations', Object.assign({ limit: 25 }, range)); await sleep(300);
+      var refs = await gc(base, tok, 'stats/toprefs', Object.assign({ limit: 20 }, range)); await sleep(300);
+      var br = await gc(base, tok, 'stats/browsers', Object.assign({ limit: 10 }, range)); await sleep(300);
+      var sy = await gc(base, tok, 'stats/systems', Object.assign({ limit: 10 }, range)); await sleep(300);
+      var la = await gc(base, tok, 'stats/languages', Object.assign({ limit: 10 }, range));
+      var dl = (total.stats || []).map(function (s) { return { day: s.day, count: s.daily != null ? s.daily : (s.hourly || []).reduce(function (a, b) { return a + b; }, 0) }; });
+      var pages = (hits.hits || []).filter(function (h) { return !h.event; }).map(function (h) { return { name: (h.title ? h.title + '  ' : '') + h.path, count: h.count }; });
+      var S = function (o) { return (o && o.stats) || []; };
+      $('out').innerHTML =
+        (notice ? '<p class="note">' + esc(notice) + '</p>' : '') +
+        '<div class="grid"><div class="card"><p class="big">' + (total.total || 0).toLocaleString() + '</p><div class="note" style="margin:0">page views, last ' + days + ' days</div></div>' +
+        '<div class="card"><p class="big">' + S(loc).length + '</p><div class="note" style="margin:0">countries in the top ' + S(loc).length + '</div></div>' +
+        '<div class="card"><p class="big">' + S(refs).length + '</p><div class="note" style="margin:0">referring sources in the top ' + S(refs).length + '</div></div></div>' +
+        '<div class="card" style="margin-top:16px"><h3>Page views per day</h3>' + daily(dl) + '</div>' +
+        '<div class="grid">' + bars('Where visitors come from (countries)', S(loc)) + bars('Referrers (where they clicked from)', S(refs), 'Empty means a direct visit, a bookmark, or a source that hides its address.') +
+        bars('Most viewed pages', pages) + bars('Languages', S(la)) + bars('Browsers', S(br)) + bars('Operating systems', S(sy)) + '</div>';
+    } catch (e) {
+      var m = String(e.message || e);
+      err.textContent = /Failed to fetch|NetworkError|Load failed/i.test(m) ? 'The browser could not reach the GoatCounter API (wrong site code, or the API does not allow requests from this page). The same numbers are on your GoatCounter dashboard: ' + base : m;
+      err.hidden = false;
+    }
+    btn.disabled = false; btn.textContent = 'Load statistics';
+  }
+  $('go').addEventListener('click', load);
+  $('days').addEventListener('change', function () { if ($('tok').value) load(); });
+})();
+</script>
+</body>
+</html>
