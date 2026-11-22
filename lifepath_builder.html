@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Draw a lifepath · companion site to the QSS paper</title>
+<meta name="description" content="Paste a publication series, fit the sigmoid lifepath in your browser, and see its phases and time folds.">
+<style>
+:root{--ink:#1d2433;--mut:#5d6778;--line:#dfe3dc;--bg:#f6f7f4;--blue:#2b4fa0;--acc:#3174f4;--teal:#1D9E75;--purple:#534AB7}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1000px;margin:0 auto;padding:0 20px}
+.hero{background:#fff;border-bottom:1px solid var(--line)}
+.hero .wrap{padding:36px 20px 30px}
+.eyebrow{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--acc);font-weight:700}
+h1{margin:6px 0 12px;font-size:clamp(26px,4vw,36px);line-height:1.15;font-weight:780}
+.lead{font-size:18px;color:#2f3a4d;max-width:780px;margin:0}
+main .wrap{padding-top:6px;padding-bottom:50px}
+h2{font-size:22px;margin:30px 0 10px;font-weight:740}
+p{margin:0 0 12px;max-width:780px}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-bottom:14px}
+.row{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-bottom:10px}
+select,input[type=text],textarea{font:inherit;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:#fff}
+textarea{width:100%;height:150px;font:13px/1.4 ui-monospace,Menlo,Consolas,monospace}
+button{font:inherit;font-weight:650;padding:8px 16px;border-radius:8px;border:1px solid var(--blue);background:var(--blue);color:#fff;cursor:pointer}
+button.s{background:#fff;color:var(--blue)}
+button:disabled{opacity:.5;cursor:default}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.chip{border:1px solid var(--line);border-left:4px solid var(--c,#9aa3b2);border-radius:6px;padding:6px 10px;background:#fff;font-size:14px}
+.chip b{font-size:18px;margin-right:4px}
+.leg{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--mut);margin:6px 0}
+.leg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+#plot,#cum{width:100%;height:auto;display:block}
+svg text{font:12px Inter,ui-sans-serif,system-ui,sans-serif;fill:#5d6778}
+table{border-collapse:collapse;background:#fff;border:1px solid var(--line);font-size:14px;width:100%}
+th,td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:left}
+th{background:#f0f3f8}
+.note{font-size:14px;color:var(--mut);max-width:800px}
+.err{color:#a32d2d;font-weight:600}
+code{background:#eef1f6;border-radius:4px;padding:1px 5px;font-size:13.5px}
+.mine{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.mine span{border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:13px;background:#fff;cursor:pointer}
+.mine span.on{border-color:var(--blue);background:#eef3fb}
+</style>
+<script src="nav.js" defer></script>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Companion site to the paper</div>
+  <h1>Draw a lifepath</h1>
+  <p class="lead">Pick a country from the paper, or paste one publication series of your own. The page fits the sigmoid curve at every half-yearly snapshot, in your browser, and draws the lifepath with its phases and time folds.</p>
+</div></header>
+<main><div class="wrap">
+
+<h2>1. Set the period and frequency</h2>
+<div class="card">
+  <div class="row">
+    <label><b>From</b> <input type="month" id="sM" value="2007-01"></label>
+    <label><b>To</b> <input type="month" id="eM" value="2023-07"></label>
+    <label><b>Refit every</b> <select id="fq"><option value="3">3 months</option><option value="6" selected>6 months</option><option value="12">12 months</option></select></label>
+    <button id="reset" class="s">Use the paper's settings</button>
+  </div>
+  <p class="note" style="margin:4px 0 0" id="setNote"></p>
+</div>
+
+<h2>2. Add a lifepath</h2>
+<div class="card">
+  <div class="row"><label><b>From the paper</b></label><select id="paperSel"><option>Loading countries…</option></select>
+    <button id="goPaper" class="s">Add this country</button><span id="paperNote" class="note"></span></div>
+  <div class="row" style="margin-top:14px"><label for="nm"><b>Your own series</b></label><input type="text" id="nm" value="My example" size="22" aria-label="Name of the series"></div>
+  <textarea id="inp" spellcheck="false" aria-label="Publication dates or counts" placeholder="One publication date per line:&#10;2011-03-14&#10;2011-03-15&#10;2012-09-02&#10;&#10;or counts, as date,count:&#10;2011-03,2&#10;2012-09,1"></textarea>
+  <div class="row" style="margin-top:10px"><button id="goOwn">Add my lifepath</button><button id="demo" class="s">Fill with a demo series</button><span id="msg" class="note"></span></div>
+  <p class="note" style="margin:6px 0 0">Dates as <code>YYYY-MM-DD</code> or <code>YYYY-MM</code>. A line with a comma, tab or semicolon is read as <code>date,count</code>. Publications before the first window count in it; those after the last are ignored. Nothing leaves your browser.</p>
+  <p class="note" style="margin:6px 0 0"><b>To compare lifepaths, add them under the same settings.</b> Every lifepath on this page is fitted on the same grid of windows, so they can be drawn together. If you change the period or frequency, the lifepaths already added are cleared, because they would no longer be comparable.</p>
+  <div class="mine" id="mine"></div>
+</div>
+
+<h2>3. The lifepaths</h2>
+<div class="card" id="res" style="display:none">
+  <div class="note" id="title" style="font-weight:700;color:var(--ink);font-size:16px"></div>
+  <div class="chips" id="chips"></div>
+  <div class="leg"><span><i style="background:var(--teal);border-radius:2px;width:16px;height:4px"></i>Fold, calendar rule</span><span><i style="background:var(--purple);border-radius:2px;width:16px;height:4px"></i>Also post-convergence</span></div>
+  <svg id="plot" viewBox="0 0 1000 470" role="img" aria-label="Lifepaths with phases and folds" style="border:1.5px solid #e9826c;border-radius:18px;box-shadow:0 4px 14px rgba(0,0,0,.18);background:#fff"></svg>
+  <div class="row" style="margin-top:12px"><span class="note">Show details for</span><select id="act"></select><button id="clr" class="s">Clear all</button><button id="dl" class="s">Download the points (CSV)</button></div>
+  <h3 style="font-size:16px;margin:12px 0 6px">Comparison</h3>
+  <table id="ctab"><thead><tr><th>Lifepath</th><th>Snapshots</th><th>Publications</th><th>Folds, calendar rule</th><th>Post-convergence</th><th>Last phase</th></tr></thead><tbody></tbody></table>
+  <h3 style="font-size:16px;margin:14px 0 6px">Folds of the selected lifepath</h3>
+  <table id="ftab"><thead><tr><th>Snapshot</th><th>x₀ before</th><th>x₀ after</th><th>Move back</th><th>Phase after</th><th>Post-convergence</th><th>Holds next window</th></tr></thead><tbody></tbody></table>
+</div>
+
+<h2>How it works</h2>
+<p>For each half-yearly snapshot the cumulative publications are scaled to 1, padded with zero windows before the first one (135 minus the snapshot number, as in the paper), and a three-parameter sigmoid is fitted. Each fit gives an inflection time x₀, a steepness k and a ceiling A. The lifepath point is x₀, converted to a date, against the log of k. Phases follow the point files of the paper: <b>Deactivated</b> if the fitted ceiling is less than 5% above the current total; otherwise <b>Inflection</b> if x₀ lies within 30 days of the snapshot date, <b>Acceleration</b> if it lies later, and <b>Deceleration</b> if it lies earlier.</p>
+<p>Folds are backward moves of x₀ of more than 183 days between consecutive snapshots (see <a href="time_folds.html">Time folds</a>). A fold is also marked post-convergence when x₀ is within the observation window (not beyond 1) in both snapshots.</p>
+<p class="note">The fit is done by a small optimiser in the browser, not by the same library as the paper. On the paper's 114 countries it reproduces the phases and dates closely, but early snapshots with very few publications are numerically fragile, and a date can differ by a few weeks. For published results use the scripts in the package.</p>
+
+</div></main>
+<script>
+/*CORE*/
+var DAY=86400000;
+function sigGrid(x,y){ // returns best (x0,k,A) by variable projection
+  var n=x.length,syy=0,i;for(i=0;i<n;i++)syy+=y[i]*y[i];
+  function ev(x0,k){x0=Math.min(x0,1.32);var sfy=0,sff=0,i,z,f;for(i=0;i<n;i++){z=-k*(x[i]-x0);f=z>40?0:(z<-40?1:1/(1+Math.exp(z)));sfy+=f*y[i];sff+=f*f;}
+    if(sff<1e-12)return {sse:syy,A:0};var A=sfy/sff;return {sse:syy-sfy*sfy/sff,A:A};}
+  var cands=[],x0,j;
+  for(x0=-0.5;x0<=1.3201;x0+=0.05)for(j=0;j<40;j++){var k=0.5*Math.pow(1200,j/39),r=ev(x0,k);if(r.A>0)cands.push([r.sse,x0,Math.log(k)]);}
+  cands.sort(function(a,b){return a[0]-b[0];});
+  var starts=[],c;for(c=0;c<cands.length&&starts.length<4;c++){var ok=true;for(j=0;j<starts.length;j++)if(Math.abs(starts[j][1]-cands[c][1])<0.12&&Math.abs(starts[j][2]-cands[c][2])<0.5){ok=false;break;}if(ok)starts.push(cands[c]);}
+  function obj(p){var k=Math.exp(Math.min(p[1],8)),r=ev(p[0],k);return r.A>0?r.sse:1e9;}
+  var best=null;
+  starts.forEach(function(s){
+    var sim=[[s[1],s[2]],[s[1]+0.05,s[2]],[s[1],s[2]+0.2]],fv=sim.map(obj),it;
+    for(it=0;it<400;it++){
+      var o=[0,1,2].sort(function(a,b){return fv[a]-fv[b];});sim=o.map(function(q){return sim[q];});fv=o.map(function(q){return fv[q];});
+      var cx=[(sim[0][0]+sim[1][0])/2,(sim[0][1]+sim[1][1])/2];
+      function pt(t){return [cx[0]+t*(sim[2][0]-cx[0]),cx[1]+t*(sim[2][1]-cx[1])];}
+      var r=pt(-1),fr=obj(r);
+      if(fr<fv[0]){var e=pt(-2),fe=obj(e);if(fe<fr){sim[2]=e;fv[2]=fe;}else{sim[2]=r;fv[2]=fr;}}
+      else if(fr<fv[1]){sim[2]=r;fv[2]=fr;}
+      else{var cc=pt(fr<fv[2]?-0.5:0.5),fc=obj(cc);if(fc<Math.min(fr,fv[2])){sim[2]=cc;fv[2]=fc;}else{for(var q=1;q<3;q++){sim[q]=[sim[0][0]+0.5*(sim[q][0]-sim[0][0]),sim[0][1]+0.5*(sim[q][1]-sim[0][1])];fv[q]=obj(sim[q]);}}}
+      if(Math.abs(fv[2]-fv[0])<1e-14&&Math.abs(sim[2][0]-sim[0][0])<1e-9)break;
+    }
+    var k=Math.exp(Math.min(sim[0][1],8)),rr=ev(sim[0][0],k);
+    if(rr.A>0&&(!best||fv[0]<best.sse))best={x0:Math.min(sim[0][0],1.32),k:k,A:rr.A,sse:fv[0]};
+  });
+  return best;
+}
+function dateMs(y,m,d){return Date.UTC(y,m-1,d);}
+function lifepath(dates,counts,N){ // dates: window-end ms on the common grid; counts per window; N: padded length in windows
+  var REF=dates[0]-214*DAY,pts=[],cum=0,i,j,seen=false;
+  for(i=0;i<dates.length;i++){
+    cum+=counts[i];if(cum<=0)continue;
+    if(!seen){seen=true;continue;} // the first snapshot with data is not fitted, as in the point files
+    var cs=[],run=0;for(j=0;j<=i;j++){run+=counts[j];cs.push(run);}
+    var pad=Math.max(0,N-i),n=pad+cs.length,x=[],y=[];
+    for(j=0;j<n;j++){x.push(j/(n-1));y.push(j<pad?0:cs[j-pad]/run);}
+    var f=sigGrid(x,y);if(!f)continue;
+    var daysI=(dates[i]-REF)/DAY,v=f.x0,sc;
+    if(v<=1)sc=i+v*(daysI-i);else{v=Math.min(v,1.32);sc=daysI+(v-1)*(daysI-i);}
+    var xd=REF+Math.round(sc)*DAY,dd=Math.round((xd-dates[i])/DAY);
+    var col=f.A<1.05?'black':(Math.abs(dd)<=30?'blue':(dd>0?'green':'red'));
+    pts.push({i:i,o:cum,s:dates[i],x:xd,x0:f.x0,k:f.k,A:f.A,y:Math.log(f.k+0.001),c:col,cum:cum});
+  }
+  var folds=[];
+  for(i=1;i<pts.length;i++){var a=pts[i-1],b=pts[i],back=(a.x-b.x)/DAY;
+    if(back>183){var nx=pts[i+1];folds.push({i:i,s:b.s,x0d:a.x,x1d:b.x,back:back,phase:b.c,post:(a.x0<=1&&b.x0<=1),holds:nx?nx.x<a.x:null});}}
+  return {pts:pts,folds:folds};
+}
+function eom(y,m){return Date.UTC(y,m,0);} // last day of month m (1-12)
+function buildGrid(sy,sm,ey,em,f){var out=[],y=sy,m=sm,end=Date.UTC(ey,em,0);
+  while(true){var t=eom(y,m);if(t>end)break;out.push(t);m+=f;while(m>12){m-=12;y++;}}
+  return out;}
+function parseInput(text){
+  var ev=[],bad=0;
+  text.split(/\r?\n/).forEach(function(l){
+    l=l.trim();if(!l||l[0]==='#')return;
+    var parts=l.split(/[,;\t]/),ds=parts[0].trim(),w=parts.length>1?parseFloat(parts[1]):1;
+    var m=/^(\d{4})-(\d{1,2})(?:-(\d{1,2}))?/.exec(ds);
+    if(!m||isNaN(w)){bad++;return;}
+    ev.push([Date.UTC(+m[1],+m[2]-1,m[3]?+m[3]:15),w]);
+  });
+  return {ev:ev,bad:bad};
+}
+function binToGrid(ev,grid){ // publications before the first window end count in window 0; after the last end are dropped
+  var cnt=grid.map(function(){return 0;}),dropped=0;
+  ev.forEach(function(e){var j=0;while(j<grid.length&&grid[j]<e[0])j++;if(j>=grid.length){dropped+=e[1];return;}cnt[j]+=e[1];});
+  return {counts:cnt,dropped:dropped};
+}
+/*ENDCORE*/
+var fd=function(t){return new Date(t).toISOString().slice(0,10);};
+function drawLifepath(svg,series){
+  var W=1000,H=470,L=64,R=26,T=22,B=52,xmin=Date.UTC(2007,0,1),xmax=Date.UTC(2040,0,1),omax=1;
+  series.forEach(function(S){S.pts.forEach(function(p){if(p.x>xmax)xmax=Date.UTC(new Date(p.x).getUTCFullYear()+1,0,1);if(p.o>omax)omax=p.o;});});
+  var px=function(v){return L+(v-xmin)/(xmax-xmin)*(W-L-R);},py=function(v){return T+Math.min(10,Math.max(0,v))/10*(H-T-B);};
+  var F={green:['#639922','#27500a'],blue:['#4169e1','#1b2f8a'],red:['#e9735a','#8a2d1c'],black:['#2b2b2b','#000']};
+  var h='<line x1="'+L+'" y1="'+T+'" x2="'+L+'" y2="'+(H-B)+'" stroke="#000" stroke-width="2.5"/><line x1="'+(L-1)+'" y1="'+(H-B)+'" x2="'+(W-R)+'" y2="'+(H-B)+'" stroke="#000" stroke-width="2.5"/>';
+  for(var yv=0;yv<=10;yv++){h+='<line x1="'+(L-6)+'" y1="'+py(yv)+'" x2="'+L+'" y2="'+py(yv)+'" stroke="#000" stroke-width="1.5"/><text x="'+(L-10)+'" y="'+(py(yv)+5)+'" text-anchor="end" style="font-size:15px;fill:#000">'+yv+'</text>';}
+  var y1=new Date(xmax).getUTCFullYear();
+  for(var y=2010;y<=y1;y+=5){var t=Date.UTC(y,0,1);h+='<line x1="'+px(t)+'" y1="'+(H-B)+'" x2="'+px(t)+'" y2="'+(H-B+6)+'" stroke="#000" stroke-width="1.5"/><text x="'+px(t)+'" y="'+(H-B+24)+'" text-anchor="middle" style="font-size:15px;fill:#000">'+y+'</text>';}
+  h+='<text x="110" y="40" style="font-size:15px;fill:#000">Legend</text>';
+  [['green','Acceleration',70],['blue','Inflection time',250],['red','Deceleration',430],['black','Deactivation',610]].forEach(function(e){
+    h+='<text x="'+e[2]+'" y="66" style="font-size:15px;fill:#000">'+e[1]+'</text><circle cx="'+(e[2]+9)+'" cy="84" r="7" fill="'+F[e[0]][0]+'" stroke="#000" stroke-width="1"/>';});
+  var multi=series.length>1;
+  series.forEach(function(S){var pts=S.pts,lc=S.line||'#9a9a9a';
+    h+='<polyline fill="none" stroke="'+lc+'" stroke-width="'+(multi?1.6:0.8)+'" points="'+pts.map(function(p){return px(p.x)+','+py(p.y);}).join(' ')+'"/>';
+    pts.forEach(function(p){var r=6+17*Math.sqrt(p.o/omax);h+='<circle cx="'+px(p.x)+'" cy="'+py(p.y)+'" r="'+r.toFixed(1)+'" fill="'+F[p.c][0]+'" fill-opacity="0.32" stroke="'+(multi?lc:F[p.c][1])+'" stroke-opacity="0.75" stroke-width="'+(multi?1.4:0.9)+'"><title>'+(S.name||'')+' · snapshot '+fd(p.s)+', x₀ '+fd(p.x)+'</title></circle>';});
+    (S.folds||[]).forEach(function(f){var a=pts[f.i-1],b=pts[f.i];h+='<line x1="'+px(a.x)+'" y1="'+py(a.y)+'" x2="'+px(b.x)+'" y2="'+py(b.y)+'" stroke="'+(f.post?'#534AB7':'#1D9E75')+'" stroke-width="4" stroke-linecap="round"/>';});
+    if(multi&&pts.length){var q=pts[pts.length-1];h+='<text x="'+(px(q.x)+10)+'" y="'+(py(q.y)-8)+'" style="font-size:14px;font-weight:700;fill:'+lc+'">'+(S.name||'')+'</text>';}
+  });
+  svg.setAttribute('viewBox','0 0 '+W+' '+H);svg.innerHTML=h;
+}
+
+var PH={green:'Acceleration',blue:'Inflection',red:'Deceleration',black:'Deactivated'},LC=['#c0392b','#2b4fa0','#1a8a63','#b8860b','#7a3e9d','#00838f'];
+var CSVROWS=null,SER=[],active=null,MINE=[],STATE=null;
+function $(id){return document.getElementById(id);}
+function settings(){var s=$('sM').value.split('-'),e=$('eM').value.split('-'),f=+$('fq').value;
+  if(s.length<2||e.length<2)return null;return {sy:+s[0],sm:+s[1],ey:+e[0],em:+e[1],f:f};}
+function skey(s){return s.sy+'-'+s.sm+'_'+s.ey+'-'+s.em+'_'+s.f;}
+function isPaper(s){return s&&skey(s)==='2007-1_2023-7_6';}
+function gridFor(s){return buildGrid(s.sy,s.sm,s.ey,s.em,s.f);}
+function padN(s){return Math.round(810/s.f);} // 135 half-year windows = 810 months of padded time
+function syncSettings(){
+  var s=settings(),n=$('setNote'),ok=s&&gridFor(s).length>=4;
+  if(!ok){n.className='err';n.textContent='The period must span at least four windows.';return false;}
+  n.className='note';n.textContent=gridFor(s).length+' windows, first ending '+fd(gridFor(s)[0])+', last ending '+fd(gridFor(s)[gridFor(s).length-1])+'. '+(isPaper(s)?'These are the paper’s settings (half-yearly snapshots, 2007 to mid-2023).':'The paper uses 6 months from 2007-01 to 2023-07; other settings use the same method but are not checked against the paper’s point files.');
+  $('goPaper').disabled=!(isPaper(s)&&CSVROWS);$('paperNote').textContent=isPaper(s)?'':'Paper countries need the paper’s settings.';
+  return true;
+}
+function onSettings(){
+  var s=settings();if(!syncSettings())return;
+  if(STATE&&skey(s)!==STATE&&SER.length){SER=[];active=null;$('res').style.display='none';$('msg').className='note';$('msg').textContent='Settings changed: earlier lifepaths cleared.';}
+  STATE=skey(s);
+}
+['sM','eM','fq'].forEach(function(id){$(id).onchange=onSettings;});
+$('reset').onclick=function(){$('sM').value='2007-01';$('eM').value='2023-07';$('fq').value='6';onSettings();};
+function add(name,res,src,npub,n){
+  var s=settings();STATE=skey(s);
+  SER=SER.filter(function(e){return e.name!==name;});
+  SER.push({name:name,res:res,src:src,npub:npub,pts:res.pts,folds:res.folds,line:null});
+  SER.forEach(function(e,i){e.line=SER.length>1?LC[i%LC.length]:'#9a9a9a';});
+  active=name;render();
+}
+function render(){
+  $('res').style.display='block';
+  var A=SER.filter(function(e){return e.name===active;})[0]||SER[SER.length-1];if(!A)return;
+  $('act').innerHTML=SER.map(function(e){return '<option'+(e.name===A.name?' selected':'')+'>'+e.name+'</option>';}).join('');
+  $('title').textContent=SER.length===1?A.name+' · '+A.src:SER.length+' lifepaths on the same grid: '+SER.map(function(e){return e.name;}).join(', ');
+  var pts=A.pts,res=A.res,cnt={green:0,blue:0,red:0,black:0};pts.forEach(function(p){cnt[p.c]++;});
+  var F={green:'#639922',blue:'#4169e1',red:'#e9735a',black:'#2b2b2b'};
+  var post=res.folds.filter(function(f){return f.post;}).length;
+  $('chips').innerHTML=pts.length?'<div class="chip" style="--c:var(--teal)"><b>'+res.folds.length+'</b>fold'+(res.folds.length===1?'':'s')+', calendar rule</div><div class="chip" style="--c:var(--purple)"><b>'+post+'</b>post-convergence</div>'+['green','blue','red','black'].map(function(c){return '<div class="chip" style="--c:'+F[c]+'"><b>'+cnt[c]+'</b>'+PH[c].toLowerCase()+'</div>';}).join(''):'<span class="err">No fit possible: not enough publications.</span>';
+  drawLifepath($('plot'),SER.filter(function(e){return e.pts.length;}));
+  $('ctab').querySelector('tbody').innerHTML=SER.map(function(e){var l=e.pts[e.pts.length-1];return '<tr><td><span style="display:inline-block;width:14px;height:3px;background:'+(e.line||'#9a9a9a')+';vertical-align:middle;margin-right:6px"></span>'+e.name+'</td><td>'+e.pts.length+'</td><td>'+e.npub+'</td><td>'+e.folds.length+'</td><td>'+e.folds.filter(function(f){return f.post;}).length+'</td><td>'+(l?PH[l.c]:'n/a')+'</td></tr>';}).join('');
+  $('ftab').querySelector('tbody').innerHTML=res.folds.length?res.folds.map(function(f){return '<tr><td>'+fd(f.s)+'</td><td>'+fd(f.x0d)+'</td><td>'+fd(f.x1d)+'</td><td><b>'+Math.round(f.back)+' days</b></td><td>'+PH[f.phase]+'</td><td>'+(f.post?'yes':'no')+'</td><td>'+(f.holds===null?'n/a':(f.holds?'yes':'no'))+'</td></tr>';}).join(''):'<tr><td colspan="7">No backward move of more than 183 days.</td></tr>';
+}
+$('act').onchange=function(){active=this.value;render();};
+$('clr').onclick=function(){SER=[];active=null;$('res').style.display='none';};
+function runOwn(){
+  var m=$('msg');m.className='note';m.textContent='';
+  if(!syncSettings())return;var s=settings(),grid=gridFor(s);
+  var p=parseInput($('inp').value);
+  if(p.ev.length<5){m.className='err';m.textContent='Need at least 5 publications.';return;}
+  var b=binToGrid(p.ev,grid),name=$('nm').value.trim()||'My example';
+  $('goOwn').disabled=true;m.textContent='Fitting '+grid.length+' windows…';
+  setTimeout(function(){
+    var res=lifepath(grid,b.counts,padN(s));
+    var tot=b.counts.reduce(function(a,c){return a+c;},0);
+    m.textContent=tot+' publications in '+grid.length+' windows'+(b.dropped?', '+b.dropped+' after the last window ignored':'')+(p.bad?', '+p.bad+' line(s) skipped':'')+'.';
+    $('goOwn').disabled=false;add(name,res,'your series',tot);
+    MINE=MINE.filter(function(e){return e.name!==name;});MINE.push({name:name,text:$('inp').value});
+    try{localStorage.setItem('cf_mine',JSON.stringify(MINE));}catch(e){}
+    renderMine();
+  },20);
+}
+function renderMine(){
+  $('mine').innerHTML=MINE.length?'<span class="note" style="border:0;background:none;cursor:default">Your examples in this browser (click to add again under the current settings):</span>':'';
+  MINE.forEach(function(e){var s=document.createElement('span');s.textContent=e.name;s.onclick=function(){$('nm').value=e.name;$('inp').value=e.text;runOwn();};$('mine').appendChild(s);});
+}
+function csvRows(t){var L=t.trim().split(/\r?\n/),h=L[0].split(',');return {head:h,rows:L.slice(1).map(function(l){return l.split(',');})};}
+function runPaper(){
+  var s=settings();if(!CSVROWS||!isPaper(s))return;var name=$('paperSel').value,ci=CSVROWS.head.indexOf(name);
+  var dates=[],counts=[];CSVROWS.rows.forEach(function(r){var m=/^(\d{4})-(\d{2})-(\d{2})/.exec(r[0]);dates.push(Date.UTC(+m[1],+m[2]-1,+m[3]));counts.push(parseFloat(r[ci])||0);});
+  $('goPaper').disabled=true;
+  setTimeout(function(){var res=lifepath(dates,counts,135);$('goPaper').disabled=false;add(name,res,'paper data',counts.reduce(function(a,c){return a+c;},0));},20);
+}
+$('goOwn').onclick=runOwn;$('goPaper').onclick=runPaper;
+$('demo').onclick=function(){
+  var s=[],yrs=[2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022],n=[2,3,5,8,12,18,25,30,34,36,35,33,30,28];
+  yrs.forEach(function(y,i){for(var k=0;k<n[i];k++){s.push(y+'-'+String(1+(k*5)%12).padStart(2,'0')+'-'+String(1+(k*7)%28).padStart(2,'0'));}});
+  $('inp').value=s.join('\n');$('nm').value='Demo: growth then plateau';
+};
+$('dl').onclick=function(){
+  var A=SER.filter(function(e){return e.name===active;})[0];if(!A)return;var rows=['snapshot,x0_date,x0_normalised,log_k,A,phase,cumulative_publications'];
+  A.pts.forEach(function(p){rows.push([fd(p.s),fd(p.x),p.x0.toFixed(4),p.y.toFixed(4),p.A.toFixed(4),PH[p.c],p.cum].join(','));});
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([rows.join('\n')],{type:'text/csv'}));a.download=(A.name||'lifepath').replace(/[^\w-]+/g,'_')+'_points.csv';a.click();
+};
+try{MINE=JSON.parse(localStorage.getItem('cf_mine')||'[]');}catch(e){MINE=[];}renderMine();
+syncSettings();STATE=skey(settings());
+fetch('package/pivoted_data_states_final.csv').then(function(r){return r.text();}).then(function(t){
+  CSVROWS=csvRows(t);var names=CSVROWS.head.slice(1).filter(function(n){return n!=='all';});
+  $('paperSel').innerHTML=names.map(function(n){return '<option>'+n+'</option>';}).join('');$('paperSel').value=names.indexOf('France')>=0?'France':names[0];syncSettings();
+}).catch(function(){$('paperSel').innerHTML='<option>(open from the site)</option>';$('goPaper').disabled=true;});
+</script>
+</body>
+</html>
