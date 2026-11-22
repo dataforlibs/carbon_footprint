@@ -31,6 +31,7 @@
     ['Author sensitivity', 'author_pipeline/author_sensitivity_dashboard.html'],
     ['Sensitivity analysis', 'lifepaths/sensitivity_dashboard.html'],
     ['Time folds', 'time_folds.html'],
+    ['Draw a lifepath', 'lifepath_builder.html'],
     ['Code &amp; data', 'https://github.com/dataforlibs/carbon_footprint/tree/main/package']
   ];
   var css = '.cfnav{position:relative;z-index:50;background:linear-gradient(to right,#3174f4,#3cb1fb);color:#fff;font:14px/1.3 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;box-shadow:0 2px 6px rgba(0,0,0,.15)}' +
