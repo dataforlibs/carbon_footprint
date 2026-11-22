@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Time folds · companion site to the QSS paper</title>
+<meta name="description" content="What a time fold is, the three ways of counting one, and an interactive view of every country's folds.">
+<style>
+:root{--ink:#1d2433;--mut:#5d6778;--line:#dfe3dc;--bg:#f6f7f4;--blue:#2b4fa0;--acc:#3174f4;--teal:#1D9E75;--purple:#534AB7;--coral:#D85A30}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1000px;margin:0 auto;padding:0 20px}
+.hero{background:#fff;border-bottom:1px solid var(--line)}
+.hero .wrap{padding:36px 20px 30px}
+.eyebrow{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--acc);font-weight:700}
+h1{margin:6px 0 12px;font-size:clamp(26px,4vw,36px);line-height:1.15;font-weight:780}
+.lead{font-size:18px;color:#2f3a4d;max-width:780px;margin:0}
+main .wrap{padding-top:6px;padding-bottom:50px}
+h2{font-size:22px;margin:34px 0 10px;font-weight:740}
+p{margin:0 0 12px;max-width:780px}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px;margin-top:10px}
+.rule{background:#fff;border:1px solid var(--line);border-top:4px solid var(--c);border-radius:10px;padding:14px 16px}
+.rule b{display:block;font-size:16px;margin-bottom:4px}
+.rule .u{font-size:13.5px;color:var(--mut);margin-top:8px}
+table{border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:8px;font-size:14.5px;width:100%;max-width:880px}
+th,td{padding:8px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:#f0f3f8;font-weight:700}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center;margin-bottom:10px}
+.ctl select{font:inherit;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.chip{border:1px solid var(--line);border-left:4px solid var(--c);border-radius:6px;padding:6px 10px;background:#fff;font-size:14px}
+.chip b{font-size:18px;margin-right:4px}
+.leg{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--mut);margin:6px 0}
+.leg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+#plot{width:100%;height:auto;display:block}
+#plot text{font:12px Inter,ui-sans-serif,system-ui,sans-serif;fill:#5d6778}
+.note{font-size:14px;color:var(--mut);max-width:780px}
+code{background:#eef1f6;border-radius:4px;padding:1px 5px;font-size:13.5px}
+table.f td.y{font-weight:700}
+footer{border-top:1px solid var(--line);color:var(--mut);font-size:13px;padding:18px 0 30px}
+</style>
+<script src="nav.js" defer></script>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Companion site to the paper</div>
+  <h1>Time folds</h1>
+  <p class="lead">A fold is a refit that moves a lifepath backward: the newest data say the fastest growth happened <em>earlier</em> than the previous fit had projected. This page explains how we count folds, and shows every country's folds.</p>
+</div></header>
+
+<main><div class="wrap">
+
+<h2>What a fold looks like</h2>
+<p>Each refit of the sigmoid curve gives a projected inflection date x₀. Following x₀ from snapshot to snapshot, the lifepath normally moves to the right: either the inflection is pushed further into the future during acceleration, or it stays about where it is. A <b>fold</b> is a step to the left, from one snapshot to the next.</p>
+
+<h2>Three ways to count a fold</h2>
+<p>The same x₀ series can be counted three ways. The paper uses the first two; they answer different questions, so their counts differ.</p>
+<div class="rules">
+  <div class="rule" style="--c:var(--teal)"><b>Calendar rule</b>x₀ moves back by more than 183 days (about six months) between consecutive snapshots, in any phase.
+    <div class="u">Used in Section 4.3.5: 60 folds in 46 of 114 countries, and 721 folds across 624 of 7,960 authors.</div></div>
+  <div class="rule" style="--c:var(--purple)"><b>Post-convergence rule</b>The same kind of backward move, but only when x₀ already lies within the observation window in both snapshots, so the fit has converged.
+    <div class="u">Used in Section 4.2.5 and the sensitivity dashboards: no such folds in the padded country runs.</div></div>
+  <div class="rule" style="--c:var(--coral)"><b>Persistence rule</b>A calendar-rule fold that also holds: x₀ stays earlier than its pre-fold value in later snapshots, so it is not a blip.
+    <div class="u">The wording in Section 3.2.3. The reported counts do not apply this extra condition.</div></div>
+</div>
+<p style="margin-top:14px">Most folds in the point files happen while a lifepath is still accelerating, when x₀ lies beyond the data. The post-convergence rule excludes those by design, which is why "zero post-convergence folds" (Section 4.2.5) and "60 folds in 46 countries" (Section 4.3.5) are both true.</p>
+
+<h2>Explore a country</h2>
+<div class="card">
+  <div class="ctl"><label for="sel"><b>Country</b></label><select id="sel"></select>
+    <label><input type="checkbox" id="onlyf"> only countries with a fold</label></div>
+  <div class="chips" id="chips"></div>
+  <div class="leg"><span><i style="background:#639922"></i>Acceleration</span><span><i style="background:#378ADD"></i>Inflection</span><span><i style="background:#E24B4A"></i>Deceleration</span><span><i style="background:#111"></i>Deactivated</span><span><i style="background:var(--teal);border-radius:2px;width:16px;height:4px"></i>Fold, calendar rule</span><span><i style="background:var(--purple);border-radius:2px;width:16px;height:4px"></i>Also post-convergence</span></div>
+  <svg id="plot" viewBox="0 0 900 380" role="img" aria-label="Lifepath of the selected country with its folds marked"></svg>
+  <table class="f" id="ftab"><thead><tr><th>Snapshot</th><th>x₀ before</th><th>x₀ after</th><th>Move back</th><th>Phase after</th><th>Post-convergence</th><th>Holds next window</th></tr></thead><tbody></tbody></table>
+  <p class="note" style="margin-top:10px">Each dot is one half-yearly snapshot, placed at its projected inflection date (x) and log-slope (y), joined in time order. Folds are computed here from the same point file used in the paper, with the rule above. In this view, "post-convergence" means x₀ is not later than the snapshot date in either of the two snapshots; the dashboards apply the same idea on a normalised window axis. "Holds next window" is a single-window check of the persistence idea and is shown for illustration only.</p>
+</div>
+<p class="note" id="tot" style="margin-top:12px"></p>
+
+<h2>Reproduce the counts</h2>
+<p>The script <a href="lifepaths/recount_folds.py"><code>recount_folds.py</code></a> recomputes the paper's numbers from the two point files. Run it in the folder that holds them:</p>
+<p><code>python3 recount_folds.py --dir lifepaths</code></p>
+
+<h2>Where the counts appear in the paper</h2>
+<table>
+<tr><th>Section</th><th>Rule</th><th>What is counted</th></tr>
+<tr><td>4.2.5 and the sensitivity dashboards</td><td>Post-convergence</td><td>Padded country runs: none. Unpadded six-month aggregation: 552 folds across 109 countries.</td></tr>
+<tr><td>4.3.5</td><td>Calendar</td><td>Countries: 60 folds, 46 countries (40.4%). Authors: 721 folds, 624 authors (7.8%). All author folds start in the acceleration phase.</td></tr>
+<tr><td>3.2.3</td><td>Persistence (wording)</td><td>Definition only; the counts above apply the calendar rule without the persistence condition.</td></tr>
+</table>
+
+</div></main>
+<footer><div class="wrap">Carbon Footprint Research Analysis · interactive companion to the paper.</div></footer>
+
+<script>
+(function(){
+var URL='lifepaths/all_years_shipped_to_final_saturation_final_circles3_Gore1_states.json';
+var COL={green:'#639922',blue:'#378ADD',red:'#E24B4A',black:'#111'};
+function pd(s){var a=s.split(' ')[0].split('-');return Date.UTC(+a[0],+a[1]-1,+a[2]);}
+function fd(t){var d=new Date(t);return d.toISOString().slice(0,10);}
+var DAY=86400000,data={},folds={};
+function analyse(name){
+  var pts=data[name].map(function(r){return {s:pd(r.yr),x:pd(r.x),y:r.y,c:r.color};}).sort(function(a,b){return a.s-b.s;});
+  var f=[];
+  for(var i=1;i<pts.length;i++){
+    var a=pts[i-1],b=pts[i],back=(a.x-b.x)/DAY;
+    if(back>183){
+      var nxt=pts[i+1];
+      f.push({i:i,s:b.s,x0:a.x,x1:b.x,back:back,phase:b.c,post:(a.x<=a.s&&b.x<=b.s),holds:nxt?nxt.x<a.x:null});
+    }
+  }
+  return {pts:pts,f:f};
+}
+function draw(name){
+  var A=folds[name],pts=A.pts,svg=document.getElementById('plot');
+  var W=900,H=380,L=56,R=20,T=16,B=40;
+  var xs=pts.map(function(p){return p.x;}),ys=pts.filter(function(p){return p.c!=='black';}).map(function(p){return p.y;});if(!ys.length)ys=pts.map(function(p){return p.y;});
+  var x0=Math.min.apply(null,xs),x1=Math.max.apply(null,xs),y0=Math.min.apply(null,ys),y1=Math.max.apply(null,ys);
+  var px=function(v){return L+(v-x0)/(x1-x0||1)*(W-L-R);},py=function(v){return T+Math.min(1.08,Math.max(-0.05,(v-y0)/(y1-y0||1)))*(H-T-B-24)+8;};
+  var h='<line x1="'+L+'" y1="'+(H-B)+'" x2="'+(W-R)+'" y2="'+(H-B)+'" stroke="#c9cfc6"/><line x1="'+L+'" y1="'+T+'" x2="'+L+'" y2="'+(H-B)+'" stroke="#c9cfc6"/>';
+  var yr0=new Date(x0).getUTCFullYear(),yr1=new Date(x1).getUTCFullYear(),step=Math.max(1,Math.ceil((yr1-yr0)/8));
+  for(var y=yr0;y<=yr1;y+=step){var t=Date.UTC(y,0,1);if(t<x0)continue;h+='<line x1="'+px(t)+'" y1="'+(H-B)+'" x2="'+px(t)+'" y2="'+(H-B+4)+'" stroke="#c9cfc6"/><text x="'+px(t)+'" y="'+(H-B+18)+'" text-anchor="middle">'+y+'</text>';}
+  h+='<text x="'+(L+4)+'" y="'+(T+8)+'">Log-slope (higher value lower; deactivated points are clamped to the bottom edge)</text><text x="'+((W+L)/2)+'" y="'+(H-6)+'" text-anchor="middle">Projected inflection date</text>';
+  h+='<polyline fill="none" stroke="#9aa3b2" stroke-width="1" points="'+pts.map(function(p){return px(p.x)+','+py(p.y);}).join(' ')+'"/>';
+  A.f.forEach(function(f){var a=pts[f.i-1],b=pts[f.i];h+='<line x1="'+px(a.x)+'" y1="'+py(a.y)+'" x2="'+px(b.x)+'" y2="'+py(b.y)+'" stroke="'+(f.post?'#534AB7':'#1D9E75')+'" stroke-width="4" stroke-linecap="round"/>';});
+  pts.forEach(function(p){h+='<circle cx="'+px(p.x)+'" cy="'+py(p.y)+'" r="4.5" fill="'+(COL[p.c]||'#888')+'"><title>Snapshot '+fd(p.s)+', x₀ '+fd(p.x)+'</title></circle>';});
+  svg.innerHTML=h;
+}
+function show(name){
+  var A=folds[name],n=A.f.length,post=A.f.filter(function(f){return f.post;}).length;
+  document.getElementById('chips').innerHTML=
+   '<div class="chip" style="--c:var(--teal)"><b>'+n+'</b>fold'+(n===1?'':'s')+', calendar rule</div>'+
+   '<div class="chip" style="--c:var(--purple)"><b>'+post+'</b>post-convergence</div>'+
+   '<div class="chip" style="--c:#9aa3b2"><b>'+A.pts.length+'</b>snapshots</div>';
+  var tb=document.querySelector('#ftab tbody');
+  tb.innerHTML=A.f.length?A.f.map(function(f){return '<tr><td>'+fd(f.s)+'</td><td>'+fd(f.x0)+'</td><td>'+fd(f.x1)+'</td><td class="y">'+Math.round(f.back)+' days</td><td>'+({green:'Acceleration',blue:'Inflection',red:'Deceleration',black:'Deactivated'}[f.phase]||f.phase)+'</td><td>'+(f.post?'yes':'no')+'</td><td>'+(f.holds===null?'n/a':(f.holds?'yes':'no'))+'</td></tr>';}).join(''):'<tr><td colspan="7">No backward move of more than 183 days.</td></tr>';
+  draw(name);
+}
+function fill(only){
+  var s=document.getElementById('sel'),cur=s.value;
+  var names=Object.keys(folds).sort().filter(function(n){return !only||folds[n].f.length;});
+  s.innerHTML=names.map(function(n){return '<option>'+n+'</option>';}).join('');
+  s.value=names.indexOf(cur)>=0?cur:(names.indexOf('France')>=0?'France':names[0]);
+  show(s.value);
+}
+fetch(URL).then(function(r){return r.json();}).then(function(d){
+  data=d;var tf=0,tc=0,tp=0;
+  Object.keys(d).forEach(function(n){folds[n]=analyse(n);var k=folds[n].f.length;tf+=k;tc+=k>0;tp+=folds[n].f.filter(function(f){return f.post;}).length;});
+  document.getElementById('tot').textContent='All '+Object.keys(d).length+' countries: '+tf+' folds in '+tc+' countries on the calendar rule; '+tp+' of them post-convergence.';
+  fill(false);
+  document.getElementById('sel').onchange=function(){show(this.value);};
+  document.getElementById('onlyf').onchange=function(){fill(this.checked);};
+}).catch(function(){document.getElementById('plot').outerHTML='<p class="note">Could not load the point file. Open this page from the site, not from a local file.</p>';});
+})();
+</script>
+</body>
+</html>
